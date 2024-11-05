@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armaan Gomes - clEar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="projects.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <header>
+    <nav>
+      <div class="nav-container">
+        <div class="nav-left">
+          <!-- <img src="path/to/your/image.png" alt="Logo" class="nav-logo"> -->
+          <a href="\#" class="nav-title">Armaan Gomes</a>
+        </div>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <!-- <li><a href="#photos">Photos</a></li> -->
+          <li><a href="https://github.com/arghunter">GitHub</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+    <section class="project-details">
+        <h1 id="title">clEar</h1> 
+        <img src="clEarv4.jpg" alt="clEar Project Image" class="project-image" id="title-image"> 
+        <div class="markdown-wrapper">
+            <div id="markdown-content"></div> 
+        </div>
+        <a href="index.html" class="btn">Back to Projects</a>
+    </section>
+    
+
+    <script>
+        fetch('clEar.md') 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(markdown => {
+                const htmlContent = marked.parse(markdown);
+                document.getElementById('markdown-content').innerHTML = htmlContent;
+            })
+            .catch(error => {
+                console.error('Error fetching Markdown:', error);
+                document.getElementById('markdown-content').innerHTML = '<p>Failed to load content.</p>';
+            });
+    </script>
+</body>
+</html>

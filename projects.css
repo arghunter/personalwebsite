@@ -1,0 +1,63 @@
+
+header {
+    /* Assuming a fixed position for the navbar */
+    position: fixed; /* or sticky if that's how you want it */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Adjust to the actual height of your navbar */
+    background-color: white; /* Change as needed */
+    z-index: 1000; /* Ensure it's on top */
+    
+}
+
+body {
+    padding-top: 60px; /* This should match the height of the navbar */
+    color: #585ab3;
+    font-size: 20px;
+}
+
+section {
+    padding: 20px; /* Add some padding for visual spacing in sections */
+}
+.project-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the items horizontally */
+    padding: 20px; /* Add some padding around */
+}
+
+.markdown-wrapper {
+    width: 48%; /* Restrict width to 50% */
+    max-width: 800px; /* Optional: Set a maximum width */
+    margin: 0 auto; /* Center the wrapper */
+    background-color: #f9f9f9; /* Optional: Add a background color */
+    padding: 20px; /* Add padding inside the wrapper */
+    border-radius: 8px; /* Optional: Add some rounding */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
+    line-height: 150%;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #1c3d72;
+}
+#title-image{
+    width: 40%;
+}
+img {
+    flex: 1; /* Allow the image to take available space */
+    height: auto;
+    width:98%;
+    display: block;
+    margin: 0 auto;
+    border-radius: 3%;
+}
+
+
+#markdown-content {
+    overflow: hidden; /* Prevent overflow if necessary */
+}
+#title{
+    font-size: 48px;
+    color: #1c3d72;
+}
+

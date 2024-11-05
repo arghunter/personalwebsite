@@ -1,0 +1,348 @@
+/* styles.css */
+html {
+    scroll-behavior: smooth; /* Enable smooth scrolling for the entire document */
+}
+
+body {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+  }
+  
+  header {
+    background-color: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  nav {
+    background-color: #f9f9f9; /* Optional: Set a background color for visibility */
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Center vertically */
+    padding: 1rem; /* Add some padding */
+    max-width: 1200px; /* Set a max width */
+    margin: 0 auto; /* Center the nav container */
+}
+
+.nav-left {
+    display: flex;
+    align-items: center; /* Center vertically */
+}
+
+.nav-logo {
+    height: 40px; /* Set a height for the logo */
+    margin-right: 10px; /* Space between the logo and title */
+}
+
+.nav-title {
+    font-size: 1.5rem; /* Adjust as necessary */
+    font-weight: 600;
+    color: #333; /* Match regular text color */
+    text-decoration: none; /* Remove underline */
+}
+
+.nav-title:hover {
+    color: #333; /* Optional: Keep the color the same on hover to make it look like normal text */
+}
+
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end; /* Align the links to the right */
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 2rem; /* Space between the links */
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333; /* Adjust color as necessary */
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+  
+
+  /*url('https://images.unsplash.com/photo-1553356084-58ef4a67b2a7?ixid=M3w5MTMyMXwwfDF8c2VhcmNofDI0fHxhYnN0cmFjdHxlbnwwfHx8fDE3MTMyODU4OTZ8MA&amp;ixlib=rb-4.0.3&amp;w=1500')*/
+  .hero {
+    position: relative;
+    height: 40vh; /* Adjust to fit the desired height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #333;
+    /* font-family: Arial, sans-serif; */
+    overflow: hidden;
+  }
+  
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://images.unsplash.com/photo-1553356084-58ef4a67b2a7?ixid=M3w5MTMyMXwwfDF8c2VhcmNofDI0fHxhYnN0cmFjdHxlbnwwfHx8fDE3MTMyODU4OTZ8MA&amp;ixlib=rb-4.0.3&amp;w=1500'); /* Replace with your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+  }
+  
+  .hero-background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7); /* Light white overlay */
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2; /* Ensures content is above the background and overlay */
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem; /* Adjust font size as needed */
+    margin: 0;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .hero-buttons {
+    margin-top: 1.5rem;
+  }
+  
+  .hero-buttons .btn {
+    background: none;
+    border: 1px solid #585ab3;
+    
+    color: #585ab3;
+    padding: 0.5rem 1.2rem;
+    border-radius: 1rem;
+    text-decoration: none;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s ease;
+  }
+  #hero-action-btn{
+    background-color: #1c3d72;
+    color: #fff;
+  }
+  #hero-action-btn:hover{
+    background-color: #585ab3;
+  }
+  .hero-buttons .btn:hover {
+    background-color: #585ab3;
+    color: #fff;
+  }
+  
+  
+  
+  
+  .about {
+    /* background-color: rgba(0, 0, 0, 0.05); */
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .about h2 {
+    font-size: 2.5rem;
+    color: #1c3d72;
+    text-align: center; 
+  }
+  
+  .about-content {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Align items vertically center */
+    gap: 20px; /* Space between image and text */
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.profile-pic {
+    flex: 1; /* Allow the image to take available space */
+    max-width: 200px; /* Set a max width for the image */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%;
+    zoom: 180%;
+}
+
+.about-stats {
+    display: flex; /* Use flexbox for the stats layout */
+    gap: 20px; /* Space between the stats */
+}
+
+.about-stats div {
+    flex: 1; /* Each stat takes equal space */
+    text-align: center; /* Center text */
+}
+
+  
+  .projects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .project {
+    flex: 1 1 45%;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+  
+  .project h3 {
+    font-size: 1.5rem;
+    color: #1c3d72;
+  }
+  
+  .project p {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .gallery {
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .gallery h2 {
+    font-size: 2.5rem;
+    color: #1c3d72;
+  }
+  
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .gallery img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    background-color: #1c3d72;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .btn.secondary {
+    background-color: #536dfe;
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      padding: 6rem 1rem;
+    }
+    
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+  
+    .about-content, .projects {
+      flex-direction: column;
+    }
+  }
+  
+
+  #project-header {
+    font-size: 2.5rem;
+    color: #1c3d72;
+    text-align: center; 
+  }
+
+  .awards-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .awards-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .awards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .award-category {
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .award-category h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    /* color: #007BFF; */
+  }
+
+  .award-category ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .award-category li {
+    margin-bottom: 5px;
+  }
+
+  .extra-category {
+    grid-column: span 2;
+  }
+  #resume {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    width:10%;
+    margin-left:45%;
+  }
+  
