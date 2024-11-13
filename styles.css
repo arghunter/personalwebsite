@@ -10,6 +10,8 @@ body {
     background-color: #f8f9fa;
     color: #333;
   }
+
+
   
   header {
     background-color: #fff;
@@ -85,6 +87,7 @@ nav ul li a {
     justify-content: center;
     text-align: center;
     color: #333;
+    padding-top: 8rem;
     /* font-family: Arial, sans-serif; */
     overflow: hidden;
   }
