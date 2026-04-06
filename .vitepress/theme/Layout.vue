@@ -46,6 +46,7 @@ function playHeadline() {
 	</nav>
 
 	<img class="hero-image" src="/agi-hero.svg" draggable="false" />
+	<span class="hero-inc">Armaan Gomes, Inc.</span>
 
 	<button class="theme-toggle" @click="toggleTheme" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
 		<span class="theme-toggle-thumb">{{ isDark ? '☀' : '☾' }}</span>

@@ -716,6 +716,20 @@ blockquote {
     letter-spacing: 0.1rem;
 }
 
+.hero-inc {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 2rem;
+    font-family: 'jgs7', Arial, Helvetica;
+    font-size: 1.4rem;
+    letter-spacing: 0.2rem;
+    opacity: 0.25;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    color: var(--accent);
+}
+
 .hero-text {
     font-size: 35px;
     color: var(--primary-lt);
