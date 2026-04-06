@@ -4,6 +4,13 @@ import { computed, ref, onMounted } from 'vue'
 import Intro from './components/Intro.vue'
 import MusicPlayer from './components/MusicPlayer.vue'
 import WordCycle from './components/WordCycle.vue'
+import VimIndicator from './components/VimIndicator.vue'
+import { useIncWord, rerollIncWord } from './useIncWord'
+import { useVimKeys } from './useVimKeys'
+
+useVimKeys()
+
+const incWord = useIncWord()
 
 const { frontmatter, page } = useData()
 
@@ -42,11 +49,12 @@ function playHeadline() {
 		<div class="nav-links">
 			<a href="/experience">{{ frontmatter.title === 'Experience' ? '>' : '' }}Experience</a>
 			<a href="/contact">{{ frontmatter.title === 'Contact' ? '>' : '' }}Contact</a>
+			<a href="/now">{{ frontmatter.title === 'Now' ? '>' : '' }}Now</a>
 		</div>
 	</nav>
 
 	<img class="hero-image" src="/agi-hero.svg" draggable="false" />
-	<span class="hero-inc">Armaan Gomes, Inc.</span>
+	<span class="hero-inc">Armaan Gomes, {{ incWord }} <button class="hero-inc-reroll" @click="rerollIncWord" aria-label="Reroll">↻</button></span>
 
 	<button class="theme-toggle" @click="toggleTheme" :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
 		<span class="theme-toggle-thumb">{{ isDark ? '☀' : '☾' }}</span>
@@ -83,6 +91,7 @@ function playHeadline() {
 	</div>
 
 	<MusicPlayer />
+	<VimIndicator />
 
 	<footer>
 		© 2026 <a href="https://github.com/arghunter" target="_blank">Armaan Gomes</a>

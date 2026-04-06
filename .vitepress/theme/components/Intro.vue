@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useIncWord } from '../useIncWord'
+
+const incWord = useIncWord()
 
 const visible = ref(true)
 
@@ -32,7 +35,7 @@ function onAfterLeave() {
       <div class="intro-content">
         <p class="intro-tagline">Brought to you by</p>
         <div class="intro-agi">AGI</div>
-        <p class="intro-name">Armaan Gomes, Inc.</p>
+        <p class="intro-name">Armaan Gomes, {{ incWord }}</p>
       </div>
 
     </div>
