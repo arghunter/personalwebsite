@@ -6,7 +6,7 @@ title: "Contact"
 
 ## How to Reach Me
 
-<a href="mailto:armaangomes@mit.edu">armaangomes@mit.edu</a> · <a href="tel:+16692909863">+1 (669) 290-9863</a> · Cambridge, MA
+<a href="mailto:armaangomes@mit.edu">armaangomes@mit.edu</a>  · Cambridge, MA
 
 <div style="height: 10px;"></div>
 

@@ -67,7 +67,7 @@ Custom accelerators for deep neural networks demonstrating PDM, Ternary, and INT
 </div>
 
 <div class="project-card">
-<div class="project-header"><h3>RV32-I Pipelined CPU</h3></div>
+<div class="project-header"><h3>RV32-IM Pipelined CPU</h3></div>
 
 Custom RISC-V CPU with pipelined design. Compiled and ran Pong over VGA.
 </div>
