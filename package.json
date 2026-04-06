@@ -1,0 +1,15 @@
+{
+	"type": "module",
+	"dependencies": {
+		"vue": "^3.5.27"
+	},
+	"devDependencies": {
+		"feed": "^5.2.0",
+		"vitepress": "^2.0.0-alpha.16"
+	},
+	"scripts": {
+		"dev": "vitepress dev",
+		"build": "vitepress build",
+		"preview": "vitepress preview"
+	}
+}
