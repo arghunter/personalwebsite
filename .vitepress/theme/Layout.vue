@@ -44,12 +44,15 @@ function playHeadline() {
 			<a href="/">{{ frontmatter.title === 'Home' ? '>' : '' }}Home</a>
 			<a href="/blog">{{ frontmatter.title === 'Blog' ? '>' : '' }}Blog</a>
 			<a href="/projects">{{ frontmatter.title === 'Projects' ? '>' : '' }}Projects</a>
+			<a href="/graph">{{ frontmatter.title === 'Graph' ? '>' : '' }}Graph</a>
 		</div>
 
 		<div class="nav-links">
+			<a href="/now">{{ frontmatter.title === 'Now' ? '>' : '' }}Now</a>
 			<a href="/experience">{{ frontmatter.title === 'Experience' ? '>' : '' }}Experience</a>
 			<a href="/contact">{{ frontmatter.title === 'Contact' ? '>' : '' }}Contact</a>
-			<a href="/now">{{ frontmatter.title === 'Now' ? '>' : '' }}Now</a>
+			
+			
 		</div>
 	</nav>
 
@@ -76,6 +79,10 @@ function playHeadline() {
 		<main>
 			<p>There's been a 404 error. Here let's go <a href="/">back home.</a></p>
 		</main>
+	</div>
+
+	<div v-else-if="frontmatter.fullWidth" class="full-width-page">
+		<Content />
 	</div>
 
 	<div v-else>

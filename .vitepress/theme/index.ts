@@ -9,11 +9,13 @@ import 'vitepress/dist/client/theme-default/styles/vars.css'
 import 'vitepress/dist/client/theme-default/styles/components/vp-code.css'
 
 import InlineImage from './components/InlineImage.vue'
+import GraphView from './components/GraphView.vue'
 
 export default {
 	Layout,
 
 	enhanceApp({ app, router, siteData }) {
 		app.component('InlineImage', InlineImage)
+		app.component('GraphView', GraphView)
 	},
 } satisfies Theme

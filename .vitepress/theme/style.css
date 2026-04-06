@@ -109,7 +109,7 @@ nav {
     padding: 1rem;
     position: sticky;
     top: 0px;
-    z-index: 2;
+    z-index: 10;
     justify-content: space-between;
     background: transparent;
     border-bottom: solid 1px transparent;
@@ -388,6 +388,11 @@ main {
     margin: 0;
     font-size: 0.9rem;
     opacity: 0.85;
+}
+
+/* ── Full-width pages ────────────────────────────────────── */
+.full-width-page {
+    display: contents;
 }
 
 /* ── Footer ──────────────────────────────────────────────── */
