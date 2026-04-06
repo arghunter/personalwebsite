@@ -398,6 +398,40 @@ footer {
     opacity: 0.35;
 }
 
+.friends-sep {
+    opacity: 0.3;
+    margin: 0 0.5rem;
+}
+
+.friends-label {
+    margin-right: 0.4rem;
+}
+
+.friends-marquee-wrap {
+    display: inline-block;
+    overflow: hidden;
+    width: 10rem;
+    vertical-align: bottom;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 80%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 80%, transparent);
+}
+
+.friends-marquee {
+    display: inline-flex;
+    gap: 0.6rem;
+    white-space: nowrap;
+    animation: marquee 10s linear infinite;
+}
+
+.friends-dot {
+    opacity: 0.3;
+}
+
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
 /* ── Code ────────────────────────────────────────────────── */
 div[class*="language-"] .lang,
 div[class*="language-"] button {

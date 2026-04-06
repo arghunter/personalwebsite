@@ -83,5 +83,21 @@ function playHeadline() {
 
 	<MusicPlayer />
 
-	<footer>© 2026 <a href="https://github.com/arghunter" target="_blank">Armaan Gomes</a></footer>
+	<footer>
+		© 2026 <a href="https://github.com/arghunter" target="_blank">Armaan Gomes</a>
+		<span class="friends-sep">|</span>
+		<span class="friends-label">Friendsites:</span>
+		<span class="friends-marquee-wrap">
+			<span class="friends-marquee">
+				<a href="https://www.outercloud.dev/" target="_blank">Outer Cloud</a>
+				<span class="friends-dot">·</span>
+				<a href="https://www.changchang.me/" target="_blank">Kevin Chang</a>
+				<span class="friends-dot">·</span>
+				<a href="https://www.outercloud.dev/" target="_blank">Outer Cloud</a>
+				<span class="friends-dot">·</span>
+				<a href="https://www.changchang.me/" target="_blank">Kevin Chang</a>
+				<span class="friends-dot">·</span>
+			</span>
+		</span>
+	</footer>
 </template>
