@@ -12,7 +12,7 @@ title: "Now"
 
 ## What I'm Learning
 
-- OOO Algorithms. Ditigal Analog Computing
+- OOO Algorithms. Digital Analog Computing
 
 <div style="height: 10px;"></div>
 
