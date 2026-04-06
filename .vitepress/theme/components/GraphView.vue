@@ -259,6 +259,7 @@ function toMM(wx: number, wy: number): [number, number] {
 }
 
 const mmViewport = computed(() => {
+  if (typeof window === 'undefined') return { x: 0, y: 0, w: MM_W, h: MM_H }
   const w = window.innerWidth, h = window.innerHeight - 56
   const wx1=(0-pan.value.x)/zoom.value, wy1=(0-pan.value.y)/zoom.value
   const wx2=(w-pan.value.x)/zoom.value, wy2=(h-pan.value.y)/zoom.value
