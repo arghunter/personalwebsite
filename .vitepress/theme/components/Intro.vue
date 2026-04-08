@@ -6,6 +6,8 @@ const incWord = useIncWord()
 
 const visible = ref(true)
 
+function skip() { visible.value = false }
+
 onMounted(() => {
   document.body.style.overflow = 'hidden'
   setTimeout(() => { visible.value = false }, 3000)
@@ -18,7 +20,7 @@ function onAfterLeave() {
 
 <template>
   <Transition name="intro-exit" @after-leave="onAfterLeave">
-    <div v-if="visible" class="intro-overlay">
+    <div v-if="visible" class="intro-overlay" @click="skip" style="cursor:pointer">
 
       <svg class="intro-circuit" viewBox="0 0 100 56" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <!-- left traces — timed with text -->
