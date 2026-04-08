@@ -388,14 +388,6 @@ onUnmounted(() => { recognition?.stop() })
 
     </div><!-- /sd-grid -->
 
-    <!-- Mobile tab bar ─────────────────────────────────────────────────────────── -->
-    <nav class="sd-tabbar">
-      <button v-for="t in tabs" :key="t.id" :class="['sd-tab', { active: tab === t.id }]" @click="switchTab(t.id)">
-        <span class="sd-tab-icon">{{ t.icon }}</span>
-        <span class="sd-tab-lbl">{{ t.label }}</span>
-      </button>
-    </nav>
-
     <!-- Mobile panels ──────────────────────────────────────────────────────────── -->
     <div class="sd-mobile">
       <div class="sd-mobile-hd">
@@ -495,6 +487,14 @@ onUnmounted(() => { recognition?.stop() })
         </div>
       </div>
     </div><!-- /sd-mobile -->
+
+    <!-- Mobile tab bar — after content so flex order works ─────────────────────── -->
+    <nav class="sd-tabbar">
+      <button v-for="t in tabs" :key="t.id" :class="['sd-tab', { active: tab === t.id }]" @click="switchTab(t.id)">
+        <span class="sd-tab-icon">{{ t.icon }}</span>
+        <span class="sd-tab-lbl">{{ t.label }}</span>
+      </button>
+    </nav>
 
   </div><!-- /sd-wrap -->
 </template>
@@ -705,21 +705,41 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-music-body { padding: 0; }
 .sd-music-body :deep(.sp) { max-width: none; margin: 0; }
 
-/* ── Mobile ──────────────────────────────────────────────────────────────────── */
+/* ── Mobile base (shown below 768px) ─────────────────────────────────────────── */
 .sd-grid { display: none; }
-.sd-wrap { position: relative; }
+
+/* sd-wrap becomes a flex column that fills the viewport on mobile */
+.sd-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--vp-nav-height, 64px));
+  overflow: hidden;
+}
+
+.sd-mobile {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--vp-c-bg);
+}
 
 .sd-mobile-hd {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0.65rem 1rem; border-bottom: 1px solid var(--vp-c-divider);
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  position: sticky; top: 0; z-index: 10;
 }
 .sd-mobile-panel { padding: 1rem 1rem 1.5rem; }
 .sd-mobile-panel :deep(.sp) { max-width: none; margin: 0; }
 
+/* Tab bar sits at the bottom of the flex column — no fixed positioning needed */
 .sd-tabbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; background: var(--vp-c-bg); border-top: 1px solid var(--vp-c-divider);
-  z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0);
+  flex-shrink: 0;
+  display: flex;
+  background: var(--vp-c-bg);
+  border-top: 1px solid var(--vp-c-divider);
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .sd-tab {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
@@ -732,7 +752,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 
 /* ── Desktop ─────────────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
-  .sd-wrap { max-width: 72rem; margin: 1.5rem auto; padding: 0 1.25rem 2rem; }
+  .sd-wrap { display: block; height: auto; overflow: visible; max-width: 72rem; margin: 1.5rem auto; padding: 0 1.25rem 2rem; }
 
   .sd-grid {
     display: grid;
