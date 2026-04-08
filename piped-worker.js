@@ -6,7 +6,7 @@
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
 }
 
@@ -283,6 +283,77 @@ export default {
           const list = await kvGet(env, 'notes')
           await kvSet(env, 'notes', list.filter(i => i.id !== p2))
           return ok({ ok: true })
+        }
+      }
+
+      // Playlists
+      if (p1 === 'playlists') {
+        const sub = parts[3]   // 'tracks' or undefined
+        const tid = parts[4]   // track tid or undefined
+
+        // GET /api/playlists
+        if (!p2 && request.method === 'GET') return ok(await kvGet(env, 'playlists'))
+
+        // PUT /api/playlists — replace all (used for first-time seed from client)
+        if (!p2 && request.method === 'PUT') {
+          const body = await request.json()
+          if (!Array.isArray(body)) return err('expected array')
+          await kvSet(env, 'playlists', body)
+          return ok({ ok: true })
+        }
+
+        // POST /api/playlists — create playlist
+        if (!p2 && request.method === 'POST') {
+          const { name } = await request.json()
+          if (!name?.trim()) return err('name required')
+          const item = { id: genSlug(), name: name.trim(), tracks: [] }
+          const pls = await kvGet(env, 'playlists'); pls.push(item)
+          await kvSet(env, 'playlists', pls)
+          return ok(item, 201)
+        }
+
+        if (p2) {
+          const pls = await kvGet(env, 'playlists')
+          const plIdx = pls.findIndex(p => p.id === p2)
+          if (plIdx === -1) return err('playlist not found', 404)
+
+          // PATCH /api/playlists/:id — rename
+          if (!sub && request.method === 'PATCH') {
+            const { name } = await request.json()
+            if (name?.trim()) pls[plIdx].name = name.trim()
+            await kvSet(env, 'playlists', pls)
+            return ok({ ok: true })
+          }
+
+          // DELETE /api/playlists/:id
+          if (!sub && request.method === 'DELETE') {
+            pls.splice(plIdx, 1)
+            await kvSet(env, 'playlists', pls)
+            return ok({ ok: true })
+          }
+
+          // POST /api/playlists/:id/tracks — add track
+          if (sub === 'tracks' && !tid && request.method === 'POST') {
+            const body = await request.json()
+            if (!body.title?.trim()) return err('title required')
+            const track = {
+              tid: genSlug(),
+              ...(body.id && { id: body.id }),
+              title: body.title.trim(),
+              artist: body.artist?.trim() || '',
+              ...(body.url && { url: body.url }),
+            }
+            pls[plIdx].tracks.push(track)
+            await kvSet(env, 'playlists', pls)
+            return ok(track, 201)
+          }
+
+          // DELETE /api/playlists/:id/tracks/:tid
+          if (sub === 'tracks' && tid && request.method === 'DELETE') {
+            pls[plIdx].tracks = pls[plIdx].tracks.filter(t => t.tid !== tid)
+            await kvSet(env, 'playlists', pls)
+            return ok({ ok: true })
+          }
         }
       }
 
