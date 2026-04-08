@@ -79,6 +79,37 @@ function parseRSSAtom(xml) {
   return items
 }
 
+// ── Catbox upload ─────────────────────────────────────────────────────────────
+
+async function uploadToCatbox(audioUrl) {
+  const form = new FormData()
+  form.append('reqtype', 'urlupload')
+  form.append('url', audioUrl)
+  const res = await fetch('https://catbox.moe/user/api.php', {
+    method: 'POST',
+    body: form,
+    signal: AbortSignal.timeout(120000),
+  })
+  const text = await res.text()
+  if (!text.startsWith('https://')) throw new Error(`catbox: ${text.slice(0, 120)}`)
+  return text.trim()
+}
+
+async function getBestAudioUrl(videoId) {
+  try {
+    const r = await fromCobalt(videoId)
+    if (r.audioStreams?.[0]?.url) return r.audioStreams[0].url
+  } catch {}
+  const fallbacks = [
+    ...PIPED_INSTANCES.map(b => tryPiped(b, videoId)),
+    ...INVIDIOUS_INSTANCES.map(b => tryInvidious(b, videoId)),
+  ]
+  const result = await Promise.any(fallbacks)
+  const best = result.audioStreams.sort((a, b) => b.bitrate - a.bitrate)[0]
+  if (!best?.url) throw new Error('no stream url found')
+  return best.url
+}
+
 // ── Piped sources ─────────────────────────────────────────────────────────────
 
 async function fromCobalt(videoId) {
@@ -386,12 +417,42 @@ export default {
             return ok(track, 201)
           }
 
+          // PATCH /api/playlists/:id/tracks/:tid — update track fields (e.g. url after catbox upload)
+          if (sub === 'tracks' && tid && request.method === 'PATCH') {
+            const patch = await request.json()
+            pls[plIdx].tracks = pls[plIdx].tracks.map(t => t.tid === tid ? { ...t, ...patch } : t)
+            await kvSet(env, 'playlists', pls)
+            return ok({ ok: true })
+          }
+
           // DELETE /api/playlists/:id/tracks/:tid
           if (sub === 'tracks' && tid && request.method === 'DELETE') {
             pls[plIdx].tracks = pls[plIdx].tracks.filter(t => t.tid !== tid)
             await kvSet(env, 'playlists', pls)
             return ok({ ok: true })
           }
+        }
+      }
+
+      // Catbox upload
+      if (p1 === 'catbox' && !p2 && request.method === 'POST') {
+        const { videoId, playlistId, tid } = await request.json()
+        if (!videoId) return err('videoId required')
+        try {
+          const audioUrl = await getBestAudioUrl(videoId)
+          const catboxUrl = await uploadToCatbox(audioUrl)
+          // If playlistId + tid provided, persist the URL on the track
+          if (playlistId && tid) {
+            const pls = await kvGet(env, 'playlists')
+            const plIdx = pls.findIndex(p => p.id === playlistId)
+            if (plIdx >= 0) {
+              pls[plIdx].tracks = pls[plIdx].tracks.map(t => t.tid === tid ? { ...t, url: catboxUrl } : t)
+              await kvSet(env, 'playlists', pls)
+            }
+          }
+          return ok({ url: catboxUrl })
+        } catch (e) {
+          return err(`upload failed: ${e.message}`, 502)
         }
       }
 
@@ -460,7 +521,69 @@ export default {
         }
       }
 
+      // AMA (authenticated management)
+      if (p1 === 'ama') {
+        if (!p2 && request.method === 'GET') return ok(await kvGet(env, 'ama'))
+
+        if (!p2 && request.method === 'POST') {
+          const { question, name } = await request.json()
+          if (!question?.trim()) return err('question required')
+          const item = {
+            id: Math.random().toString(36).slice(2, 12),
+            question: question.trim(),
+            name: name?.trim() || '',
+            answer: '',
+            answered: false,
+            askedAt: new Date().toISOString(),
+            answeredAt: '',
+          }
+          const list = await kvGet(env, 'ama'); list.push(item)
+          await kvSet(env, 'ama', list)
+          return ok(item, 201)
+        }
+
+        if (p2 && request.method === 'PATCH') {
+          const { answer } = await request.json()
+          const list = await kvGet(env, 'ama')
+          await kvSet(env, 'ama', list.map(i => i.id === p2
+            ? { ...i, answer: answer?.trim() || '', answered: !!(answer?.trim()), answeredAt: new Date().toISOString() }
+            : i))
+          return ok({ ok: true })
+        }
+
+        if (p2 && request.method === 'DELETE') {
+          await kvSet(env, 'ama', (await kvGet(env, 'ama')).filter(i => i.id !== p2))
+          return ok({ ok: true })
+        }
+      }
+
       return err('not found', 404)
+    }
+
+    // ── /ama → public read + submit ────────────────────────────────────────────
+    if (p0 === 'ama') {
+      if (request.method === 'GET') {
+        const all = await kvGet(env, 'ama')
+        return new Response(JSON.stringify(all.filter(i => i.answered)), {
+          headers: { ...CORS, 'Content-Type': 'application/json' },
+        })
+      }
+      if (request.method === 'POST') {
+        const { question, name } = await request.json()
+        if (!question?.trim()) return new Response(JSON.stringify({ error: 'question required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } })
+        const item = {
+          id: Math.random().toString(36).slice(2, 12),
+          question: question.trim(),
+          name: name?.trim() || '',
+          answer: '',
+          answered: false,
+          askedAt: new Date().toISOString(),
+          answeredAt: '',
+        }
+        const list = await kvGet(env, 'ama'); list.push(item)
+        await kvSet(env, 'ama', list)
+        return new Response(JSON.stringify(item), { status: 201, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
     }
 
     // ── /now-playing → public read ─────────────────────────────────────────────

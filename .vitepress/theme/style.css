@@ -808,3 +808,6 @@ blockquote {
 
 .hero-text > .jgs  { font-size: 55px; }
 .hero-text > .jgs5 { font-size: 40px; }
+
+.desktop-only { display: none; }
+@media (min-width: 768px) { .desktop-only { display: block; } }

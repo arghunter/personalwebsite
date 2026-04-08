@@ -267,9 +267,24 @@ async function addToPlaylist(playlistId: string) {
     const pl = playlists.value.find(p => p.id === playlistId)
     if (pl) pl.tracks.push(track)
     const name = pl?.name ?? 'playlist'
-    addMsg.value = `✓ added to ${name}`
+    addMsg.value = `✓ added — uploading to catbox…`
+    const vid = addVideoId.value
     ytInput.value = ''; addVideoId.value = ''; addTitle.value = ''; addArtist.value = ''
-    setTimeout(() => { addMsg.value = '' }, 2500)
+    // Upload audio to catbox in background
+    try {
+      const result = await apiFetch('/api/catbox', {
+        method: 'POST',
+        body: JSON.stringify({ videoId: vid, playlistId, tid: track.tid }),
+      })
+      if (pl) {
+        const t = pl.tracks.find(t => t.tid === track.tid)
+        if (t) t.url = result.url
+      }
+      addMsg.value = `✓ added to ${name} & cached`
+    } catch {
+      addMsg.value = `✓ added to ${name} (catbox failed — will stream live)`
+    }
+    setTimeout(() => { addMsg.value = '' }, 3000)
   } catch (e: any) { addMsg.value = `error: ${e.message}` }
   addBusy.value = false
 }
@@ -371,7 +386,7 @@ onUnmounted(() => {
             <span class="sp-track-title">{{ track.title }}</span>
             <span class="sp-track-artist">{{ track.artist }}</span>
           </div>
-          <button v-if="editMode && workerConn" class="sp-del-track-btn" @click.stop="deleteTrack(pl.id, track.tid)" title="Remove">×</button>
+          <button v-if="workerConn" class="sp-del-track-btn" @click.stop="deleteTrack(pl.id, track.tid)" title="Remove">×</button>
         </div>
         <div v-if="!pl.tracks.length" class="sp-empty-pl">empty</div>
       </div>

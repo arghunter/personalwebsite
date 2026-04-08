@@ -15,7 +15,7 @@ const setupErr   = ref('')
 const setupBusy  = ref(false)
 
 // ── Mobile tabs ────────────────────────────────────────────────────────────────
-type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep' | 'feeds'
+type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep' | 'feeds' | 'ama'
 const tab  = ref<Tab>('music')
 const tabs = [
   { id: 'music'  as Tab, icon: '♪', label: 'music' },
@@ -24,6 +24,7 @@ const tabs = [
   { id: 'later'  as Tab, icon: '○', label: 'later' },
   { id: 'sleep'  as Tab, icon: '◑', label: 'sleep' },
   { id: 'feeds'  as Tab, icon: '⊞', label: 'feeds' },
+  { id: 'ama'    as Tab, icon: '?', label: 'ama' },
 ]
 
 // ── Notes ──────────────────────────────────────────────────────────────────────
@@ -117,6 +118,13 @@ const feedErr        = ref('')
 let readSet          = new Set<string>()
 const mobileFeedView = ref<'list' | 'articles'>('list')
 
+// ── AMA ────────────────────────────────────────────────────────────────────────
+interface AMAItem { id: string; question: string; name: string; answer: string; answered: boolean; askedAt: string; answeredAt: string }
+const amaItems   = ref<AMAItem[]>([])
+const amaAnswers = ref<Record<string, string>>({})
+const amaBusy    = ref<Record<string, boolean>>({})
+const amaErr     = ref('')
+
 // ── API ────────────────────────────────────────────────────────────────────────
 async function apiFetch(path: string, opts: RequestInit = {}) {
   const res = await fetch(`${workerUrl.value}${path}`, {
@@ -163,9 +171,12 @@ async function loadSleep() { try { sleepLog.value = await apiFetch('/api/sleep')
 async function loadFeeds() {
   try { feeds.value = await apiFetch('/api/feeds') } catch {}
 }
-function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds() }
+async function loadAma() {
+  try { amaItems.value = await apiFetch('/api/ama') } catch {}
+}
+function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds(); loadAma() }
 
-const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false })
+const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false, ama: false })
 async function switchTab(t: Tab) {
   tab.value = t
   if (mobileLoaded.value[t]) return
@@ -175,6 +186,32 @@ async function switchTab(t: Tab) {
   else if (t === 'later') await loadLater()
   else if (t === 'sleep') await loadSleep()
   else if (t === 'feeds') await loadFeeds()
+  else if (t === 'ama') await loadAma()
+}
+
+// ── AMA CRUD ───────────────────────────────────────────────────────────────────
+async function answerAma(id: string) {
+  const answer = amaAnswers.value[id]?.trim()
+  if (!answer) return
+  amaBusy.value = { ...amaBusy.value, [id]: true }
+  try {
+    await apiFetch(`/api/ama/${id}`, { method: 'PATCH', body: JSON.stringify({ answer }) })
+    const idx = amaItems.value.findIndex(i => i.id === id)
+    if (idx >= 0) amaItems.value[idx] = { ...amaItems.value[idx], answer, answered: true, answeredAt: new Date().toISOString() }
+  } catch (e: any) { amaErr.value = e.message }
+  amaBusy.value = { ...amaBusy.value, [id]: false }
+}
+
+async function deleteAma(id: string) {
+  try {
+    await apiFetch(`/api/ama/${id}`, { method: 'DELETE' })
+    amaItems.value = amaItems.value.filter(i => i.id !== id)
+  } catch {}
+}
+
+function amaDate(ts: string) {
+  if (!ts) return ''
+  return new Date(ts).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 // ── Feeds CRUD ─────────────────────────────────────────────────────────────────
@@ -750,6 +787,39 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- AMA -->
+      <div class="sd-card sd-area-ama">
+        <div class="sd-card-hd"><span class="sd-card-title">ask me anything</span></div>
+        <div class="sd-card-body sd-ama-body">
+          <p v-if="amaErr" class="sd-err">{{ amaErr }}</p>
+          <div v-if="!amaItems.length" class="sd-empty">no questions yet</div>
+          <div class="sd-ama-list">
+            <div v-for="item in [...amaItems].reverse()" :key="item.id" :class="['sd-ama-item', { 'sd-ama-answered': item.answered }]">
+              <div class="sd-ama-q-row">
+                <div class="sd-ama-question">{{ item.question }}</div>
+                <div class="sd-ama-meta">
+                  <span v-if="item.name" class="sd-ama-name">{{ item.name }}</span>
+                  <span class="sd-ama-date">{{ amaDate(item.askedAt) }}</span>
+                  <button class="sd-del-btn" @click="deleteAma(item.id)">×</button>
+                </div>
+              </div>
+              <div v-if="item.answered" class="sd-ama-existing-answer">{{ item.answer }}</div>
+              <div class="sd-ama-answer-row">
+                <textarea
+                  v-model="amaAnswers[item.id]"
+                  class="sd-textarea sd-ama-textarea"
+                  :placeholder="item.answered ? 'edit answer…' : 'write answer…'"
+                  rows="2"
+                ></textarea>
+                <button class="sd-submit-btn" @click="answerAma(item.id)" :disabled="amaBusy[item.id] || !amaAnswers[item.id]?.trim()">
+                  {{ amaBusy[item.id] ? '…' : item.answered ? 'update' : 'publish' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /sd-grid -->
 
     <!-- ── Mobile panels ──────────────────────────────────────────────────────── -->
@@ -930,6 +1000,27 @@ onUnmounted(() => {
             </a>
           </div>
         </template>
+      </div>
+
+      <!-- AMA mobile -->
+      <div v-if="mobileLoaded.ama" v-show="tab === 'ama'" class="sd-mobile-panel">
+        <p v-if="amaErr" class="sd-err">{{ amaErr }}</p>
+        <div v-if="!amaItems.length" class="sd-empty">no questions yet</div>
+        <div v-for="item in [...amaItems].reverse()" :key="item.id" :class="['sd-ama-item-mobile', { 'sd-ama-answered': item.answered }]">
+          <div class="sd-ama-question">{{ item.question }}</div>
+          <div class="sd-ama-meta">
+            <span v-if="item.name" class="sd-ama-name">{{ item.name }}</span>
+            <span class="sd-ama-date">{{ amaDate(item.askedAt) }}</span>
+          </div>
+          <div v-if="item.answered" class="sd-ama-existing-answer">{{ item.answer }}</div>
+          <textarea v-model="amaAnswers[item.id]" class="sd-textarea" :placeholder="item.answered ? 'edit answer…' : 'write answer…'" rows="2" style="margin-top:0.5rem"></textarea>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.35rem">
+            <button class="sd-submit-btn" @click="answerAma(item.id)" :disabled="amaBusy[item.id] || !amaAnswers[item.id]?.trim()">
+              {{ amaBusy[item.id] ? '…' : item.answered ? 'update' : 'publish' }}
+            </button>
+            <button class="sd-del-btn" @click="deleteAma(item.id)" style="opacity:0.5">×</button>
+          </div>
+        </div>
       </div>
 
     </div><!-- /sd-mobile -->
@@ -1569,7 +1660,8 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
       "sleep notes"
       "later notes"
       "ideas ideas"
-      "feeds feeds";
+      "feeds feeds"
+      "ama   ama";
     gap: 1rem;
   }
 
@@ -1755,4 +1847,28 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 /* ── Transition ──────────────────────────────────────────────────────────────── */
 .sd-fade-enter-active, .sd-fade-leave-active { transition: opacity 0.2s; }
 .sd-fade-enter-from,  .sd-fade-leave-to      { opacity: 0; }
+
+/* ── AMA ─────────────────────────────────────────────────────────────────────── */
+.sd-area-ama { grid-area: ama; }
+.sd-ama-body { padding: 0; overflow-y: auto; max-height: 500px; }
+.sd-ama-list { display: flex; flex-direction: column; }
+.sd-ama-item {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.sd-ama-item:last-child { border-bottom: none; }
+.sd-ama-answered { opacity: 0.65; }
+.sd-ama-answered:hover { opacity: 1; }
+.sd-ama-q-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+.sd-ama-question { font-size: 0.9rem; color: var(--vp-c-text-1); line-height: 1.5; font-weight: 500; flex: 1; }
+.sd-ama-meta { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.sd-ama-name { font-size: 0.75rem; color: var(--vp-c-brand-1); }
+.sd-ama-date { font-size: 0.72rem; color: var(--vp-c-text-3); }
+.sd-ama-existing-answer { font-size: 0.82rem; color: var(--vp-c-text-2); line-height: 1.5; padding: 0.45rem 0.65rem; background: var(--vp-c-bg-soft); border-left: 2px solid var(--vp-c-brand-1); white-space: pre-wrap; }
+.sd-ama-answer-row { display: flex; gap: 0.5rem; align-items: flex-start; }
+.sd-ama-textarea { resize: none; flex: 1; }
+.sd-ama-item-mobile { padding: 0.85rem 0; border-bottom: 1px solid var(--vp-c-divider); }
+.sd-ama-item-mobile:last-child { border-bottom: none; }
+
 </style>

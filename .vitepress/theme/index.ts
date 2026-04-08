@@ -13,6 +13,7 @@ import GraphView from './components/GraphView.vue'
 import SecretPlayer from './components/SecretPlayer.vue'
 import SecretDashboard from './components/SecretDashboard.vue'
 import NowPlaying from './components/NowPlaying.vue'
+import AMA from './components/AMA.vue'
 
 export default {
 	Layout,
@@ -23,5 +24,6 @@ export default {
 		app.component('SecretPlayer', SecretPlayer)
 		app.component('SecretDashboard', SecretDashboard)
 		app.component('NowPlaying', NowPlaying)
+		app.component('AMA', AMA)
 	},
 } satisfies Theme
