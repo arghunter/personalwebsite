@@ -10,7 +10,7 @@ import { useVimKeys } from './useVimKeys'
 import { useEasterEgg } from './useEasterEgg'
 
 useVimKeys()
-useEasterEgg()
+const { enableShake, needsShakePermission, shakeEnabled } = useEasterEgg()
 
 const incWord = useIncWord()
 
@@ -104,6 +104,7 @@ function playHeadline() {
 
 	<footer>
 		© 2026 <a href="https://github.com/arghunter" target="_blank">Armaan Gomes</a>
+		<button v-if="needsShakePermission && !shakeEnabled" @click="enableShake" class="shake-enable" aria-label="Enable shake">&#128247;</button>
 		<span class="friends-sep">|</span>
 		<span class="friends-label">Friendsites:</span>
 		<span class="friends-marquee-wrap">

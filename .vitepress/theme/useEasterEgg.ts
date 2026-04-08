@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vitepress'
 
 // SHA-256 of the trigger word — not stored in plaintext
@@ -11,6 +11,13 @@ async function sha256(str: string): Promise<string> {
     .map(b => b.toString(16).padStart(2, '0'))
     .join('')
 }
+
+// iOS 13+ requires explicit permission for DeviceMotionEvent
+const needsShakePermission =
+  typeof DeviceMotionEvent !== 'undefined' &&
+  typeof (DeviceMotionEvent as any).requestPermission === 'function'
+
+export const shakeEnabled = ref(false)
 
 export function useEasterEgg() {
   const router = useRouter()
@@ -40,7 +47,7 @@ export function useEasterEgg() {
     }
   }
 
-  // 5 clicks on avatar image (mobile-friendly trigger)
+  // 5 clicks on avatar image
   let clickCount = 0
   let clickTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -55,13 +62,51 @@ export function useEasterEgg() {
     clickTimer = setTimeout(() => { clickCount = 0 }, 1500)
   }
 
+  // Shake detection
+  let lastX = 0, lastY = 0, lastZ = 0, lastCheck = 0
+  let shakeCooldown = false
+
+  function onMotion(e: DeviceMotionEvent) {
+    if (shakeCooldown) return
+    const acc = e.accelerationIncludingGravity
+    if (!acc) return
+    const { x = 0, y = 0, z = 0 } = acc
+    const now = Date.now()
+    if (now - lastCheck < 100) return
+    const delta = Math.abs((x ?? 0) - lastX) + Math.abs((y ?? 0) - lastY) + Math.abs((z ?? 0) - lastZ)
+    lastX = x ?? 0; lastY = y ?? 0; lastZ = z ?? 0; lastCheck = now
+    if (delta > 30) {
+      shakeCooldown = true
+      setTimeout(() => { shakeCooldown = false }, 2000)
+      router.go('/secret')
+    }
+  }
+
+  function setupShake() {
+    window.addEventListener('devicemotion', onMotion)
+    shakeEnabled.value = true
+  }
+
+  async function enableShake() {
+    if (needsShakePermission) {
+      const result = await (DeviceMotionEvent as any).requestPermission()
+      if (result === 'granted') setupShake()
+    } else {
+      setupShake()
+    }
+  }
+
   onMounted(() => {
     window.addEventListener('keydown', onKeyDown)
     document.querySelector('.no-border')?.addEventListener('click', onAvatarClick)
+    if (!needsShakePermission) setupShake()
   })
 
   onUnmounted(() => {
     window.removeEventListener('keydown', onKeyDown)
     document.querySelector('.no-border')?.removeEventListener('click', onAvatarClick)
+    window.removeEventListener('devicemotion', onMotion)
   })
+
+  return { enableShake, needsShakePermission, shakeEnabled }
 }

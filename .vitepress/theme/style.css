@@ -403,6 +403,17 @@ footer {
     opacity: 0.35;
 }
 
+.shake-enable {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    opacity: 0.5;
+}
+.shake-enable:hover { opacity: 1; }
+
 .friends-sep {
     opacity: 0.3;
     margin: 0 0.5rem;
