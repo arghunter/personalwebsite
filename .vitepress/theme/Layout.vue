@@ -7,8 +7,10 @@ import WordCycle from './components/WordCycle.vue'
 import VimIndicator from './components/VimIndicator.vue'
 import { useIncWord, rerollIncWord } from './useIncWord'
 import { useVimKeys } from './useVimKeys'
+import { useEasterEgg } from './useEasterEgg'
 
 useVimKeys()
+useEasterEgg()
 
 const incWord = useIncWord()
 

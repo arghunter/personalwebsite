@@ -26,16 +26,29 @@ onMounted(() => {
     document.head.appendChild(tag)
   }
 
+  window.__pauseMusic = () => { if (player) player.pauseVideo() }
+  window.__resumeMusic = () => { if (player) player.playVideo() }
+
   window.onYouTubeIframeAPIReady = () => {
     player = new window.YT.Player('yt-hidden-player', {
       videoId: '',
-      playerVars: { autoplay: 0 },
+      playerVars: { autoplay: 0, loop: 1 },
       events: {
         onReady: () => {
           player.setVolume(volume.value)
         },
         onStateChange: (e) => {
           isPlaying.value = e.data === window.YT.PlayerState.PLAYING
+          if (typeof window.__onPlayStateChange === 'function') {
+            window.__onPlayStateChange(isPlaying.value)
+          }
+          if (e.data === window.YT.PlayerState.ENDED) {
+            if (typeof window.__onMusicEnd === 'function') {
+              window.__onMusicEnd()
+            } else {
+              player.playVideo()
+            }
+          }
         }
       }
     })
