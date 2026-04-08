@@ -40,6 +40,34 @@ export function useEasterEgg() {
     }
   }
 
-  onMounted(() => window.addEventListener('keydown', onKeyDown))
-  onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
+  // Long press on hero image (mobile trigger)
+  let longPressTimer: ReturnType<typeof setTimeout> | null = null
+
+  function onHeroTouchStart() {
+    longPressTimer = setTimeout(() => router.go('/secret'), 800)
+  }
+
+  function cancelLongPress() {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null }
+  }
+
+  onMounted(() => {
+    window.addEventListener('keydown', onKeyDown)
+    const hero = document.querySelector('.hero-image')
+    if (hero) {
+      hero.addEventListener('touchstart', onHeroTouchStart, { passive: true })
+      hero.addEventListener('touchend', cancelLongPress)
+      hero.addEventListener('touchmove', cancelLongPress)
+    }
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', onKeyDown)
+    const hero = document.querySelector('.hero-image')
+    if (hero) {
+      hero.removeEventListener('touchstart', onHeroTouchStart)
+      hero.removeEventListener('touchend', cancelLongPress)
+      hero.removeEventListener('touchmove', cancelLongPress)
+    }
+  })
 }
