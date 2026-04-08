@@ -1,0 +1,22 @@
+{
+  "name": "Armaan Gomes",
+  "short_name": "AGI",
+  "description": "Armaan Gomes – personal site",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0b1a",
+  "theme_color": "#a78bfa",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

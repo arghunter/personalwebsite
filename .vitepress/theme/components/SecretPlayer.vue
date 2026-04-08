@@ -161,11 +161,15 @@ onMounted(() => {
   buildShuffleOrder()
   ;(window as any).__onMusicEnd = onMusicEnd
   ;(window as any).__onPlayStateChange = (playing: boolean) => { isPlaying.value = playing }
+  ;(window as any).__nextTrack = () => advance(1)
+  ;(window as any).__prevTrack = () => advance(-1)
 })
 
 onUnmounted(() => {
   ;(window as any).__onMusicEnd = undefined
   ;(window as any).__onPlayStateChange = undefined
+  ;(window as any).__nextTrack = undefined
+  ;(window as any).__prevTrack = undefined
 })
 </script>
 

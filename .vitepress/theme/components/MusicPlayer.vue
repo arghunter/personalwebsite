@@ -18,6 +18,13 @@ onMounted(() => {
       player.setVolume(volume.value)
       player.playVideo()
     }
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title,
+        artist,
+        artwork: [{ src: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' }]
+      })
+    }
   }
 
   if (!window.YT) {
@@ -36,11 +43,25 @@ onMounted(() => {
       events: {
         onReady: () => {
           player.setVolume(volume.value)
+          if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', () => player.playVideo())
+            navigator.mediaSession.setActionHandler('pause', () => player.pauseVideo())
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+              if (typeof window.__nextTrack === 'function') window.__nextTrack()
+            })
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+              if (typeof window.__prevTrack === 'function') window.__prevTrack()
+            })
+          }
         },
         onStateChange: (e) => {
           isPlaying.value = e.data === window.YT.PlayerState.PLAYING
           if (typeof window.__onPlayStateChange === 'function') {
             window.__onPlayStateChange(isPlaying.value)
+          }
+          if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState =
+              e.data === window.YT.PlayerState.PLAYING ? 'playing' : 'paused'
           }
           if (e.data === window.YT.PlayerState.ENDED) {
             if (typeof window.__onMusicEnd === 'function') {
