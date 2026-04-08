@@ -40,6 +40,7 @@ const playlists: Playlist[] = [
   { id: 'JAc9NFk0X3Y', url: 'https://files.catbox.moe/ftzg66.mp3', title: 'Me In Me', artist: 'Watt White'},
   { id: 'SUvlSxoichA', url: 'https://files.catbox.moe/59kevs.mp3', title: 'Remember the Name ', artist: 'Fort Minor' },
   { id: 'XbQc2Qmv6dM', url: 'https://files.catbox.moe/d2e1dx.mp3', title: 'Angry Too', artist: 'Lola Blanc' },
+  { id: 'IgheiVEoT9o', url: 'https://files.catbox.moe/fisgc8.mp3', title: 'Pomegranate Lips', artist: 'Derivakat' }
     ],
   },
 ]
