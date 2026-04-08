@@ -25,7 +25,21 @@ const playlists: Playlist[] = [
   { id: 'w3SS0Qh-xSY', url: 'https://files.catbox.moe/13wbun.mp3', title: 'Long Live the Queen', artist: 'Frank Turner' },
   { id: 'VfetGaJBWZk', url: 'https://files.catbox.moe/n707qk.mp3', title: 'Could Have Been Me', artist: 'The Struts' },
   { id: '58uQjg5N2Dw', url: 'https://files.catbox.moe/lyofto.mp3', title: 'Miracle', artist: 'Jeff Williams ft. Casey Lee Williams' },
-      { id: 'vk_uj4WeFYU', title: 'Tristam & Braken - Frame of Mind', artist: '7clouds Drum & Bass' }
+  { id: 'pKt3o7WPYdo', url: 'https://files.catbox.moe/l0ugbo.mp3', title: 'I Lived', artist: 'OneRepublic' }
+    ],
+  },
+    {
+    name: 'Hype',
+    tracks: [
+  { id: 's6Gjq-oxHEs', url: 'https://files.catbox.moe/tx5zu0.mp3', title: 'Larger Than Life', artist: 'Pink Zebra' },
+  { id: 'Okp2H9w8dDI', url: 'https://files.catbox.moe/opkvg4.mp3', title: 'The Triumph', artist: 'Jeff Williams ft. Casey Lee Williams' },
+  { id: 'pKt3o7WPYdo', url: 'https://files.catbox.moe/l0ugbo.mp3', title: 'I Lived', artist: 'OneRepublic' },
+  { id: 'XJZXmFDcPa0', url: 'https://files.catbox.moe/yfd5x1.mp3', title: 'Legendary', artist: 'NEFFEX' },
+  { id: 'RJBBMQ_HC9c', url: 'https://files.catbox.moe/xlj4td.mp3', title: 'Caffeine', artist: 'Jeff Williams (feat. Casey Lee Williams \u0026 Lamar Hall)' },
+  { id: '23zffqyvp8I', url: 'https://files.catbox.moe/l7q3my.mp3', title: 'UNBREAKABLE', artist: 'AViVA' },
+  { id: 'JAc9NFk0X3Y', url: 'https://files.catbox.moe/ftzg66.mp3', title: 'Me In Me', artist: 'Watt White'},
+  { id: 'SUvlSxoichA', url: 'https://files.catbox.moe/59kevs.mp3', title: 'Remember the Name ', artist: 'Fort Minor' },
+  { id: 'XbQc2Qmv6dM', url: 'https://files.catbox.moe/d2e1dx.mp3', title: 'Angry Too', artist: 'Lola Blanc' },
     ],
   },
 ]
