@@ -4,29 +4,29 @@
     --background-dk: #13112a;
 
     --primary-lt: #dbd6f0;
-    --background-lt: #0d0b1a;
+    --background-lt: #100d20;
     --detail-lt: #1c1830;
     --shadow-lt: #00000050;
 
     --accent: #a78bfa;
     --hr-color: #2d2847;
     --nav-bg: var(--background-lt);
-    --bg-image: url("background-slash-dark.png");
+    --bg-image: url("circuit-bg-dark.svg");
     --headline-shadow: #4c1d95;
 }
 
 /* ── Light mode ──────────────────────────────────────────── */
 html.light {
-    --primary-lt: #0e0c1f;
-    --background-lt: #e9e4ff;
-    --detail-lt: #d8d1f5;
-    --shadow-lt: #00000022;
+    --primary-lt: #1a0c35;
+    --background-lt: #e2d9ff;
+    --detail-lt: #d4c9ff;
+    --shadow-lt: #2d0b6620;
 
-    --accent: #6d28d9;
-    --hr-color: #b8aee0;
-    --nav-bg: var(--background-lt);
-    --bg-image: url("background-slash-light.png");
-    --headline-shadow: #2e1a6e;
+    --accent: #7c3aed;
+    --hr-color: #c4aaf0;
+    --nav-bg: rgba(236, 228, 255, 0.75);
+    --bg-image: url("circuit-bg-light.svg");
+    --headline-shadow: #5b21b6;
 }
 
 /* ── Transitions ─────────────────────────────────────────── */
@@ -59,7 +59,9 @@ body {
     padding: 0;
     background-color: var(--background-lt);
     background-image: var(--bg-image);
-    background-repeat: repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 h1 { line-height: 1.2; }
@@ -257,8 +259,10 @@ img.no-border {
 }
 
 html.light .hero-image {
-    opacity: 0.25;
+    opacity: 0.18;
 }
+
+
 
 /* ── Main content ────────────────────────────────────────── */
 main {
