@@ -7,9 +7,24 @@ const volume = ref(80)
 const trackTitle = ref('')
 const trackArtist = ref('')
 let player = null
+let silentSource = null
+
+function keepAudioSessionAlive() {
+  if (silentSource) return
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
+    silentSource = ctx.createBufferSource()
+    silentSource.buffer = buffer
+    silentSource.loop = true
+    silentSource.connect(ctx.destination)
+    silentSource.start(0)
+  } catch {}
+}
 
 onMounted(() => {
   window.__playMusic = (videoId, title, artist) => {
+    keepAudioSessionAlive()
     trackTitle.value = title
     trackArtist.value = artist
     isVisible.value = true
