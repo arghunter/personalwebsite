@@ -138,7 +138,7 @@ export default defineConfig({
     }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['link', { rel: 'manifest', href: '/manifest.json' }],
-    ['link', { rel: 'apple-touch-icon', href: '/favicon.png' }],
+    ['link', { rel: 'apple-touch-icon', href: '/agi-icon-512.png' }],
     ['meta', { name: 'theme-color', content: '#a78bfa' }],
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
