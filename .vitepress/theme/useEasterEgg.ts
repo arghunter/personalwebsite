@@ -42,6 +42,7 @@ export function useEasterEgg() {
       const hash = await sha256(buffer.join(''))
       if (hash === SECRET_HASH) {
         buffer.length = 0
+        localStorage.setItem('sd_s', '1')
         router.go('/secret')
       }
     }
@@ -56,6 +57,7 @@ export function useEasterEgg() {
     if (clickTimer) clearTimeout(clickTimer)
     if (clickCount >= 5) {
       clickCount = 0
+      localStorage.setItem('sd_s', '1')
       router.go('/secret')
       return
     }
@@ -78,6 +80,7 @@ export function useEasterEgg() {
     if (delta > 30) {
       shakeCooldown = true
       setTimeout(() => { shakeCooldown = false }, 2000)
+      localStorage.setItem('sd_s', '1')
       router.go('/secret')
     }
   }

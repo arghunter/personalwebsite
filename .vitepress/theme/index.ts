@@ -11,6 +11,7 @@ import 'vitepress/dist/client/theme-default/styles/components/vp-code.css'
 import InlineImage from './components/InlineImage.vue'
 import GraphView from './components/GraphView.vue'
 import SecretPlayer from './components/SecretPlayer.vue'
+import SecretDashboard from './components/SecretDashboard.vue'
 
 export default {
 	Layout,
@@ -19,5 +20,6 @@ export default {
 		app.component('InlineImage', InlineImage)
 		app.component('GraphView', GraphView)
 		app.component('SecretPlayer', SecretPlayer)
+		app.component('SecretDashboard', SecretDashboard)
 	},
 } satisfies Theme

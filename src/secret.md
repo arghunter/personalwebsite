@@ -3,4 +3,4 @@ title: "secret"
 fullWidth: true
 ---
 
-<SecretPlayer />
+<SecretDashboard />
