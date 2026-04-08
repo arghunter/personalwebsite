@@ -15,7 +15,7 @@ const setupErr   = ref('')
 const setupBusy  = ref(false)
 
 // ── Mobile tabs ────────────────────────────────────────────────────────────────
-type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep'
+type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep' | 'feeds'
 const tab  = ref<Tab>('music')
 const tabs = [
   { id: 'music'  as Tab, icon: '♪', label: 'music' },
@@ -23,6 +23,7 @@ const tabs = [
   { id: 'ideas'  as Tab, icon: '✦', label: 'ideas' },
   { id: 'later'  as Tab, icon: '○', label: 'later' },
   { id: 'sleep'  as Tab, icon: '◑', label: 'sleep' },
+  { id: 'feeds'  as Tab, icon: '⊞', label: 'feeds' },
 ]
 
 // ── Notes ──────────────────────────────────────────────────────────────────────
@@ -103,6 +104,19 @@ const sleepLog  = ref<SleepEntry[]>([])
 const sleepBusy = ref(false)
 const sleepErr  = ref('')
 
+// ── Feeds ──────────────────────────────────────────────────────────────────────
+interface FeedSource { id: string; url: string; title: string; addedAt: string }
+interface FeedItem { title: string; link: string; summary: string; pubDate: string }
+const feeds          = ref<FeedSource[]>([])
+const feedItems      = ref<Record<string, FeedItem[]>>({})
+const activeFeedId   = ref<string>('')
+const feedLoading    = ref<Record<string, boolean>>({})
+const newFeedUrl     = ref('')
+const newFeedBusy    = ref(false)
+const feedErr        = ref('')
+let readSet          = new Set<string>()
+const mobileFeedView = ref<'list' | 'articles'>('list')
+
 // ── API ────────────────────────────────────────────────────────────────────────
 async function apiFetch(path: string, opts: RequestInit = {}) {
   const res = await fetch(`${workerUrl.value}${path}`, {
@@ -146,9 +160,12 @@ async function loadNotes() {
 async function loadIdeas() { try { ideas.value = await apiFetch('/api/ideas') } catch {} }
 async function loadLater() { try { laterItems.value = await apiFetch('/api/readlater') } catch {} }
 async function loadSleep() { try { sleepLog.value = await apiFetch('/api/sleep') } catch {} }
-function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep() }
+async function loadFeeds() {
+  try { feeds.value = await apiFetch('/api/feeds') } catch {}
+}
+function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds() }
 
-const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false })
+const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false })
 async function switchTab(t: Tab) {
   tab.value = t
   if (mobileLoaded.value[t]) return
@@ -157,6 +174,66 @@ async function switchTab(t: Tab) {
   else if (t === 'ideas') await loadIdeas()
   else if (t === 'later') await loadLater()
   else if (t === 'sleep') await loadSleep()
+  else if (t === 'feeds') await loadFeeds()
+}
+
+// ── Feeds CRUD ─────────────────────────────────────────────────────────────────
+function loadReadSet() {
+  try { const raw = localStorage.getItem('sd_read'); if (raw) readSet = new Set(JSON.parse(raw)) } catch {}
+}
+function saveReadSet() {
+  try { localStorage.setItem('sd_read', JSON.stringify([...readSet])) } catch {}
+}
+function isRead(link: string) { return readSet.has(link) }
+function markRead(link: string) { readSet.add(link); saveReadSet() }
+function unreadCount(feedId: string) {
+  const items = feedItems.value[feedId]
+  if (!items) return 0
+  return items.filter(i => i.link && !isRead(i.link)).length
+}
+
+async function selectFeed(feedId: string) {
+  activeFeedId.value = feedId
+  mobileFeedView.value = 'articles'
+  if (feedItems.value[feedId]) return
+  feedLoading.value = { ...feedLoading.value, [feedId]: true }
+  try {
+    feedItems.value = { ...feedItems.value, [feedId]: await apiFetch(`/api/feeds/${feedId}/items`) }
+  } catch {}
+  feedLoading.value = { ...feedLoading.value, [feedId]: false }
+}
+
+async function addFeed() {
+  const url = newFeedUrl.value.trim()
+  if (!url) return
+  newFeedBusy.value = true; feedErr.value = ''
+  try {
+    const item = await apiFetch('/api/feeds', { method: 'POST', body: JSON.stringify({ url }) })
+    feeds.value.push(item)
+    newFeedUrl.value = ''
+  } catch (e: any) { feedErr.value = e.message }
+  newFeedBusy.value = false
+}
+
+async function deleteFeed(id: string) {
+  try {
+    await apiFetch(`/api/feeds/${id}`, { method: 'DELETE' })
+    feeds.value = feeds.value.filter(f => f.id !== id)
+    if (activeFeedId.value === id) activeFeedId.value = ''
+    const copy = { ...feedItems.value }; delete copy[id]; feedItems.value = copy
+  } catch {}
+}
+
+function feedItemDate(pubDate: string) {
+  if (!pubDate) return ''
+  const d = new Date(pubDate)
+  if (isNaN(d.getTime())) return pubDate
+  const now = new Date()
+  const diff = now.getTime() - d.getTime()
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
+  if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`
+  return d.toLocaleDateString('en', { month: 'short', day: 'numeric' })
 }
 
 // ── Notes editor ───────────────────────────────────────────────────────────────
@@ -405,6 +482,7 @@ const sleepChart = computed<DayBar[]>(() => {
 // ── Mount / unmount ────────────────────────────────────────────────────────────
 onMounted(() => {
   if (localStorage.getItem('sd_s') !== '1') { router.go('/'); return }
+  loadReadSet()
   const w = localStorage.getItem('sd_w'), k = localStorage.getItem('sd_k')
   if (w && k) { workerUrl.value = w; apiKey.value = k; ready.value = true; loadAll() }
   else { showSetup.value = true }
@@ -626,6 +704,52 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- Feeds -->
+      <div class="sd-card sd-area-feeds">
+        <div class="sd-card-hd">
+          <span class="sd-card-title">feeds</span>
+        </div>
+        <div class="sd-feeds-layout">
+
+          <!-- Feed sidebar -->
+          <div class="sd-feeds-sidebar">
+            <div class="sd-feeds-list">
+              <button v-for="f in feeds" :key="f.id"
+                :class="['sd-feed-item', { active: activeFeedId === f.id }]"
+                @click="selectFeed(f.id)">
+                <span class="sd-feed-name">{{ f.title }}</span>
+                <span v-if="unreadCount(f.id)" class="sd-feed-badge">{{ unreadCount(f.id) }}</span>
+                <button class="sd-del-btn" @click.stop="deleteFeed(f.id)" title="Remove feed">×</button>
+              </button>
+              <div v-if="!feeds.length" class="sd-empty" style="padding: 1rem 0.75rem; font-size: 0.8rem;">no feeds yet</div>
+            </div>
+            <div class="sd-feeds-add">
+              <input v-model="newFeedUrl" class="sd-input" placeholder="rss feed url…" @keydown.enter="addFeed" />
+              <button class="sd-submit-btn" @click="addFeed" :disabled="newFeedBusy">{{ newFeedBusy ? '…' : 'add' }}</button>
+              <p v-if="feedErr" class="sd-err" style="margin: 0.4rem 0 0; grid-column: 1/-1;">{{ feedErr }}</p>
+            </div>
+          </div>
+
+          <!-- Articles pane -->
+          <div class="sd-feeds-articles">
+            <div v-if="!activeFeedId" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">select a feed</div>
+            <div v-else-if="feedLoading[activeFeedId]" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">loading…</div>
+            <div v-else-if="!feedItems[activeFeedId]?.length" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">no articles</div>
+            <div v-else class="sd-articles-list">
+              <a v-for="item in feedItems[activeFeedId]" :key="item.link || item.title"
+                :href="item.link" target="_blank" rel="noopener"
+                :class="['sd-article-row', { 'sd-article-read': isRead(item.link) }]"
+                @click="markRead(item.link)">
+                <div class="sd-article-title">{{ item.title }}</div>
+                <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
+                <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div><!-- /sd-grid -->
 
     <!-- ── Mobile panels ──────────────────────────────────────────────────────── -->
@@ -770,6 +894,42 @@ onUnmounted(() => {
           </div>
           <div v-if="!sleepLog.length" class="sd-empty">no log yet</div>
         </div>
+      </div>
+
+      <!-- Feeds mobile -->
+      <div v-if="mobileLoaded.feeds" v-show="tab === 'feeds'" class="sd-mobile-panel sd-mobile-panel-feeds">
+        <template v-if="mobileFeedView === 'list'">
+          <div class="sd-feeds-mobile-add">
+            <input v-model="newFeedUrl" class="sd-input" placeholder="rss feed url…" @keydown.enter="addFeed" />
+            <button class="sd-submit-btn" @click="addFeed" :disabled="newFeedBusy">{{ newFeedBusy ? '…' : 'add' }}</button>
+          </div>
+          <p v-if="feedErr" class="sd-err" style="padding: 0 0 0.5rem;">{{ feedErr }}</p>
+          <div class="sd-list">
+            <div v-for="f in feeds" :key="f.id" class="sd-row" @click="selectFeed(f.id)" style="cursor:pointer">
+              <div class="sd-row-body">
+                <span class="sd-row-primary">{{ f.title }}</span>
+              </div>
+              <span v-if="unreadCount(f.id)" class="sd-feed-badge">{{ unreadCount(f.id) }}</span>
+              <button class="sd-del-btn" @click.stop="deleteFeed(f.id)">×</button>
+            </div>
+            <div v-if="!feeds.length" class="sd-empty">no feeds yet</div>
+          </div>
+        </template>
+        <template v-else>
+          <button class="sd-feeds-back-btn" @click="mobileFeedView = 'list'">← back</button>
+          <div v-if="feedLoading[activeFeedId]" class="sd-empty">loading…</div>
+          <div v-else-if="!feedItems[activeFeedId]?.length" class="sd-empty">no articles</div>
+          <div v-else class="sd-articles-list">
+            <a v-for="item in feedItems[activeFeedId]" :key="item.link || item.title"
+              :href="item.link" target="_blank" rel="noopener"
+              :class="['sd-article-row', { 'sd-article-read': isRead(item.link) }]"
+              @click="markRead(item.link)">
+              <div class="sd-article-title">{{ item.title }}</div>
+              <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
+              <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
+            </a>
+          </div>
+        </template>
       </div>
 
     </div><!-- /sd-mobile -->
@@ -1189,6 +1349,50 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-md-preview :deep(del) { text-decoration: line-through; opacity: 0.6; }
 .sd-md-preview :deep(*:last-child) { margin-bottom: 0; }
 
+/* ── Feeds layout ───────────────────────────────────────────────────────────── */
+.sd-feeds-layout {
+  display: flex; flex: 1; min-height: 0; overflow: hidden;
+}
+.sd-feeds-sidebar {
+  width: 200px; flex-shrink: 0;
+  border-right: 1px solid var(--vp-c-divider);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sd-feeds-list { flex: 1; overflow-y: auto; }
+.sd-feed-item {
+  display: flex; align-items: center; gap: 0.4rem; width: 100%;
+  background: none; border: none; border-bottom: 1px solid var(--vp-c-divider);
+  padding: 0.6rem 0.75rem; cursor: pointer; text-align: left;
+  font: inherit; color: inherit; transition: background 0.1s;
+}
+.sd-feed-item:hover { background: var(--vp-c-bg-soft); }
+.sd-feed-item.active { background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent); }
+.sd-feed-name { flex: 1; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-feed-badge {
+  font-size: 0.65rem; background: var(--vp-c-brand-1); color: #fff;
+  border-radius: 999px; padding: 0.1em 0.45em; flex-shrink: 0; line-height: 1.5;
+}
+.sd-feeds-add {
+  padding: 0.6rem; display: flex; flex-direction: column; gap: 0.4rem;
+  border-top: 1px solid var(--vp-c-divider); flex-shrink: 0;
+}
+.sd-feeds-add .sd-input { font-size: 0.8rem; padding: 0.35rem 0.55rem; }
+.sd-feeds-add .sd-submit-btn { font-size: 0.8rem; padding: 0.35rem 0.65rem; align-self: flex-end; }
+.sd-feeds-articles { flex: 1; overflow-y: auto; min-width: 0; }
+.sd-articles-list { display: flex; flex-direction: column; }
+.sd-article-row {
+  display: block; padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  text-decoration: none; color: inherit;
+  transition: background 0.1s;
+}
+.sd-article-row:hover { background: var(--vp-c-bg-soft); }
+.sd-article-row:last-child { border-bottom: none; }
+.sd-article-read { opacity: 0.4; }
+.sd-article-title { font-size: 0.875rem; color: var(--vp-c-brand-1); font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
+.sd-article-summary { font-size: 0.78rem; color: var(--vp-c-text-2); line-height: 1.45; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sd-article-meta { font-size: 0.7rem; color: var(--vp-c-text-3); }
+
 /* ── Mobile base ─────────────────────────────────────────────────────────────── */
 .sd-grid { display: none; }
 .sd-notes-body { display: none; }
@@ -1341,6 +1545,18 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   font-size: 0.75rem; color: var(--vp-c-text-3); font-style: italic;
 }
 
+/* ── Mobile feeds panel ─────────────────────────────────────────────────────── */
+.sd-mobile-panel-feeds { padding: 0; display: flex; flex-direction: column; }
+.sd-feeds-mobile-add { display: flex; gap: 0.4rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--vp-c-divider); }
+.sd-feeds-mobile-add .sd-input { flex: 1; }
+.sd-feeds-back-btn {
+  background: none; border: none; border-bottom: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-2); font: inherit; font-size: 0.85rem;
+  padding: 0.65rem 1rem; cursor: pointer; text-align: left; width: 100%;
+  transition: color 0.15s;
+}
+.sd-feeds-back-btn:hover { color: var(--vp-c-text-1); }
+
 /* ── Desktop ─────────────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .sd-wrap { display: block; height: auto; overflow: visible; max-width: 80rem; margin: 1.5rem auto; padding: 0 1.25rem 2rem; }
@@ -1352,7 +1568,8 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
       "music notes"
       "sleep notes"
       "later notes"
-      "ideas ideas";
+      "ideas ideas"
+      "feeds feeds";
     gap: 1rem;
   }
 
@@ -1365,6 +1582,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   .sd-area-sleep { grid-area: sleep; align-self: start; }
   .sd-area-later { grid-area: later; align-self: start; }
   .sd-area-ideas { grid-area: ideas; }
+  .sd-area-feeds { grid-area: feeds; height: 480px; }
 
   /* Cap heights for small cards */
   .sd-area-music .sd-card-body { max-height: 420px; overflow-y: auto; }

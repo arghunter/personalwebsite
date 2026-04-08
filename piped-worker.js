@@ -41,6 +41,44 @@ const BROWSER_HEADERS = {
   'Referer': 'https://piped.video/',
 }
 
+// ── RSS / Atom parser ─────────────────────────────────────────────────────────
+
+function stripTags(s) { return (s || '').replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'").trim() }
+function cdataContent(s) { const m = s?.match(/<!\[CDATA\[([\s\S]*?)\]\]>/); return m ? m[1].trim() : stripTags(s || '') }
+function tagContent(chunk, tag) { const m = chunk.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i')); return m ? cdataContent(m[1]) : '' }
+
+function parseRSSAtom(xml) {
+  const items = []
+  // RSS 2.0
+  const itemRe = /<item[\s>]([\s\S]*?)<\/item>/gi
+  let m
+  while ((m = itemRe.exec(xml)) !== null && items.length < 40) {
+    const c = m[1]
+    const linkMatch = c.match(/<link>([\s\S]*?)<\/link>/i) || c.match(/<link[^>]+href=["']([^"']+)["']/i)
+    items.push({
+      title: tagContent(c, 'title') || '(no title)',
+      link: linkMatch ? cdataContent(linkMatch[1] || linkMatch[0]).replace(/<[^>]*>/g,'').trim() : '',
+      summary: stripTags(tagContent(c, 'description') || tagContent(c, 'content:encoded')).slice(0, 280),
+      pubDate: tagContent(c, 'pubDate') || tagContent(c, 'dc:date') || '',
+    })
+  }
+  // Atom
+  if (!items.length) {
+    const entryRe = /<entry[\s>]([\s\S]*?)<\/entry>/gi
+    while ((m = entryRe.exec(xml)) !== null && items.length < 40) {
+      const c = m[1]
+      const linkMatch = c.match(/<link[^>]+href=["']([^"']+)["'][^>]*\/?>/i)
+      items.push({
+        title: tagContent(c, 'title') || '(no title)',
+        link: linkMatch ? linkMatch[1] : '',
+        summary: stripTags(tagContent(c, 'summary') || tagContent(c, 'content')).slice(0, 280),
+        pubDate: tagContent(c, 'published') || tagContent(c, 'updated') || '',
+      })
+    }
+  }
+  return items
+}
+
 // ── Piped sources ─────────────────────────────────────────────────────────────
 
 async function fromCobalt(videoId) {
@@ -353,6 +391,54 @@ export default {
             pls[plIdx].tracks = pls[plIdx].tracks.filter(t => t.tid !== tid)
             await kvSet(env, 'playlists', pls)
             return ok({ ok: true })
+          }
+        }
+      }
+
+      // Feeds
+      if (p1 === 'feeds') {
+        // GET /api/feeds — list subscribed feeds
+        if (!p2 && request.method === 'GET') return ok(await kvGet(env, 'feeds'))
+
+        // POST /api/feeds — add feed { url, title? }
+        if (!p2 && request.method === 'POST') {
+          const { url: feedUrl, title: feedTitle } = await request.json()
+          if (!feedUrl) return err('url required')
+          const item = {
+            id: Math.random().toString(36).slice(2, 12),
+            url: feedUrl,
+            title: feedTitle?.trim() || new URL(feedUrl).hostname,
+            addedAt: new Date().toISOString(),
+          }
+          const list = await kvGet(env, 'feeds')
+          list.push(item)
+          await kvSet(env, 'feeds', list)
+          return ok(item, 201)
+        }
+
+        // DELETE /api/feeds/:id
+        if (p2 && request.method === 'DELETE') {
+          const list = await kvGet(env, 'feeds')
+          await kvSet(env, 'feeds', list.filter(f => f.id !== p2))
+          return ok({ ok: true })
+        }
+
+        // GET /api/feeds/:id/items — proxy + parse RSS/Atom
+        if (p2 && parts[3] === 'items' && request.method === 'GET') {
+          const list = await kvGet(env, 'feeds')
+          const feed = list.find(f => f.id === p2)
+          if (!feed) return err('feed not found', 404)
+          try {
+            const res = await fetch(feed.url, {
+              signal: AbortSignal.timeout(8000),
+              headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FeedReader/1.0)', 'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
+            })
+            if (!res.ok) return err(`upstream ${res.status}`, 502)
+            const xml = await res.text()
+            const items = parseRSSAtom(xml)
+            return ok(items)
+          } catch (e) {
+            return err(`fetch failed: ${e.message}`, 502)
           }
         }
       }
