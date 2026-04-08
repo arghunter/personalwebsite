@@ -40,34 +40,28 @@ export function useEasterEgg() {
     }
   }
 
-  // Long press on hero image (mobile trigger)
-  let longPressTimer: ReturnType<typeof setTimeout> | null = null
+  // 5 clicks on avatar image (mobile-friendly trigger)
+  let clickCount = 0
+  let clickTimer: ReturnType<typeof setTimeout> | null = null
 
-  function onHeroTouchStart() {
-    longPressTimer = setTimeout(() => router.go('/secret'), 800)
-  }
-
-  function cancelLongPress() {
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null }
+  function onAvatarClick() {
+    clickCount++
+    if (clickTimer) clearTimeout(clickTimer)
+    if (clickCount >= 5) {
+      clickCount = 0
+      router.go('/secret')
+      return
+    }
+    clickTimer = setTimeout(() => { clickCount = 0 }, 1500)
   }
 
   onMounted(() => {
     window.addEventListener('keydown', onKeyDown)
-    const hero = document.querySelector('.hero-image')
-    if (hero) {
-      hero.addEventListener('touchstart', onHeroTouchStart, { passive: true })
-      hero.addEventListener('touchend', cancelLongPress)
-      hero.addEventListener('touchmove', cancelLongPress)
-    }
+    document.querySelector('.no-border')?.addEventListener('click', onAvatarClick)
   })
 
   onUnmounted(() => {
     window.removeEventListener('keydown', onKeyDown)
-    const hero = document.querySelector('.hero-image')
-    if (hero) {
-      hero.removeEventListener('touchstart', onHeroTouchStart)
-      hero.removeEventListener('touchend', cancelLongPress)
-      hero.removeEventListener('touchmove', cancelLongPress)
-    }
+    document.querySelector('.no-border')?.removeEventListener('click', onAvatarClick)
   })
 }
