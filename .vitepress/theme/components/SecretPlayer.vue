@@ -2,7 +2,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 interface Track {
-  id: string
+  id?: string   // YouTube video ID — used for worker stream + iframe fallback
+  url?: string  // Direct audio URL (e.g. Cloudflare R2) — background-safe on iOS
   title: string
   artist: string
 }
@@ -17,13 +18,13 @@ const playlists: Playlist[] = [
   {
     name: 'Site Songs',
     tracks: [
-      { id: '3Hl99YpWR6k', title: 'Touch the Sky',       artist: 'Jeff Williams ft. Casey Lee Williams' },
-      { id: '6g1Yi0eSjkg', title: 'Indomitable',          artist: 'Jeff Williams ft. Casey Lee Williams' },
-      { id: 's6Gjq-oxHEs', title: 'Larger Than Life',     artist: 'Pink Zebra' },
-      { id: 'Okp2H9w8dDI', title: 'The Triumph',          artist: 'Jeff Williams ft. Casey Lee Williams' },
-      { id: 'w3SS0Qh-xSY', title: 'Long Live the Queen',  artist: 'Frank Turner' },
-      { id: 'VfetGaJBWZk', title: 'Could Have Been Me',   artist: 'The Struts' },
-      { id: '58uQjg5N2Dw', title: 'Miracle',              artist: 'Jeff Williams ft. Casey Lee Williams' },
+  { id: '3Hl99YpWR6k', url: 'https://files.catbox.moe/ldkm97.mp3', title: 'Touch the Sky', artist: 'Jeff Williams ft. Casey Lee Williams' },
+  { id: '6g1Yi0eSjkg', url: 'https://files.catbox.moe/sza2s0.mp3', title: 'Indomitable', artist: 'Jeff Williams ft. Casey Lee Williams' },
+  { id: 's6Gjq-oxHEs', url: 'https://files.catbox.moe/tx5zu0.mp3', title: 'Larger Than Life', artist: 'Pink Zebra' },
+  { id: 'Okp2H9w8dDI', url: 'https://files.catbox.moe/opkvg4.mp3', title: 'The Triumph', artist: 'Jeff Williams ft. Casey Lee Williams' },
+  { id: 'w3SS0Qh-xSY', url: 'https://files.catbox.moe/13wbun.mp3', title: 'Long Live the Queen', artist: 'Frank Turner' },
+  { id: 'VfetGaJBWZk', url: 'https://files.catbox.moe/n707qk.mp3', title: 'Could Have Been Me', artist: 'The Struts' },
+  { id: '58uQjg5N2Dw', url: 'https://files.catbox.moe/lyofto.mp3', title: 'Miracle', artist: 'Jeff Williams ft. Casey Lee Williams' },
       { id: 'vk_uj4WeFYU', title: 'Tristam & Braken - Frame of Mind', artist: '7clouds Drum & Bass' }
     ],
   },
@@ -69,7 +70,7 @@ function playTrack(playlistIdx: number, trackIdx: number) {
   }
   currentTrack.value = trackIdx
   isPlaying.value = true
-  ;(window as any).__playMusic?.(track.id, track.title, track.artist)
+  ;(window as any).__playMusic?.(track.id, track.title, track.artist, track.url)
 }
 
 function onMusicEnd() {
