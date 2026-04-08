@@ -255,13 +255,28 @@ export default {
         if (request.method === 'GET') return ok(await kvGet(env, 'notes'))
 
         if (request.method === 'POST') {
-          const { text } = await request.json()
-          if (!text?.trim()) return err('text required')
-          const item = { id: Math.random().toString(36).slice(2, 12), text: text.trim(), createdAt: new Date().toISOString() }
-          const list = await kvGet(env, 'notes')
-          list.unshift(item)
+          const body = await request.json()
+          // Support both { title, body } and legacy { text }
+          const title = body.title?.trim() || body.text?.split('\n')[0]?.slice(0, 60) || 'untitled'
+          const noteBody = body.body !== undefined ? body.body : (body.text || '')
+          const item = {
+            id: Math.random().toString(36).slice(2, 12),
+            title, body: noteBody,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }
+          const list = await kvGet(env, 'notes'); list.unshift(item)
           await kvSet(env, 'notes', list)
           return ok(item, 201)
+        }
+
+        if (request.method === 'PATCH' && p2) {
+          const patch = await request.json()
+          const list = await kvGet(env, 'notes')
+          await kvSet(env, 'notes', list.map(n => n.id === p2
+            ? { ...n, ...(patch.title !== undefined && { title: patch.title }), ...(patch.body !== undefined && { body: patch.body }), updatedAt: new Date().toISOString() }
+            : n))
+          return ok({ ok: true })
         }
 
         if (request.method === 'DELETE' && p2) {

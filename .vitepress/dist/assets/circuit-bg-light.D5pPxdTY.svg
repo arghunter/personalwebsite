@@ -1,0 +1,380 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <g stroke="rgba(109,40,217,0.055)" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+
+    <!-- band A: y 0–220 -->
+    <polyline points="0,60 85,60 85,25"/>
+    <polyline points="85,60 125,100 210,100"/>
+    <polyline points="210,100 250,60 340,60"/>
+    <line x1="340" y1="60" x2="340" y2="110"/>
+    <polyline points="380,35 440,35 480,75 560,75"/>
+    <line x1="480" y1="75" x2="480" y2="130"/>
+    <polyline points="560,75 600,35 680,35"/>
+    <polyline points="680,35 680,90 760,90"/>
+    <polyline points="760,90 800,50 900,50"/>
+    <line x1="900" y1="50" x2="900" y2="105"/>
+    <polyline points="900,50 960,50 1000,90 1080,90"/>
+    <polyline points="1080,90 1120,50 1200,50"/>
+    <line x1="1200" y1="50" x2="1200" y2="110"/>
+    <polyline points="1200,50 1260,50 1300,90 1380,90"/>
+    <line x1="1300" y1="90" x2="1300" y2="145"/>
+    <polyline points="1380,90 1420,50 1510,50"/>
+    <polyline points="1510,50 1550,90 1630,90"/>
+    <line x1="1630" y1="90" x2="1630" y2="140"/>
+    <polyline points="1630,90 1690,90 1730,50 1830,50"/>
+    <line x1="1830" y1="50" x2="1830" y2="110"/>
+    <polyline points="1830,110 1880,110 1920,110"/>
+    <line x1="1870" y1="165" x2="1920" y2="165"/>
+
+    <polyline points="0,175 60,175 100,135 200,135"/>
+    <polyline points="200,135 240,175 330,175"/>
+    <line x1="240" y1="175" x2="240" y2="220"/>
+    <polyline points="370,155 450,155 490,195 570,195"/>
+    <line x1="450" y1="155" x2="450" y2="105"/>
+    <polyline points="570,195 610,155 700,155"/>
+    <polyline points="700,155 740,195 820,195"/>
+    <line x1="740" y1="195" x2="740" y2="240"/>
+    <polyline points="820,195 860,155 960,155"/>
+    <line x1="860" y1="155" x2="860" y2="105"/>
+    <polyline points="960,155 1000,195 1090,195"/>
+    <polyline points="1090,195 1130,155 1220,155"/>
+    <line x1="1130" y1="155" x2="1130" y2="205"/>
+    <polyline points="1260,135 1340,135 1380,175 1460,175"/>
+    <line x1="1380" y1="175" x2="1380" y2="220"/>
+    <polyline points="1460,175 1500,135 1590,135"/>
+    <line x1="1590" y1="135" x2="1590" y2="185"/>
+    <polyline points="1630,155 1710,155 1750,195 1840,195"/>
+    <polyline points="1840,195 1880,155 1920,155"/>
+
+    <!-- band B: y 220–440 -->
+    <polyline points="0,255 70,255 110,215 210,215"/>
+    <line x1="110" y1="215" x2="110" y2="270"/>
+    <polyline points="210,215 250,255 340,255"/>
+    <polyline points="340,255 380,295 460,295"/>
+    <line x1="380" y1="295" x2="380" y2="245"/>
+    <polyline points="460,295 500,255 590,255"/>
+    <line x1="500" y1="255" x2="500" y2="310"/>
+    <polyline points="590,255 630,295 710,295"/>
+    <polyline points="710,295 750,255 840,255"/>
+    <line x1="750" y1="255" x2="750" y2="310"/>
+    <polyline points="840,255 880,295 960,295"/>
+    <line x1="960" y1="295" x2="960" y2="245"/>
+    <polyline points="960,295 1000,335 1080,335"/>
+    <polyline points="1080,335 1120,295 1200,295"/>
+    <line x1="1120" y1="295" x2="1120" y2="350"/>
+    <polyline points="1200,295 1240,255 1330,255"/>
+    <line x1="1240" y1="255" x2="1240" y2="310"/>
+    <polyline points="1330,255 1370,295 1450,295"/>
+    <polyline points="1450,295 1490,255 1570,255"/>
+    <line x1="1490" y1="255" x2="1490" y2="305"/>
+    <polyline points="1570,255 1610,295 1690,295"/>
+    <line x1="1690" y1="295" x2="1690" y2="245"/>
+    <polyline points="1690,295 1730,335 1810,335"/>
+    <polyline points="1810,335 1850,295 1920,295"/>
+
+    <polyline points="0,375 65,375 105,335 195,335"/>
+    <line x1="105" y1="335" x2="105" y2="385"/>
+    <polyline points="195,335 235,375 315,375"/>
+    <line x1="235" y1="375" x2="235" y2="425"/>
+    <polyline points="355,355 435,355 475,395 555,395"/>
+    <line x1="475" y1="395" x2="475" y2="440"/>
+    <polyline points="555,395 595,355 685,355"/>
+    <polyline points="685,355 725,395 805,395"/>
+    <line x1="725" y1="395" x2="725" y2="345"/>
+    <polyline points="845,370 925,370 965,410 1045,410"/>
+    <line x1="965" y1="410" x2="965" y2="355"/>
+    <polyline points="1045,410 1085,370 1165,370"/>
+    <line x1="1085" y1="370" x2="1085" y2="420"/>
+    <polyline points="1205,350 1285,350 1325,390 1405,390"/>
+    <polyline points="1405,390 1445,350 1525,350"/>
+    <line x1="1445" y1="350" x2="1445" y2="405"/>
+    <polyline points="1565,370 1645,370 1685,330 1785,330"/>
+    <line x1="1685" y1="330" x2="1685" y2="385"/>
+    <polyline points="1785,330 1825,370 1920,370"/>
+
+    <!-- band C: y 440–660 -->
+    <polyline points="0,460 75,460 115,420 215,420"/>
+    <line x1="115" y1="420" x2="115" y2="475"/>
+    <polyline points="215,420 255,460 335,460"/>
+    <polyline points="335,460 375,500 455,500"/>
+    <line x1="375" y1="500" x2="375" y2="450"/>
+    <polyline points="455,500 495,460 575,460"/>
+    <line x1="495" y1="460" x2="495" y2="515"/>
+    <polyline points="575,460 615,500 695,500"/>
+    <polyline points="695,500 735,460 815,460"/>
+    <line x1="735" y1="460" x2="735" y2="510"/>
+    <polyline points="815,460 855,420 945,420"/>
+    <line x1="855" y1="420" x2="855" y2="475"/>
+    <polyline points="945,420 985,460 1065,460"/>
+    <line x1="985" y1="460" x2="985" y2="515"/>
+    <polyline points="1065,460 1105,500 1185,500"/>
+    <polyline points="1185,500 1225,460 1305,460"/>
+    <line x1="1225" y1="460" x2="1225" y2="510"/>
+    <polyline points="1305,460 1345,420 1425,420"/>
+    <line x1="1345" y1="420" x2="1345" y2="470"/>
+    <polyline points="1425,420 1465,460 1545,460"/>
+    <polyline points="1545,460 1585,500 1665,500"/>
+    <line x1="1585" y1="500" x2="1585" y2="450"/>
+    <polyline points="1665,500 1705,460 1785,460"/>
+    <line x1="1705" y1="460" x2="1705" y2="515"/>
+    <polyline points="1785,460 1825,420 1920,420"/>
+
+    <polyline points="0,575 70,575 110,535 210,535"/>
+    <line x1="110" y1="535" x2="110" y2="590"/>
+    <polyline points="210,535 250,575 330,575"/>
+    <line x1="250" y1="575" x2="250" y2="620"/>
+    <polyline points="370,555 450,555 490,595 570,595"/>
+    <line x1="490" y1="595" x2="490" y2="645"/>
+    <polyline points="570,595 610,555 700,555"/>
+    <polyline points="700,555 740,595 820,595"/>
+    <line x1="740" y1="595" x2="740" y2="545"/>
+    <polyline points="860,570 940,570 980,610 1060,610"/>
+    <line x1="980" y1="610" x2="980" y2="560"/>
+    <polyline points="1060,610 1100,570 1180,570"/>
+    <line x1="1100" y1="570" x2="1100" y2="620"/>
+    <polyline points="1220,550 1300,550 1340,590 1420,590"/>
+    <polyline points="1420,590 1460,550 1540,550"/>
+    <line x1="1460" y1="550" x2="1460" y2="600"/>
+    <polyline points="1580,570 1660,570 1700,530 1800,530"/>
+    <line x1="1700" y1="530" x2="1700" y2="585"/>
+    <polyline points="1800,530 1840,570 1920,570"/>
+
+    <!-- band D: y 660–840 -->
+    <polyline points="0,680 75,680 115,640 215,640"/>
+    <line x1="115" y1="640" x2="115" y2="695"/>
+    <polyline points="215,640 255,680 335,680"/>
+    <polyline points="335,680 375,720 455,720"/>
+    <line x1="375" y1="720" x2="375" y2="670"/>
+    <polyline points="455,720 495,680 575,680"/>
+    <line x1="495" y1="680" x2="495" y2="730"/>
+    <polyline points="575,680 615,640 695,640"/>
+    <polyline points="695,640 735,680 815,680"/>
+    <line x1="735" y1="680" x2="735" y2="730"/>
+    <polyline points="815,680 855,720 935,720"/>
+    <line x1="855" y1="720" x2="855" y2="670"/>
+    <polyline points="935,720 975,680 1055,680"/>
+    <line x1="975" y1="680" x2="975" y2="730"/>
+    <polyline points="1055,680 1095,640 1175,640"/>
+    <line x1="1095" y1="640" x2="1095" y2="695"/>
+    <polyline points="1175,640 1215,680 1295,680"/>
+    <polyline points="1295,680 1335,720 1415,720"/>
+    <line x1="1335" y1="720" x2="1335" y2="670"/>
+    <polyline points="1415,720 1455,680 1535,680"/>
+    <line x1="1455" y1="680" x2="1455" y2="730"/>
+    <polyline points="1535,680 1575,640 1655,640"/>
+    <line x1="1575" y1="640" x2="1575" y2="690"/>
+    <polyline points="1655,640 1695,680 1775,680"/>
+    <polyline points="1775,680 1815,720 1895,720"/>
+    <polyline points="1895,720 1920,720"/>
+
+    <polyline points="0,790 65,790 105,750 185,750"/>
+    <line x1="105" y1="750" x2="105" y2="800"/>
+    <polyline points="185,750 225,790 305,790"/>
+    <line x1="225" y1="790" x2="225" y2="840"/>
+    <polyline points="345,770 425,770 465,730 565,730"/>
+    <line x1="465" y1="730" x2="465" y2="785"/>
+    <polyline points="565,730 605,770 685,770"/>
+    <polyline points="685,770 725,810 805,810"/>
+    <line x1="725" y1="810" x2="725" y2="760"/>
+    <polyline points="845,785 925,785 965,745 1065,745"/>
+    <line x1="965" y1="745" x2="965" y2="800"/>
+    <polyline points="1065,745 1105,785 1185,785"/>
+    <line x1="1105" y1="785" x2="1105" y2="840"/>
+    <polyline points="1225,765 1305,765 1345,725 1445,725"/>
+    <polyline points="1445,725 1485,765 1565,765"/>
+    <line x1="1485" y1="765" x2="1485" y2="815"/>
+    <polyline points="1605,745 1685,745 1725,785 1805,785"/>
+    <line x1="1725" y1="785" x2="1725" y2="735"/>
+    <polyline points="1805,785 1845,745 1920,745"/>
+
+    <!-- band E: y 840–1080 -->
+    <polyline points="0,870 75,870 115,830 215,830"/>
+    <line x1="115" y1="830" x2="115" y2="880"/>
+    <polyline points="215,830 255,870 335,870"/>
+    <polyline points="335,870 375,910 455,910"/>
+    <line x1="375" y1="910" x2="375" y2="860"/>
+    <polyline points="455,910 495,870 575,870"/>
+    <line x1="495" y1="870" x2="495" y2="920"/>
+    <polyline points="575,870 615,830 695,830"/>
+    <polyline points="695,830 735,870 815,870"/>
+    <line x1="735" y1="870" x2="735" y2="920"/>
+    <polyline points="815,870 855,910 935,910"/>
+    <line x1="855" y1="910" x2="855" y2="860"/>
+    <polyline points="935,910 975,870 1055,870"/>
+    <line x1="975" y1="870" x2="975" y2="920"/>
+    <polyline points="1055,870 1095,830 1175,830"/>
+    <line x1="1095" y1="830" x2="1095" y2="880"/>
+    <polyline points="1175,830 1215,870 1295,870"/>
+    <polyline points="1295,870 1335,910 1415,910"/>
+    <line x1="1335" y1="910" x2="1335" y2="860"/>
+    <polyline points="1415,910 1455,870 1535,870"/>
+    <line x1="1455" y1="870" x2="1455" y2="920"/>
+    <polyline points="1535,870 1575,830 1655,830"/>
+    <line x1="1575" y1="830" x2="1575" y2="880"/>
+    <polyline points="1655,830 1695,870 1775,870"/>
+    <polyline points="1775,870 1815,910 1895,910"/>
+    <polyline points="1895,910 1920,910"/>
+
+    <polyline points="0,985 70,985 110,945 210,945"/>
+    <line x1="110" y1="945" x2="110" y2="995"/>
+    <polyline points="210,945 250,985 330,985"/>
+    <line x1="250" y1="985" x2="250" y2="1035"/>
+    <polyline points="370,965 450,965 490,1005 570,1005"/>
+    <line x1="490" y1="1005" x2="490" y2="1055"/>
+    <polyline points="570,1005 610,965 690,965"/>
+    <polyline points="690,965 730,1005 810,1005"/>
+    <line x1="730" y1="1005" x2="730" y2="955"/>
+    <polyline points="850,980 930,980 970,940 1070,940"/>
+    <line x1="970" y1="940" x2="970" y2="995"/>
+    <polyline points="1070,940 1110,980 1190,980"/>
+    <line x1="1110" y1="980" x2="1110" y2="1035"/>
+    <polyline points="1230,960 1310,960 1350,1000 1430,1000"/>
+    <polyline points="1430,1000 1470,960 1550,960"/>
+    <line x1="1470" y1="960" x2="1470" y2="1010"/>
+    <polyline points="1590,975 1670,975 1710,935 1810,935"/>
+    <line x1="1710" y1="935" x2="1710" y2="990"/>
+    <polyline points="1810,935 1850,975 1920,975"/>
+
+  </g>
+
+  <g fill="rgba(109,40,217,0.11)">
+    <!-- band A corners/junctions -->
+    <circle cx="85" cy="60" r="2.5"/><circle cx="85" cy="25" r="2"/><circle cx="125" cy="100" r="2.5"/><circle cx="210" cy="100" r="2"/>
+    <circle cx="250" cy="60" r="2.5"/><circle cx="340" cy="60" r="2.5"/><circle cx="340" cy="110" r="2"/>
+    <circle cx="480" cy="75" r="2.5"/><circle cx="480" cy="130" r="2"/><circle cx="560" cy="75" r="2"/>
+    <circle cx="600" cy="35" r="2.5"/><circle cx="680" cy="35" r="2.5"/>
+    <circle cx="680" cy="90" r="2.5"/><circle cx="760" cy="90" r="2"/>
+    <circle cx="800" cy="50" r="2.5"/><circle cx="900" cy="50" r="2.5"/><circle cx="900" cy="105" r="2"/>
+    <circle cx="1000" cy="90" r="2.5"/><circle cx="1080" cy="90" r="2.5"/>
+    <circle cx="1120" cy="50" r="2.5"/><circle cx="1200" cy="50" r="2.5"/><circle cx="1200" cy="110" r="2"/>
+    <circle cx="1300" cy="90" r="2.5"/><circle cx="1300" cy="145" r="2"/><circle cx="1380" cy="90" r="2"/>
+    <circle cx="1420" cy="50" r="2.5"/><circle cx="1510" cy="50" r="2"/>
+    <circle cx="1550" cy="90" r="2.5"/><circle cx="1630" cy="90" r="2.5"/><circle cx="1630" cy="140" r="2"/>
+    <circle cx="1730" cy="50" r="2.5"/><circle cx="1830" cy="50" r="2.5"/><circle cx="1830" cy="110" r="2.5"/>
+    <circle cx="1880" cy="110" r="2"/>
+    <circle cx="100" cy="135" r="2.5"/><circle cx="200" cy="135" r="2.5"/>
+    <circle cx="240" cy="175" r="2.5"/><circle cx="240" cy="220" r="2"/>
+    <circle cx="490" cy="195" r="2.5"/><circle cx="570" cy="195" r="2.5"/>
+    <circle cx="450" cy="155" r="2.5"/><circle cx="450" cy="105" r="2"/>
+    <circle cx="610" cy="155" r="2.5"/><circle cx="700" cy="155" r="2.5"/>
+    <circle cx="740" cy="195" r="2.5"/><circle cx="740" cy="240" r="2"/><circle cx="820" cy="195" r="2"/>
+    <circle cx="860" cy="155" r="2.5"/><circle cx="860" cy="105" r="2"/><circle cx="960" cy="155" r="2.5"/>
+    <circle cx="1000" cy="195" r="2.5"/><circle cx="1090" cy="195" r="2.5"/>
+    <circle cx="1130" cy="155" r="2.5"/><circle cx="1130" cy="205" r="2"/><circle cx="1220" cy="155" r="2"/>
+    <circle cx="1380" cy="175" r="2.5"/><circle cx="1380" cy="220" r="2"/><circle cx="1460" cy="175" r="2"/>
+    <circle cx="1500" cy="135" r="2.5"/><circle cx="1590" cy="135" r="2.5"/><circle cx="1590" cy="185" r="2"/>
+    <circle cx="1750" cy="195" r="2.5"/><circle cx="1840" cy="195" r="2.5"/>
+    <circle cx="1880" cy="155" r="2"/>
+
+    <!-- band B corners/junctions -->
+    <circle cx="110" cy="215" r="2.5"/><circle cx="110" cy="270" r="2"/><circle cx="210" cy="215" r="2"/>
+    <circle cx="250" cy="255" r="2.5"/><circle cx="340" cy="255" r="2.5"/>
+    <circle cx="380" cy="295" r="2.5"/><circle cx="380" cy="245" r="2"/><circle cx="460" cy="295" r="2.5"/>
+    <circle cx="500" cy="255" r="2.5"/><circle cx="500" cy="310" r="2"/><circle cx="590" cy="255" r="2.5"/>
+    <circle cx="630" cy="295" r="2.5"/><circle cx="710" cy="295" r="2.5"/>
+    <circle cx="750" cy="255" r="2.5"/><circle cx="750" cy="310" r="2"/><circle cx="840" cy="255" r="2.5"/>
+    <circle cx="880" cy="295" r="2.5"/><circle cx="960" cy="295" r="2.5"/><circle cx="960" cy="245" r="2"/>
+    <circle cx="1000" cy="335" r="2.5"/><circle cx="1080" cy="335" r="2.5"/>
+    <circle cx="1120" cy="295" r="2.5"/><circle cx="1120" cy="350" r="2"/><circle cx="1200" cy="295" r="2.5"/>
+    <circle cx="1240" cy="255" r="2.5"/><circle cx="1240" cy="310" r="2"/><circle cx="1330" cy="255" r="2.5"/>
+    <circle cx="1370" cy="295" r="2.5"/><circle cx="1450" cy="295" r="2.5"/>
+    <circle cx="1490" cy="255" r="2.5"/><circle cx="1490" cy="305" r="2"/><circle cx="1570" cy="255" r="2.5"/>
+    <circle cx="1610" cy="295" r="2.5"/><circle cx="1690" cy="295" r="2.5"/><circle cx="1690" cy="245" r="2"/>
+    <circle cx="1730" cy="335" r="2.5"/><circle cx="1810" cy="335" r="2.5"/>
+    <circle cx="1850" cy="295" r="2"/>
+    <circle cx="105" cy="335" r="2.5"/><circle cx="105" cy="385" r="2"/><circle cx="195" cy="335" r="2"/>
+    <circle cx="235" cy="375" r="2.5"/><circle cx="235" cy="425" r="2"/><circle cx="315" cy="375" r="2"/>
+    <circle cx="475" cy="395" r="2.5"/><circle cx="475" cy="440" r="2"/><circle cx="555" cy="395" r="2.5"/>
+    <circle cx="595" cy="355" r="2.5"/><circle cx="685" cy="355" r="2.5"/>
+    <circle cx="725" cy="395" r="2.5"/><circle cx="725" cy="345" r="2"/><circle cx="805" cy="395" r="2"/>
+    <circle cx="965" cy="410" r="2.5"/><circle cx="965" cy="355" r="2"/><circle cx="1045" cy="410" r="2.5"/>
+    <circle cx="1085" cy="370" r="2.5"/><circle cx="1085" cy="420" r="2"/><circle cx="1165" cy="370" r="2"/>
+    <circle cx="1325" cy="390" r="2.5"/><circle cx="1405" cy="390" r="2.5"/>
+    <circle cx="1445" cy="350" r="2.5"/><circle cx="1445" cy="405" r="2"/><circle cx="1525" cy="350" r="2"/>
+    <circle cx="1685" cy="330" r="2.5"/><circle cx="1685" cy="385" r="2"/><circle cx="1785" cy="330" r="2.5"/>
+    <circle cx="1825" cy="370" r="2"/>
+
+    <!-- band C corners/junctions -->
+    <circle cx="115" cy="420" r="2.5"/><circle cx="115" cy="475" r="2"/><circle cx="215" cy="420" r="2"/>
+    <circle cx="255" cy="460" r="2.5"/><circle cx="335" cy="460" r="2.5"/>
+    <circle cx="375" cy="500" r="2.5"/><circle cx="375" cy="450" r="2"/><circle cx="455" cy="500" r="2.5"/>
+    <circle cx="495" cy="460" r="2.5"/><circle cx="495" cy="515" r="2"/><circle cx="575" cy="460" r="2.5"/>
+    <circle cx="615" cy="500" r="2.5"/><circle cx="695" cy="500" r="2.5"/>
+    <circle cx="735" cy="460" r="2.5"/><circle cx="735" cy="510" r="2"/><circle cx="815" cy="460" r="2.5"/>
+    <circle cx="855" cy="420" r="2.5"/><circle cx="855" cy="475" r="2"/><circle cx="945" cy="420" r="2.5"/>
+    <circle cx="985" cy="460" r="2.5"/><circle cx="985" cy="515" r="2"/><circle cx="1065" cy="460" r="2.5"/>
+    <circle cx="1105" cy="500" r="2.5"/><circle cx="1185" cy="500" r="2.5"/>
+    <circle cx="1225" cy="460" r="2.5"/><circle cx="1225" cy="510" r="2"/><circle cx="1305" cy="460" r="2.5"/>
+    <circle cx="1345" cy="420" r="2.5"/><circle cx="1345" cy="470" r="2"/><circle cx="1425" cy="420" r="2.5"/>
+    <circle cx="1465" cy="460" r="2.5"/><circle cx="1545" cy="460" r="2.5"/>
+    <circle cx="1585" cy="500" r="2.5"/><circle cx="1585" cy="450" r="2"/><circle cx="1665" cy="500" r="2.5"/>
+    <circle cx="1705" cy="460" r="2.5"/><circle cx="1705" cy="515" r="2"/><circle cx="1785" cy="460" r="2.5"/>
+    <circle cx="1825" cy="420" r="2"/>
+    <circle cx="110" cy="535" r="2.5"/><circle cx="110" cy="590" r="2"/><circle cx="210" cy="535" r="2"/>
+    <circle cx="250" cy="575" r="2.5"/><circle cx="250" cy="620" r="2"/><circle cx="330" cy="575" r="2"/>
+    <circle cx="490" cy="595" r="2.5"/><circle cx="490" cy="645" r="2"/><circle cx="570" cy="595" r="2.5"/>
+    <circle cx="610" cy="555" r="2.5"/><circle cx="700" cy="555" r="2.5"/>
+    <circle cx="740" cy="595" r="2.5"/><circle cx="740" cy="545" r="2"/><circle cx="820" cy="595" r="2"/>
+    <circle cx="980" cy="610" r="2.5"/><circle cx="980" cy="560" r="2"/><circle cx="1060" cy="610" r="2.5"/>
+    <circle cx="1100" cy="570" r="2.5"/><circle cx="1100" cy="620" r="2"/><circle cx="1180" cy="570" r="2"/>
+    <circle cx="1340" cy="590" r="2.5"/><circle cx="1420" cy="590" r="2.5"/>
+    <circle cx="1460" cy="550" r="2.5"/><circle cx="1460" cy="600" r="2"/><circle cx="1540" cy="550" r="2"/>
+    <circle cx="1700" cy="530" r="2.5"/><circle cx="1700" cy="585" r="2"/><circle cx="1800" cy="530" r="2.5"/>
+    <circle cx="1840" cy="570" r="2"/>
+
+    <!-- band D corners/junctions -->
+    <circle cx="115" cy="640" r="2.5"/><circle cx="115" cy="695" r="2"/><circle cx="215" cy="640" r="2"/>
+    <circle cx="255" cy="680" r="2.5"/><circle cx="335" cy="680" r="2.5"/>
+    <circle cx="375" cy="720" r="2.5"/><circle cx="375" cy="670" r="2"/><circle cx="455" cy="720" r="2.5"/>
+    <circle cx="495" cy="680" r="2.5"/><circle cx="495" cy="730" r="2"/><circle cx="575" cy="680" r="2.5"/>
+    <circle cx="615" cy="640" r="2.5"/><circle cx="695" cy="640" r="2.5"/>
+    <circle cx="735" cy="680" r="2.5"/><circle cx="735" cy="730" r="2"/><circle cx="815" cy="680" r="2.5"/>
+    <circle cx="855" cy="720" r="2.5"/><circle cx="855" cy="670" r="2"/><circle cx="935" cy="720" r="2.5"/>
+    <circle cx="975" cy="680" r="2.5"/><circle cx="975" cy="730" r="2"/><circle cx="1055" cy="680" r="2.5"/>
+    <circle cx="1095" cy="640" r="2.5"/><circle cx="1095" cy="695" r="2"/><circle cx="1175" cy="640" r="2.5"/>
+    <circle cx="1215" cy="680" r="2.5"/><circle cx="1295" cy="680" r="2.5"/>
+    <circle cx="1335" cy="720" r="2.5"/><circle cx="1335" cy="670" r="2"/><circle cx="1415" cy="720" r="2.5"/>
+    <circle cx="1455" cy="680" r="2.5"/><circle cx="1455" cy="730" r="2"/><circle cx="1535" cy="680" r="2.5"/>
+    <circle cx="1575" cy="640" r="2.5"/><circle cx="1575" cy="690" r="2"/><circle cx="1655" cy="640" r="2.5"/>
+    <circle cx="1695" cy="680" r="2.5"/><circle cx="1775" cy="680" r="2.5"/>
+    <circle cx="1815" cy="720" r="2.5"/><circle cx="1895" cy="720" r="2"/>
+    <circle cx="105" cy="750" r="2.5"/><circle cx="105" cy="800" r="2"/><circle cx="185" cy="750" r="2"/>
+    <circle cx="225" cy="790" r="2.5"/><circle cx="225" cy="840" r="2"/><circle cx="305" cy="790" r="2"/>
+    <circle cx="465" cy="730" r="2.5"/><circle cx="465" cy="785" r="2"/><circle cx="565" cy="730" r="2.5"/>
+    <circle cx="605" cy="770" r="2.5"/><circle cx="685" cy="770" r="2.5"/>
+    <circle cx="725" cy="810" r="2.5"/><circle cx="725" cy="760" r="2"/><circle cx="805" cy="810" r="2"/>
+    <circle cx="965" cy="745" r="2.5"/><circle cx="965" cy="800" r="2"/><circle cx="1065" cy="745" r="2.5"/>
+    <circle cx="1105" cy="785" r="2.5"/><circle cx="1105" cy="840" r="2"/><circle cx="1185" cy="785" r="2"/>
+    <circle cx="1345" cy="725" r="2.5"/><circle cx="1445" cy="725" r="2.5"/>
+    <circle cx="1485" cy="765" r="2.5"/><circle cx="1485" cy="815" r="2"/><circle cx="1565" cy="765" r="2"/>
+    <circle cx="1725" cy="785" r="2.5"/><circle cx="1725" cy="735" r="2"/><circle cx="1805" cy="785" r="2.5"/>
+    <circle cx="1845" cy="745" r="2"/>
+
+    <!-- band E corners/junctions -->
+    <circle cx="115" cy="830" r="2.5"/><circle cx="115" cy="880" r="2"/><circle cx="215" cy="830" r="2"/>
+    <circle cx="255" cy="870" r="2.5"/><circle cx="335" cy="870" r="2.5"/>
+    <circle cx="375" cy="910" r="2.5"/><circle cx="375" cy="860" r="2"/><circle cx="455" cy="910" r="2.5"/>
+    <circle cx="495" cy="870" r="2.5"/><circle cx="495" cy="920" r="2"/><circle cx="575" cy="870" r="2.5"/>
+    <circle cx="615" cy="830" r="2.5"/><circle cx="695" cy="830" r="2.5"/>
+    <circle cx="735" cy="870" r="2.5"/><circle cx="735" cy="920" r="2"/><circle cx="815" cy="870" r="2.5"/>
+    <circle cx="855" cy="910" r="2.5"/><circle cx="855" cy="860" r="2"/><circle cx="935" cy="910" r="2.5"/>
+    <circle cx="975" cy="870" r="2.5"/><circle cx="975" cy="920" r="2"/><circle cx="1055" cy="870" r="2.5"/>
+    <circle cx="1095" cy="830" r="2.5"/><circle cx="1095" cy="880" r="2"/><circle cx="1175" cy="830" r="2.5"/>
+    <circle cx="1215" cy="870" r="2.5"/><circle cx="1295" cy="870" r="2.5"/>
+    <circle cx="1335" cy="910" r="2.5"/><circle cx="1335" cy="860" r="2"/><circle cx="1415" cy="910" r="2.5"/>
+    <circle cx="1455" cy="870" r="2.5"/><circle cx="1455" cy="920" r="2"/><circle cx="1535" cy="870" r="2.5"/>
+    <circle cx="1575" cy="830" r="2.5"/><circle cx="1575" cy="880" r="2"/><circle cx="1655" cy="830" r="2.5"/>
+    <circle cx="1695" cy="870" r="2.5"/><circle cx="1775" cy="870" r="2.5"/>
+    <circle cx="1815" cy="910" r="2.5"/><circle cx="1895" cy="910" r="2"/>
+    <circle cx="110" cy="945" r="2.5"/><circle cx="110" cy="995" r="2"/><circle cx="210" cy="945" r="2"/>
+    <circle cx="250" cy="985" r="2.5"/><circle cx="250" cy="1035" r="2"/><circle cx="330" cy="985" r="2"/>
+    <circle cx="490" cy="1005" r="2.5"/><circle cx="490" cy="1055" r="2"/><circle cx="570" cy="1005" r="2.5"/>
+    <circle cx="610" cy="965" r="2.5"/><circle cx="690" cy="965" r="2.5"/>
+    <circle cx="730" cy="1005" r="2.5"/><circle cx="730" cy="955" r="2"/><circle cx="810" cy="1005" r="2"/>
+    <circle cx="970" cy="940" r="2.5"/><circle cx="970" cy="995" r="2"/><circle cx="1070" cy="940" r="2.5"/>
+    <circle cx="1110" cy="980" r="2.5"/><circle cx="1110" cy="1035" r="2"/><circle cx="1190" cy="980" r="2"/>
+    <circle cx="1350" cy="1000" r="2.5"/><circle cx="1430" cy="1000" r="2.5"/>
+    <circle cx="1470" cy="960" r="2.5"/><circle cx="1470" cy="1010" r="2"/><circle cx="1550" cy="960" r="2"/>
+    <circle cx="1710" cy="935" r="2.5"/><circle cx="1710" cy="990" r="2"/><circle cx="1810" cy="935" r="2.5"/>
+    <circle cx="1850" cy="975" r="2"/>
+  </g>
+</svg>

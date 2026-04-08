@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Armaan Gomes</title>
+        <link>https://arghunter.github.io</link>
+        <description>Welcome to my feed!</description>
+        <lastBuildDate>Wed, 08 Apr 2026 16:50:20 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <image>
+            <title>Armaan Gomes</title>
+            <url>https://arghunter.github.io/favicon.png</url>
+            <link>https://arghunter.github.io</link>
+        </image>
+        <item>
+            <title><![CDATA[KERNN v1 - Building A General Feed Forward Neural Network Accelerator]]></title>
+            <link>https://arghunter.github.io/blogs/kernn/</link>
+            <guid isPermaLink="false">https://arghunter.github.io/blogs/kernn/</guid>
+            <pubDate>Fri, 10 Apr 2026 04:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Supermic+more: PDM Bitstream ASICs for Audio Signal Processing]]></title>
+            <link>https://arghunter.github.io/blogs/supermic/</link>
+            <guid isPermaLink="false">https://arghunter.github.io/blogs/supermic/</guid>
+            <pubDate>Sun, 01 Sep 2024 04:00:00 GMT</pubDate>
+            <description><![CDATA[PDM microphones have remarkable properties for beamforming. By manipulating the bitstream directly at 3072 kHz rather than converting to PCM first, delay-and-sum beamforming becomes simpler and more precise. This project implements these operations as ASICs using the Skywater 130nm CMOS process, with eight designs submitted for fabrication.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[clEar: Glasses-Based Beamforming Hearing Aids]]></title>
+            <link>https://arghunter.github.io/blogs/clear/</link>
+            <guid isPermaLink="false">https://arghunter.github.io/blogs/clear/</guid>
+            <pubDate>Wed, 01 May 2024 04:00:00 GMT</pubDate>
+            <description><![CDATA[clEar is a glasses-based beamforming hearing aid that uses Golomb-spaced microphone arrays, a custom MSMVDR beamforming technique, and a hybrid multi-speaker tracking algorithm to achieve a 71% increase in STOI and 9.9 dB SNR improvement. ISEF Grand Award, CSEF First Place.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[How It's Made]]></title>
+            <link>https://arghunter.github.io/blogs/made/</link>
+            <guid isPermaLink="false">https://arghunter.github.io/blogs/made/</guid>
+            <pubDate>Sat, 04 Feb 1026 04:56:02 GMT</pubDate>
+            <description><![CDATA[Everyone who can, should make a personal website. So here's how I made mine.]]></description>
+        </item>
+    </channel>
+</rss>
