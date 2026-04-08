@@ -10,16 +10,31 @@ const trackId     = ref('')
 const screenMode  = ref(false)
 const usingNative = ref(false) // true = Piped audio, false = YT iframe fallback
 
-const audioEl = ref(null)
-let player    = null
-let wakeLock  = null
+const audioEl   = ref(null)
+let player      = null
+let wakeLock    = null
+let silentUrl   = null
 
-// ── Piped API ─────────────────────────────────────────────────────────────────
-const PIPED_INSTANCES = [
-  'https://pipedapi.kavin.rocks',
-  'https://pipedapi.adminforge.de',
-  'https://api.piped.yt',
-]
+// Build a tiny silent WAV blob URL so we can activate the audio element
+// within the user gesture before any async work happens
+function getSilentUrl() {
+  if (silentUrl) return silentUrl
+  const sr = 8000, n = 400 // 50ms mono 8-bit
+  const buf = new ArrayBuffer(44 + n)
+  const v = new DataView(buf)
+  const s = (o, str) => [...str].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)))
+  s(0, 'RIFF'); v.setUint32(4, 36 + n, true); s(8, 'WAVE')
+  s(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true)
+  v.setUint32(24, sr, true); v.setUint32(28, sr, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true)
+  s(36, 'data'); v.setUint32(40, n, true)
+  for (let i = 0; i < n; i++) v.setUint8(44 + i, 128)
+  silentUrl = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }))
+  return silentUrl
+}
+
+// ── Piped proxy ───────────────────────────────────────────────────────────────
+// After deploying piped-worker.js to Cloudflare, paste your worker URL below
+const WORKER_URL = 'https://twilight-tooth-d247.acgo8888.workers.dev/' // e.g. 'https://my-worker.username.workers.dev'
 
 async function fetchWithTimeout(url, ms = 5000) {
   const ctrl = new AbortController()
@@ -32,19 +47,25 @@ async function fetchWithTimeout(url, ms = 5000) {
 }
 
 async function getAudioUrl(videoId) {
-  for (const base of PIPED_INSTANCES) {
-    try {
-      const res = await fetchWithTimeout(`${base}/streams/${videoId}`)
-      if (!res.ok) continue
-      const { audioStreams = [] } = await res.json()
-      // Prefer MP4/AAC for iOS Safari; fall back to any stream
-      const pick = (type) => audioStreams
-        .filter(s => s.mimeType?.includes(type))
-        .sort((a, b) => b.bitrate - a.bitrate)[0]
-      const stream = pick('audio/mp4') ?? pick('audio/') ?? audioStreams[0]
-      if (stream?.url) return stream.url
-    } catch {}
+  if (!WORKER_URL) {
+    console.warn('[music] no worker URL set — falling back to YT iframe')
+    return null
   }
+  try {
+    console.log(`[music] fetching via worker for ${videoId}`)
+    const res = await fetchWithTimeout(`${WORKER_URL}/${videoId}`)
+    if (!res.ok) { console.warn(`[music] worker returned ${res.status}`); return null }
+    const { audioStreams = [] } = await res.json()
+    const pick = (type) => audioStreams
+      .filter(s => s.mimeType?.includes(type))
+      .sort((a, b) => b.bitrate - a.bitrate)[0]
+    const stream = pick('audio/mp4') ?? pick('audio/') ?? audioStreams[0]
+    if (stream?.url) {
+      console.log(`[music] got stream — ${stream.mimeType} @ ${stream.bitrate}bps`)
+      return stream.url
+    }
+  } catch (e) { console.warn('[music] worker fetch failed:', e.message) }
+  console.error('[music] falling back to YT iframe')
   return null
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,20 +92,33 @@ async function playMusic(videoId, title, artist) {
   isVisible.value   = true
   updateMediaSession(videoId, title, artist)
 
-  // Try Piped native audio first
-  const url = await getAudioUrl(videoId)
-  if (url && audioEl.value) {
-    usingNative.value  = true
-    audioEl.value.src  = url
+  if (audioEl.value) {
+    // Activate the audio element NOW, within the user gesture, before any await.
+    // iOS requires play() to be called synchronously from a user gesture.
+    // We play silence first, then swap in the real URL once the fetch resolves.
+    audioEl.value.src    = getSilentUrl()
+    audioEl.value.volume = 0
+    audioEl.value.loop   = true
+    audioEl.value.play().catch(() => {})
+
+    const url = await getAudioUrl(videoId)
+
+    audioEl.value.loop   = false
     audioEl.value.volume = volume.value / 100
-    try {
-      await audioEl.value.play()
-      return
-    } catch {}
+
+    if (url) {
+      usingNative.value = true
+      audioEl.value.src = url
+      try { await audioEl.value.play(); console.log('[music] playing via native audio'); return }
+      catch (e) { console.warn('[music] native play() rejected:', e.message) }
+    } else {
+      audioEl.value.pause()
+    }
   }
 
   // Fall back to YT iframe
   usingNative.value = false
+  console.log('[music] playing via YT iframe')
   if (player) {
     player.loadVideoById(videoId)
     player.setVolume(volume.value)
