@@ -3,6 +3,7 @@ title: "KERNN v1 - Building A General Feed Forward Neural Network Accelerator"
 description: "How I built a general purpose feed forward neural network accelerator"
 longDescription: ""
 date: 2026-4-10
+hidden: true
 ---
 
 # KERNN v1 - Building A General Deep Neural Network Accelerator
