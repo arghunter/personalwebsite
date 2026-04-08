@@ -144,7 +144,7 @@ export default defineConfig({
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
     ['meta', { name: 'apple-mobile-web-app-title', content: 'AGI' }]
   ],
-  vite: { plugins: [siteGraphPlugin()] },
+  vite: { plugins: [siteGraphPlugin()], envDir: process.cwd() },
   cleanUrls: true,
   markdown: {
     config(md) {

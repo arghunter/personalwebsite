@@ -145,6 +145,16 @@ function buildShuffleOrder() {
   shuffleOrder.value = arr
 }
 
+function reportNowPlaying(title: string, artist: string, live: boolean) {
+  if (!workerUrl.value || !apiKey.value) return
+  fetch(`${workerUrl.value}/api/now-playing`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey.value },
+    body: JSON.stringify({ title, artist, live }),
+    keepalive: true,
+  }).catch(() => {})
+}
+
 function playTrack(playlistId: string, trackIdx: number) {
   const pl = playlists.value.find(p => p.id === playlistId)
   const track = pl?.tracks[trackIdx]
@@ -156,6 +166,7 @@ function playTrack(playlistId: string, trackIdx: number) {
   currentTrack.value = trackIdx
   isPlaying.value = true
   ;(window as any).__playMusic?.(track.id, track.title, track.artist, track.url)
+  reportNowPlaying(track.title, track.artist, true)
 }
 
 function onMusicEnd() {
@@ -324,6 +335,12 @@ onUnmounted(() => {
   ;(window as any).__onPlayStateChange = undefined
   ;(window as any).__nextTrack = undefined
   ;(window as any).__prevTrack = undefined
+  // Mark as not live when player closes
+  if (isPlaying.value) {
+    const pl = playlists.value.find(p => p.id === activeListId.value)
+    const track = pl?.tracks[currentTrack.value]
+    if (track) reportNowPlaying(track.title, track.artist, false)
+  }
 })
 </script>
 

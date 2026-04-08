@@ -20,6 +20,7 @@ I work on ASIC design, signal processing, and computer architecture — from bea
 <div style="height: 10px;"></div>
 
 <span class="subtext">If you want to hear what I listen to, some links play music (try the header and quotes)</span>
+ <NowPlaying />   
 
 <div style="height: 60px;"></div>
 

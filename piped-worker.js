@@ -357,7 +357,33 @@ export default {
         }
       }
 
+      // Now Playing
+      if (p1 === 'now-playing') {
+        if (request.method === 'GET') return ok(await kvGet(env, 'now-playing') || null)
+
+        if (request.method === 'POST') {
+          const body = await request.json()
+          const entry = {
+            title: body.title || '',
+            artist: body.artist || '',
+            live: body.live !== false,
+            ts: new Date().toISOString(),
+          }
+          await env.DB.put('now-playing', JSON.stringify(entry))
+          return ok(entry)
+        }
+      }
+
       return err('not found', 404)
+    }
+
+    // ── /now-playing → public read ─────────────────────────────────────────────
+    if (p0 === 'now-playing' && request.method === 'GET') {
+      const raw = await env.DB.get('now-playing')
+      const data = raw ? JSON.parse(raw) : null
+      return new Response(JSON.stringify(data), {
+        headers: { ...CORS, 'Content-Type': 'application/json' },
+      })
     }
 
     // ── /:videoId → Piped proxy (existing) ────────────────────────────────────
