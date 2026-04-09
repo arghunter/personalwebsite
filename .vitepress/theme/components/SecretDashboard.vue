@@ -108,15 +108,22 @@ const sleepErr  = ref('')
 // ── Feeds ──────────────────────────────────────────────────────────────────────
 interface FeedSource { id: string; url: string; title: string; addedAt: string }
 interface FeedItem { title: string; link: string; summary: string; pubDate: string }
-const feeds          = ref<FeedSource[]>([])
-const feedItems      = ref<Record<string, FeedItem[]>>({})
-const activeFeedId   = ref<string>('')
-const feedLoading    = ref<Record<string, boolean>>({})
-const newFeedUrl     = ref('')
-const newFeedBusy    = ref(false)
-const feedErr        = ref('')
-let readSet          = new Set<string>()
-const mobileFeedView = ref<'list' | 'articles'>('list')
+const feeds              = ref<FeedSource[]>([])
+const feedItems          = ref<Record<string, FeedItem[]>>({})
+const activeFeedId       = ref<string>('')
+const feedLoading        = ref<Record<string, boolean>>({})
+const newFeedUrl         = ref('')
+const newFeedBusy        = ref(false)
+const feedErr            = ref('')
+const editingFeedId      = ref('')
+const editingFeedTitle   = ref('')
+let readSet              = new Set<string>()
+const mobileFeedView     = ref<'list' | 'articles'>('list')
+const feedUnreadOnly     = ref(false)
+const feedSearch         = ref('')
+const focusedArticleIndex = ref(-1)
+const feedSavedLinks     = ref<Set<string>>(new Set())
+let feedAutoRefreshTimer: ReturnType<typeof setInterval> | null = null
 
 // ── AMA ────────────────────────────────────────────────────────────────────────
 interface AMAItem { id: string; question: string; name: string; answer: string; answered: boolean; askedAt: string; answeredAt: string }
@@ -174,11 +181,20 @@ async function loadFeeds() {
 async function loadAma() {
   try { amaItems.value = await apiFetch('/api/ama') } catch {}
 }
-function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds(); loadAma() }
+function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds(); loadAma(); startFeedAutoRefresh() }
 
 const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false, ama: false })
 async function switchTab(t: Tab) {
+  const prev = tab.value
   tab.value = t
+  if (prev === 'feeds' && t !== 'feeds') {
+    stopFeedAutoRefresh()
+    document.removeEventListener('keydown', onFeedKeydown)
+  }
+  if (t === 'feeds' && prev !== 'feeds') {
+    startFeedAutoRefresh()
+    document.addEventListener('keydown', onFeedKeydown)
+  }
   if (mobileLoaded.value[t]) return
   mobileLoaded.value[t] = true
   if (t === 'notes') await loadNotes()
@@ -224,20 +240,138 @@ function saveReadSet() {
 function isRead(link: string) { return readSet.has(link) }
 function markRead(link: string) { readSet.add(link); saveReadSet() }
 function unreadCount(feedId: string) {
+  if (feedId === '__all__') {
+    return feeds.value.reduce((sum, f) => {
+      const items = feedItems.value[f.id]
+      return sum + (items ? items.filter(i => i.link && !isRead(i.link)).length : 0)
+    }, 0)
+  }
   const items = feedItems.value[feedId]
   if (!items) return 0
   return items.filter(i => i.link && !isRead(i.link)).length
 }
 
+const allFeedItems = computed<FeedItem[]>(() => {
+  const all: FeedItem[] = []
+  for (const f of feeds.value) {
+    const items = feedItems.value[f.id]
+    if (items) all.push(...items)
+  }
+  return [...all].sort((a, b) => {
+    const da = a.pubDate ? new Date(a.pubDate).getTime() : 0
+    const db = b.pubDate ? new Date(b.pubDate).getTime() : 0
+    return db - da
+  })
+})
+
+const activeArticles = computed<FeedItem[]>(() => {
+  let items: FeedItem[]
+  if (activeFeedId.value === '__all__') {
+    items = allFeedItems.value
+  } else {
+    items = feedItems.value[activeFeedId.value] ?? []
+  }
+  if (feedUnreadOnly.value) items = items.filter(i => !isRead(i.link))
+  if (feedSearch.value.trim()) {
+    const q = feedSearch.value.trim().toLowerCase()
+    items = items.filter(i =>
+      i.title?.toLowerCase().includes(q) ||
+      i.summary?.toLowerCase().includes(q)
+    )
+  }
+  return items
+})
+
 async function selectFeed(feedId: string) {
   activeFeedId.value = feedId
+  focusedArticleIndex.value = -1
   mobileFeedView.value = 'articles'
+  if (feedId === '__all__') return
   if (feedItems.value[feedId]) return
   feedLoading.value = { ...feedLoading.value, [feedId]: true }
   try {
     feedItems.value = { ...feedItems.value, [feedId]: await apiFetch(`/api/feeds/${feedId}/items`) }
   } catch {}
   feedLoading.value = { ...feedLoading.value, [feedId]: false }
+}
+
+async function refreshFeed(feedId: string) {
+  if (feedId === '__all__') {
+    const ids = feeds.value.map(f => f.id)
+    for (const id of ids) {
+      const copy = { ...feedItems.value }; delete copy[id]; feedItems.value = copy
+      feedLoading.value = { ...feedLoading.value, [id]: true }
+      try {
+        feedItems.value = { ...feedItems.value, [id]: await apiFetch(`/api/feeds/${id}/items`) }
+      } catch {}
+      feedLoading.value = { ...feedLoading.value, [id]: false }
+    }
+    return
+  }
+  const copy = { ...feedItems.value }; delete copy[feedId]; feedItems.value = copy
+  feedLoading.value = { ...feedLoading.value, [feedId]: true }
+  try {
+    feedItems.value = { ...feedItems.value, [feedId]: await apiFetch(`/api/feeds/${feedId}/items`) }
+  } catch {}
+  feedLoading.value = { ...feedLoading.value, [feedId]: false }
+}
+
+async function autoRefreshLoadedFeeds() {
+  const ids = feeds.value.filter(f => feedItems.value[f.id]).map(f => f.id)
+  for (const id of ids) {
+    const copy = { ...feedItems.value }; delete copy[id]; feedItems.value = copy
+    try {
+      feedItems.value = { ...feedItems.value, [id]: await apiFetch(`/api/feeds/${id}/items`) }
+    } catch {}
+  }
+}
+
+function startFeedAutoRefresh() {
+  stopFeedAutoRefresh()
+  feedAutoRefreshTimer = setInterval(() => { autoRefreshLoadedFeeds() }, 5 * 60 * 1000)
+}
+
+function stopFeedAutoRefresh() {
+  if (feedAutoRefreshTimer) { clearInterval(feedAutoRefreshTimer); feedAutoRefreshTimer = null }
+}
+
+function markAllRead() {
+  for (const item of activeArticles.value) {
+    if (item.link) markRead(item.link)
+  }
+}
+
+async function saveToReadLater(item: FeedItem) {
+  try {
+    const saved = await apiFetch('/api/readlater', { method: 'POST', body: JSON.stringify({ url: item.link, title: item.title }) })
+    if (saved) laterItems.value.unshift(saved)
+    feedSavedLinks.value = new Set([...feedSavedLinks.value, item.link])
+    setTimeout(() => {
+      feedSavedLinks.value = new Set([...feedSavedLinks.value].filter(l => l !== item.link))
+    }, 2000)
+  } catch {}
+}
+
+function onFeedKeydown(e: KeyboardEvent) {
+  const tag = (e.target as HTMLElement)?.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return
+  const items = activeArticles.value
+  if (!items.length) return
+  if (e.key === 'j') {
+    e.preventDefault()
+    focusedArticleIndex.value = Math.min(focusedArticleIndex.value + 1, items.length - 1)
+  } else if (e.key === 'k') {
+    e.preventDefault()
+    focusedArticleIndex.value = Math.max(focusedArticleIndex.value - 1, 0)
+  } else if (e.key === 'o' || e.key === 'Enter') {
+    const item = items[focusedArticleIndex.value]
+    if (item?.link) { window.open(item.link, '_blank', 'noopener'); markRead(item.link) }
+  } else if (e.key === 'm') {
+    const item = items[focusedArticleIndex.value]
+    if (item?.link) markRead(item.link)
+  } else if (e.key === 'r') {
+    if (activeFeedId.value) refreshFeed(activeFeedId.value)
+  }
 }
 
 async function addFeed() {
@@ -251,6 +385,25 @@ async function addFeed() {
   } catch (e: any) { feedErr.value = e.message }
   newFeedBusy.value = false
 }
+
+function startEditFeed(f: FeedSource, e: Event) {
+  e.stopPropagation()
+  editingFeedId.value = f.id
+  editingFeedTitle.value = f.title
+  nextTick(() => (document.getElementById('feed-rename-' + f.id) as HTMLInputElement)?.select())
+}
+
+async function commitRenameFeed(f: FeedSource) {
+  const title = editingFeedTitle.value.trim()
+  editingFeedId.value = ''
+  if (!title || title === f.title) return
+  try {
+    await apiFetch(`/api/feeds/${f.id}`, { method: 'PATCH', body: JSON.stringify({ title }) })
+    f.title = title
+  } catch {}
+}
+
+function cancelRenameFeed() { editingFeedId.value = '' }
 
 async function deleteFeed(id: string) {
   try {
@@ -523,11 +676,15 @@ onMounted(() => {
   const w = localStorage.getItem('sd_w'), k = localStorage.getItem('sd_k')
   if (w && k) { workerUrl.value = w; apiKey.value = k; ready.value = true; loadAll() }
   else { showSetup.value = true }
+  // Desktop: feeds panel always visible, so keyboard nav is always active
+  document.addEventListener('keydown', onFeedKeydown)
 })
 
 onUnmounted(() => {
   recognition?.stop()
   if (saveTimer) clearTimeout(saveTimer)
+  stopFeedAutoRefresh()
+  document.removeEventListener('keydown', onFeedKeydown)
 })
 </script>
 
@@ -750,14 +907,31 @@ onUnmounted(() => {
 
           <!-- Feed sidebar -->
           <div class="sd-feeds-sidebar">
+            <div class="sd-feeds-sidebar-hd">
+              <span class="sd-feeds-sidebar-title">sources</span>
+              <button class="sd-feeds-refresh-btn" @click="activeFeedId ? refreshFeed(activeFeedId) : null" title="Refresh current feed">↺</button>
+            </div>
             <div class="sd-feeds-list">
-              <button v-for="f in feeds" :key="f.id"
+              <!-- All pseudo-feed -->
+              <button :class="['sd-feed-item', { active: activeFeedId === '__all__' }]" @click="selectFeed('__all__')">
+                <span class="sd-feed-name">All</span>
+                <span v-if="unreadCount('__all__')" class="sd-feed-badge">{{ unreadCount('__all__') }}</span>
+              </button>
+              <div v-for="f in feeds" :key="f.id"
                 :class="['sd-feed-item', { active: activeFeedId === f.id }]"
                 @click="selectFeed(f.id)">
-                <span class="sd-feed-name">{{ f.title }}</span>
+                <template v-if="editingFeedId === f.id">
+                  <input :id="'feed-rename-' + f.id" v-model="editingFeedTitle" class="sd-feed-rename-input"
+                    @click.stop @keydown.enter.stop="commitRenameFeed(f)"
+                    @keydown.escape.stop="cancelRenameFeed" @blur="commitRenameFeed(f)" />
+                </template>
+                <template v-else>
+                  <span class="sd-feed-name" @dblclick.stop="startEditFeed(f, $event)" title="Double-click to rename">{{ f.title }}</span>
+                </template>
                 <span v-if="unreadCount(f.id)" class="sd-feed-badge">{{ unreadCount(f.id) }}</span>
+                <button class="sd-feeds-item-refresh" @click.stop="refreshFeed(f.id)" title="Refresh">↺</button>
                 <button class="sd-del-btn" @click.stop="deleteFeed(f.id)" title="Remove feed">×</button>
-              </button>
+              </div>
               <div v-if="!feeds.length" class="sd-empty" style="padding: 1rem 0.75rem; font-size: 0.8rem;">no feeds yet</div>
             </div>
             <div class="sd-feeds-add">
@@ -770,18 +944,35 @@ onUnmounted(() => {
           <!-- Articles pane -->
           <div class="sd-feeds-articles">
             <div v-if="!activeFeedId" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">select a feed</div>
-            <div v-else-if="feedLoading[activeFeedId]" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">loading…</div>
-            <div v-else-if="!feedItems[activeFeedId]?.length" class="sd-empty" style="height:100%; display:flex; align-items:center; justify-content:center;">no articles</div>
-            <div v-else class="sd-articles-list">
-              <a v-for="item in feedItems[activeFeedId]" :key="item.link || item.title"
-                :href="item.link" target="_blank" rel="noopener"
-                :class="['sd-article-row', { 'sd-article-read': isRead(item.link) }]"
-                @click="markRead(item.link)">
-                <div class="sd-article-title">{{ item.title }}</div>
-                <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
-                <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
-              </a>
-            </div>
+            <template v-else>
+              <!-- Articles header -->
+              <div class="sd-articles-hd">
+                <input v-model="feedSearch" class="sd-feeds-search" placeholder="search articles…" autocomplete="off" />
+                <button :class="['sd-feeds-filter-btn', { active: feedUnreadOnly }]" @click="feedUnreadOnly = !feedUnreadOnly">unread only</button>
+                <button class="sd-feeds-markall-btn" @click="markAllRead">mark all read</button>
+                <button class="sd-feeds-refresh-btn" @click="refreshFeed(activeFeedId)" title="Refresh">↺</button>
+              </div>
+              <div v-if="feedLoading[activeFeedId] && activeFeedId !== '__all__'" class="sd-empty" style="padding:2rem; text-align:center;">loading…</div>
+              <div v-else-if="!activeArticles.length" class="sd-empty" style="padding:2rem; text-align:center;">{{ feedSearch || feedUnreadOnly ? 'no results' : 'no articles' }}</div>
+              <div v-else class="sd-articles-list">
+                <div v-for="(item, idx) in activeArticles" :key="item.link || item.title"
+                  :class="['sd-article-row', { 'sd-article-read': isRead(item.link), 'sd-article-focused': focusedArticleIndex === idx }]"
+                  @mouseenter="focusedArticleIndex = idx">
+                  <div class="sd-article-row-main">
+                    <a :href="item.link" target="_blank" rel="noopener" class="sd-article-link" @click="markRead(item.link)">
+                      <div class="sd-article-title">{{ item.title }}</div>
+                      <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
+                      <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
+                    </a>
+                  </div>
+                  <div class="sd-article-actions">
+                    <button class="sd-article-later-btn" @click.prevent="saveToReadLater(item)" :title="feedSavedLinks.has(item.link) ? 'saved!' : 'save to read later'">
+                      {{ feedSavedLinks.has(item.link) ? 'saved' : '→later' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
 
         </div>
@@ -975,29 +1166,57 @@ onUnmounted(() => {
           </div>
           <p v-if="feedErr" class="sd-err" style="padding: 0 0 0.5rem;">{{ feedErr }}</p>
           <div class="sd-list">
+            <!-- All pseudo-feed -->
+            <div class="sd-row" @click="selectFeed('__all__')" style="cursor:pointer">
+              <div class="sd-row-body">
+                <span class="sd-row-primary">All</span>
+              </div>
+              <span v-if="unreadCount('__all__')" class="sd-feed-badge">{{ unreadCount('__all__') }}</span>
+            </div>
             <div v-for="f in feeds" :key="f.id" class="sd-row" @click="selectFeed(f.id)" style="cursor:pointer">
               <div class="sd-row-body">
-                <span class="sd-row-primary">{{ f.title }}</span>
+                <template v-if="editingFeedId === f.id">
+                  <input :id="'feed-rename-m-' + f.id" v-model="editingFeedTitle" class="sd-feed-rename-input"
+                    @click.stop @keydown.enter.stop="commitRenameFeed(f)"
+                    @keydown.escape.stop="cancelRenameFeed" @blur="commitRenameFeed(f)" />
+                </template>
+                <span v-else class="sd-row-primary" @dblclick.stop="startEditFeed(f, $event)" title="Double-click to rename">{{ f.title }}</span>
               </div>
               <span v-if="unreadCount(f.id)" class="sd-feed-badge">{{ unreadCount(f.id) }}</span>
+              <button class="sd-feeds-refresh-btn" @click.stop="refreshFeed(f.id)" title="Refresh">↺</button>
               <button class="sd-del-btn" @click.stop="deleteFeed(f.id)">×</button>
             </div>
             <div v-if="!feeds.length" class="sd-empty">no feeds yet</div>
           </div>
         </template>
         <template v-else>
-          <button class="sd-feeds-back-btn" @click="mobileFeedView = 'list'">← back</button>
-          <div v-if="feedLoading[activeFeedId]" class="sd-empty">loading…</div>
-          <div v-else-if="!feedItems[activeFeedId]?.length" class="sd-empty">no articles</div>
+          <div class="sd-feeds-mobile-articles-hd">
+            <button class="sd-feeds-back-btn" @click="mobileFeedView = 'list'">← back</button>
+            <div class="sd-feeds-mobile-controls">
+              <input v-model="feedSearch" class="sd-feeds-search" placeholder="search…" autocomplete="off" />
+              <button :class="['sd-feeds-filter-btn', { active: feedUnreadOnly }]" @click="feedUnreadOnly = !feedUnreadOnly">unread</button>
+              <button class="sd-feeds-markall-btn" @click="markAllRead">✓ all</button>
+              <button class="sd-feeds-refresh-btn" @click="refreshFeed(activeFeedId)" title="Refresh">↺</button>
+            </div>
+          </div>
+          <div v-if="feedLoading[activeFeedId] && activeFeedId !== '__all__'" class="sd-empty">loading…</div>
+          <div v-else-if="!activeArticles.length" class="sd-empty">{{ feedSearch || feedUnreadOnly ? 'no results' : 'no articles' }}</div>
           <div v-else class="sd-articles-list">
-            <a v-for="item in feedItems[activeFeedId]" :key="item.link || item.title"
-              :href="item.link" target="_blank" rel="noopener"
-              :class="['sd-article-row', { 'sd-article-read': isRead(item.link) }]"
-              @click="markRead(item.link)">
-              <div class="sd-article-title">{{ item.title }}</div>
-              <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
-              <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
-            </a>
+            <div v-for="(item, idx) in activeArticles" :key="item.link || item.title"
+              :class="['sd-article-row', { 'sd-article-read': isRead(item.link), 'sd-article-focused': focusedArticleIndex === idx }]">
+              <div class="sd-article-row-main">
+                <a :href="item.link" target="_blank" rel="noopener" class="sd-article-link" @click="markRead(item.link)">
+                  <div class="sd-article-title">{{ item.title }}</div>
+                  <div v-if="item.summary" class="sd-article-summary">{{ item.summary }}</div>
+                  <div class="sd-article-meta">{{ feedItemDate(item.pubDate) }}</div>
+                </a>
+              </div>
+              <div class="sd-article-actions">
+                <button class="sd-article-later-btn" @click.prevent="saveToReadLater(item)" :title="feedSavedLinks.has(item.link) ? 'saved!' : 'save to read later'">
+                  {{ feedSavedLinks.has(item.link) ? 'saved' : '→later' }}
+                </button>
+              </div>
+            </div>
           </div>
         </template>
       </div>
@@ -1449,6 +1668,26 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   border-right: 1px solid var(--vp-c-divider);
   display: flex; flex-direction: column; overflow: hidden;
 }
+.sd-feeds-sidebar-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
+}
+.sd-feeds-sidebar-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--vp-c-text-3); }
+.sd-feeds-refresh-btn {
+  background: none; border: none; color: var(--vp-c-text-2);
+  font: inherit; font-size: 0.9rem; padding: 0.1rem 0.3rem;
+  cursor: pointer; line-height: 1; transition: color 0.15s;
+}
+.sd-feeds-refresh-btn:hover { color: var(--vp-c-brand-1); }
+.sd-feeds-item-refresh {
+  background: none; border: none; color: var(--vp-c-text-3);
+  font: inherit; font-size: 0.75rem; padding: 0 0.2rem;
+  cursor: pointer; line-height: 1; opacity: 0; transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.sd-feed-item:hover .sd-feeds-item-refresh { opacity: 1; }
+.sd-feeds-item-refresh:hover { color: var(--vp-c-brand-1); opacity: 1 !important; }
 .sd-feeds-list { flex: 1; overflow-y: auto; }
 .sd-feed-item {
   display: flex; align-items: center; gap: 0.4rem; width: 100%;
@@ -1456,9 +1695,14 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   padding: 0.6rem 0.75rem; cursor: pointer; text-align: left;
   font: inherit; color: inherit; transition: background 0.1s;
 }
-.sd-feed-item:hover { background: var(--vp-c-bg-soft); }
+.sd-feed-item:hover { background: var(--detail-lt); }
 .sd-feed-item.active { background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent); }
-.sd-feed-name { flex: 1; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-feed-name { flex: 1; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; }
+.sd-feed-rename-input {
+  flex: 1; min-width: 0; font: inherit; font-size: 0.82rem;
+  background: var(--vp-c-bg); border: 1px solid var(--vp-c-brand-1);
+  color: inherit; padding: 0.1rem 0.25rem; outline: none;
+}
 .sd-feed-badge {
   font-size: 0.65rem; background: var(--vp-c-brand-1); color: #fff;
   border-radius: 999px; padding: 0.1em 0.45em; flex-shrink: 0; line-height: 1.5;
@@ -1469,20 +1713,68 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 }
 .sd-feeds-add .sd-input { font-size: 0.8rem; padding: 0.35rem 0.55rem; }
 .sd-feeds-add .sd-submit-btn { font-size: 0.8rem; padding: 0.35rem 0.65rem; align-self: flex-end; }
-.sd-feeds-articles { flex: 1; overflow-y: auto; min-width: 0; }
+.sd-feeds-articles { flex: 1; overflow-y: auto; min-width: 0; display: flex; flex-direction: column; }
+.sd-articles-hd {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.sd-feeds-search {
+  flex: 1; min-width: 80px; background: none; border: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1); font: inherit; font-size: 0.78rem;
+  padding: 0.2rem 0.5rem; outline: none; transition: border-color 0.15s;
+}
+.sd-feeds-search::placeholder { color: var(--vp-c-text-3); }
+.sd-feeds-search:focus { border-color: var(--vp-c-brand-1); }
+.sd-feeds-filter-btn {
+  background: none; border: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2);
+  font: inherit; font-size: 0.72rem; padding: 0.18rem 0.5rem;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.sd-feeds-filter-btn:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+.sd-feeds-filter-btn.active {
+  border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1);
+  background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
+}
+.sd-feeds-markall-btn {
+  background: none; border: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2);
+  font: inherit; font-size: 0.72rem; padding: 0.18rem 0.5rem;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sd-feeds-markall-btn:hover { border-color: var(--vp-c-text-2); color: var(--vp-c-text-1); }
 .sd-articles-list { display: flex; flex-direction: column; }
 .sd-article-row {
-  display: block; padding: 0.75rem 1rem;
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--vp-c-divider);
-  text-decoration: none; color: inherit;
+  color: inherit;
   transition: background 0.1s;
 }
 .sd-article-row:hover { background: var(--vp-c-bg-soft); }
 .sd-article-row:last-child { border-bottom: none; }
 .sd-article-read { opacity: 0.4; }
+.sd-article-focused { background: color-mix(in srgb, var(--vp-c-brand-1) 8%, transparent) !important; outline: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 40%, transparent); }
+.sd-article-row-main { flex: 1; min-width: 0; }
+.sd-article-link { display: block; text-decoration: none; color: inherit; }
+.sd-article-link:hover .sd-article-title { text-decoration: underline; }
 .sd-article-title { font-size: 0.875rem; color: var(--vp-c-brand-1); font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
 .sd-article-summary { font-size: 0.78rem; color: var(--vp-c-text-2); line-height: 1.45; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .sd-article-meta { font-size: 0.7rem; color: var(--vp-c-text-3); }
+.sd-article-actions { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; padding-top: 0.1rem; }
+.sd-article-later-btn {
+  background: none; border: 1px solid var(--vp-c-divider); color: var(--vp-c-text-3);
+  font: inherit; font-size: 0.68rem; padding: 0.1rem 0.4rem;
+  cursor: pointer; white-space: nowrap; opacity: 0;
+  transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+}
+.sd-article-row:hover .sd-article-later-btn { opacity: 1; }
+.sd-article-later-btn:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); opacity: 1; }
+
+/* ── Mobile feeds articles header ───────────────────────────────────────────── */
+.sd-feeds-mobile-articles-hd { display: flex; flex-direction: column; border-bottom: 1px solid var(--vp-c-divider); flex-shrink: 0; }
+.sd-feeds-mobile-controls { display: flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; flex-wrap: wrap; }
 
 /* ── Mobile base ─────────────────────────────────────────────────────────────── */
 .sd-grid { display: none; }
@@ -1640,13 +1932,17 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-mobile-panel-feeds { padding: 0; display: flex; flex-direction: column; }
 .sd-feeds-mobile-add { display: flex; gap: 0.4rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--vp-c-divider); }
 .sd-feeds-mobile-add .sd-input { flex: 1; }
+@media (max-width: 767px) {
+  .sd-article-later-btn { opacity: 1 !important; }
+}
 .sd-feeds-back-btn {
   background: none; border: none; border-bottom: 1px solid var(--vp-c-divider);
   color: var(--vp-c-text-2); font: inherit; font-size: 0.85rem;
   padding: 0.65rem 1rem; cursor: pointer; text-align: left; width: 100%;
-  transition: color 0.15s;
+  transition: color 0.15s; flex-shrink: 0;
 }
 .sd-feeds-back-btn:hover { color: var(--vp-c-text-1); }
+.sd-feeds-mobile-articles-hd .sd-feeds-back-btn { border-bottom: none; }
 
 /* ── Desktop ─────────────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
