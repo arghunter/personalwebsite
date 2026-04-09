@@ -991,35 +991,19 @@ hr::after  { right: 0; }
   animation: pcb-signal 1.8s linear infinite;
 }
 
-/* Nav frosted glass + trace underline on scroll */
-.nav-scrolled {
-  border-bottom: 1px solid rgba(167,139,250,0.25) !important;
-  background: rgba(19,17,42,0.88) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-html.light .nav-scrolled {
-  border-bottom-color: rgba(124,58,237,0.2) !important;
-  background: rgba(226,217,255,0.88) !important;
+
+/* ── Focus-visible — keyboard navigation ring ────────────────────────────── */
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-/* Nav link signal pulse on hover */
-.nav-links a {
-  position: relative;
-}
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  background-size: 60% 100%;
-  opacity: 0;
-  animation: none;
-}
-.nav-links a:hover::after {
-  opacity: 1;
-  animation: pcb-signal 1s linear infinite;
+/* Suppress mouse-click focus ring on elements that handle it via hover styles */
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Blinking cursor on hero headline */
@@ -1046,19 +1030,6 @@ code { border-radius: 2px; }
   text-shadow: 0 0 8px rgba(167,139,250,0.8);
 }
 
-/* PCB layout dot grid — beneath circuit SVG, simulates EDA tool background */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(167,139,250,0.18) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-html.light body::after {
-  background-image: radial-gradient(circle, rgba(100,60,200,0.12) 1px, transparent 1px);
-}
 
 /* Timeline vias — hollow ring with drill hole like a real PCB via */
 .timeline-dot {

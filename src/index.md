@@ -26,8 +26,10 @@ I work on ASIC design, signal processing, and computer architecture — from bea
 <div style="height: 5px;"></div>
 
 <span class="subtext">If you want to hear what I listen to, some links play music (try the header and quotes)</span>
- <NowPlaying />   
+ <!-- <NowPlaying />    -->
 
 <div style="height: 10px;"></div>
 
-<span class="newsreader">"I want to live my life in such a way that when I get out of bed in the morning, the devil says, 'oh no, he's up.'"<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=s6Gjq-oxHEs" onclick="if(window.__playMusic){window.__playMusic('s6Gjq-oxHEs','Larger Than Life','Pink Zebra');return false;"> Steve Maraboli</a></span></span>
+
+ <span class="newsreader">"I want to live my life in such a way that when I get out of bed in the morning, the devil says, 'oh no, he's up.'"<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=w3SS0Qh-xSY" onclick="if(window.__playMusic){window.__playMusic('s6Gjq-oxHEs','Larger Than Life','Pink Zebra');return false;}"> Steve Maraboli</a></span></span>
+

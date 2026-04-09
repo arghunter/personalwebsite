@@ -20,7 +20,6 @@ const { frontmatter, page } = useData()
 const is404 = computed(() => page.value.isNotFound)
 
 const isDark = ref(true)
-const navScrolled = ref(false)
 const scrollPct = ref(0)
 const menuOpen = ref(false)
 
@@ -29,7 +28,6 @@ watch(() => page.value.relativePath, () => { menuOpen.value = false })
 onMounted(() => {
   isDark.value = !document.documentElement.classList.contains('light')
   const onScroll = () => {
-    navScrolled.value = window.scrollY > 10
     const max = document.documentElement.scrollHeight - window.innerHeight
     scrollPct.value = max > 0 ? Math.round((window.scrollY / max) * 100) : 0
   }
@@ -54,7 +52,7 @@ function playHeadline() {
 </script>
 
 <template>
-	<nav :class="{ 'nav-scrolled': navScrolled }">
+	<nav>
 		<div class="nav-links nav-links-desktop">
 			<a href="/">{{ frontmatter.title === 'Home' ? '>' : '' }}Home</a>
 			<a href="/blog">{{ frontmatter.title === 'Blog' ? '>' : '' }}Blog</a>
