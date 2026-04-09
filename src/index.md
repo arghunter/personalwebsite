@@ -24,4 +24,4 @@ I work on ASIC design, signal processing, and computer architecture — from bea
 
 <div style="height: 60px;"></div>
 
-<span class="newsreader">"I want to live my life in such a way that when I get out of bed in the morning, the devil says, 'oh no, he's up.'"<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=s6Gjq-oxHEs" onclick="if(window.__playMusic){window.__playMusic('s6Gjq-oxHEs','Larger Than Life','Pink Zebra');return false;}"> Steve Maraboli</a></span></span>
+<span class="newsreader">"I want to live my life in such a way that when I get out of bed in the morning, the devil says, 'oh no, he's up.'"<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=s6Gjq-oxHEs" onclick="if(window.__playMusic){window.__playMusic('s6Gjq-oxHEs','Larger Than Life','Pink Zebra');return false;"> Steve Maraboli</a></span></span>

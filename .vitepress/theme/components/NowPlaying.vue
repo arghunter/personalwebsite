@@ -50,17 +50,26 @@ onMounted(async () => {
 }
 
 .np-dot {
+  position: relative;
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
   background: #a78bfa;
   flex-shrink: 0;
-  animation: np-pulse 2s ease-in-out infinite;
 }
 
-@keyframes np-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+.np-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid #a78bfa;
+  animation: np-ripple 2s ease-out infinite;
+}
+
+@keyframes np-ripple {
+  0%   { opacity: 0.8; transform: scale(1);   }
+  100% { opacity: 0;   transform: scale(2.4); }
 }
 
 .np-note {

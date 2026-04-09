@@ -148,7 +148,7 @@ strong {
     z-index: 100;
     background: var(--detail-lt);
     border: 1px solid var(--hr-color);
-    border-radius: 999px;
+    border-radius: 0;
     cursor: pointer;
     width: 3rem;
     height: 1.6rem;
@@ -163,7 +163,7 @@ strong {
     transform: translateY(-50%);
     width: 1.15rem;
     height: 1.15rem;
-    border-radius: 50%;
+    border-radius: 2px;
     background: var(--accent);
     transition: left 250ms ease, background 250ms ease;
     display: flex;
@@ -633,7 +633,8 @@ code {
     gap: 0.6rem;
     background: var(--detail-lt);
     border: 1px solid var(--hr-color);
-    border-radius: 999px;
+    border-left: 2px solid var(--accent);
+    border-radius: 0;
     padding: 0.35rem 0.9rem 0.35rem 0.4rem;
     transition: background 250ms ease, border-color 250ms ease;
 }
@@ -641,7 +642,7 @@ code {
 .music-btn {
     background: var(--accent);
     border: none;
-    border-radius: 50%;
+    border-radius: 2px;
     width: 1.6rem;
     height: 1.6rem;
     cursor: pointer;
@@ -725,7 +726,7 @@ code {
     gap: 0.6rem;
     background: var(--detail-lt);
     border: 1px solid var(--hr-color);
-    border-radius: 0.5rem;
+    border-radius: 0;
     padding: 0.35rem 0.75rem;
     font-size: 0.65rem;
     pointer-events: none;
@@ -811,3 +812,317 @@ blockquote {
 
 .desktop-only { display: none; }
 @media (min-width: 768px) { .desktop-only { display: block; } }
+
+/* ══ PCB / circuit aesthetic enhancements ══════════════════════════════════ */
+
+
+/* Scanlines — subtle CRT overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 1px,
+    rgba(0,0,0,0.022) 1px,
+    rgba(0,0,0,0.022) 2px
+  );
+}
+
+html.light body::before {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 1px,
+    rgba(0,0,0,0.012) 1px,
+    rgba(0,0,0,0.012) 2px
+  );
+}
+
+/* Circuit-trace hr with solder dots at ends */
+hr {
+  border: none;
+  border-top: 1px solid var(--hr-color);
+  position: relative;
+  overflow: visible;
+}
+hr::before, hr::after {
+  content: '';
+  position: absolute;
+  top: -2.5px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+hr::before { left: 0; }
+hr::after  { right: 0; }
+
+/* Square corners on project cards — PCB components have no border-radius */
+.project-card {
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* PCB silkscreen corner marks */
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, var(--accent) 8px, transparent 8px) 0 0 / 1px 8px no-repeat,
+    linear-gradient(to bottom, var(--accent) 8px, transparent 8px) 0 0 / 8px 1px no-repeat,
+    linear-gradient(to left, var(--accent) 8px, transparent 8px) 100% 0 / 1px 8px no-repeat,
+    linear-gradient(to bottom, var(--accent) 8px, transparent 8px) 100% 0 / 8px 1px no-repeat,
+    linear-gradient(to right, var(--accent) 8px, transparent 8px) 0 100% / 1px 8px no-repeat,
+    linear-gradient(to top, var(--accent) 8px, transparent 8px) 0 100% / 8px 1px no-repeat,
+    linear-gradient(to left, var(--accent) 8px, transparent 8px) 100% 100% / 1px 8px no-repeat,
+    linear-gradient(to top, var(--accent) 8px, transparent 8px) 100% 100% / 8px 1px no-repeat;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.project-card:hover::before { opacity: 0.7; }
+
+/* Signal pulse running along project card bottom edge on hover */
+@keyframes pcb-signal {
+  0%   { background-position: -120% 0; }
+  100% { background-position: 220%  0; }
+}
+
+.project-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+  background-size: 40% 100%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.project-card:hover::after {
+  opacity: 1;
+  animation: pcb-signal 1.8s linear infinite;
+}
+
+/* Nav frosted glass + trace underline on scroll */
+.nav-scrolled {
+  border-bottom: 1px solid rgba(167,139,250,0.25) !important;
+  background: rgba(19,17,42,0.88) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+html.light .nav-scrolled {
+  border-bottom-color: rgba(124,58,237,0.2) !important;
+  background: rgba(226,217,255,0.88) !important;
+}
+
+/* Nav link signal pulse on hover */
+.nav-links a {
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background-size: 60% 100%;
+  opacity: 0;
+  animation: none;
+}
+.nav-links a:hover::after {
+  opacity: 1;
+  animation: pcb-signal 1s linear infinite;
+}
+
+/* Blinking cursor on hero headline */
+@keyframes pcb-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Timeline dot pulse on hover */
+.timeline-item:hover .timeline-dot {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* Code blocks — square, terminal feel */
+div[class*="language-"] {
+  border-radius: 0;
+  border: 1px solid rgba(167,139,250,0.15);
+}
+
+/* Inline code — remove soft radius */
+code { border-radius: 2px; }
+
+/* Selection glow */
+*::selection {
+  color: #fff;
+  background: var(--accent);
+  text-shadow: 0 0 8px rgba(167,139,250,0.8);
+}
+
+/* PCB layout dot grid — beneath circuit SVG, simulates EDA tool background */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(167,139,250,0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+html.light body::after {
+  background-image: radial-gradient(circle, rgba(100,60,200,0.12) 1px, transparent 1px);
+}
+
+/* Timeline vias — hollow ring with drill hole like a real PCB via */
+.timeline-dot {
+  border-radius: 50%;
+  background: transparent !important;
+  border: 2px solid var(--accent) !important;
+  box-shadow: inset 0 0 0 2px var(--background-lt);
+}
+.timeline-item:hover .timeline-dot {
+  background: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent),
+              inset 0 0 0 2px var(--accent);
+}
+
+/* Project card ref designators — silkscreen label in card heading */
+.project-card { counter-increment: pcb-ref; }
+main { counter-reset: pcb-ref; }
+.project-card .project-header h3::after {
+  content: ' U' counter(pcb-ref);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  opacity: 0.35;
+  font-family: 'DM Mono', monospace;
+  vertical-align: super;
+  margin-left: 0.3rem;
+}
+
+/* Blockquote as PCB keepout zone — diagonal amber hatching */
+blockquote {
+  position: relative;
+  border-left: 3px solid #fbbf24;
+  padding: 0.6rem 1rem 0.6rem 1.1rem;
+  margin-left: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 6px,
+    rgba(251,191,36,0.04) 6px,
+    rgba(251,191,36,0.04) 7px
+  );
+}
+blockquote::before {
+  content: 'KEEPOUT';
+  position: absolute;
+  top: -0.55rem; left: 0.5rem;
+  font-size: 0.45rem;
+  letter-spacing: 0.15em;
+  color: #fbbf24;
+  opacity: 0.6;
+  font-family: 'DM Mono', monospace;
+  font-style: normal;
+  background: var(--background-lt);
+  padding: 0 0.2rem;
+}
+
+/* H2 section headings — KiCad net-label arrow */
+main h2 {
+  position: relative;
+  padding-left: 1.1rem;
+}
+main h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  background: none;
+  border-style: solid;
+  border-width: 0.32em 0 0.32em 0.52em;
+  border-color: transparent transparent transparent var(--accent);
+  border-radius: 0;
+  opacity: 0.75;
+}
+
+/* Input / textarea focus — oscilloscope probe contact glow */
+input:focus, textarea:focus, select:focus, [contenteditable]:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 8px rgba(167,139,250,0.35);
+}
+
+/* Inline links — differential pair traces on hover */
+main a:not(.no-underline):hover {
+  text-decoration: underline double;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  background: none;
+  box-shadow: none;
+  padding-bottom: 0;
+}
+
+/* Inline code — logic probe / terminal readout */
+code:not(.shiki code) {
+  background: #0b1a0e;
+  color: #4ade80;
+  border: 1px solid rgba(74,222,128,0.2);
+  padding: 0.15rem 0.3rem;
+  border-radius: 2px;
+}
+
+
+/* Scroll VU meter — right edge signal level bar */
+.scroll-vu {
+  position: fixed;
+  right: 2px;
+  top: 15%;
+  height: 70%;
+  width: 2px;
+  z-index: 50;
+  background: rgba(167,139,250,0.08);
+  pointer-events: none;
+  overflow: hidden;
+}
+.scroll-vu-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, var(--accent), rgba(167,139,250,0.3));
+  transition: height 0.12s ease;
+}
+
+/* Blog post date — REV prefix */
+.page-date::before {
+  content: 'REV ';
+  font-size: 0.6em;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  opacity: 0.7;
+  vertical-align: middle;
+  margin-right: 0.15em;
+}
+
+/* 404 page — DRC error report */
+.drc-report {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  border: 1px solid rgba(167,139,250,0.2);
+  padding: 1.5rem 1.75rem;
+  max-width: 38rem;
+  margin: 2rem auto;
+  line-height: 1.8;
+}
+.drc-severity { color: #f43f5e; font-weight: 700; letter-spacing: 0.05em; }
+.drc-field { opacity: 0.45; }
+.drc-value { color: var(--accent); }
+

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
-  <g stroke="rgba(167,139,250,0.06)" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+  <g stroke="rgba(167,139,250,0.09)" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter">
 
     <!-- band A: y 0–220 -->
     <polyline points="0,60 85,60 85,25"/>
@@ -236,7 +236,7 @@
 
   </g>
 
-  <g fill="rgba(167,139,250,0.13)">
+  <g fill="rgba(167,139,250,0.19)">
     <!-- band A corners/junctions -->
     <circle cx="85" cy="60" r="2.5"/><circle cx="85" cy="25" r="2"/><circle cx="125" cy="100" r="2.5"/><circle cx="210" cy="100" r="2"/>
     <circle cx="250" cy="60" r="2.5"/><circle cx="340" cy="60" r="2.5"/><circle cx="340" cy="110" r="2"/>

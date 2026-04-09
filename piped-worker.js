@@ -82,13 +82,24 @@ function parseRSSAtom(xml) {
 // ── Catbox upload ─────────────────────────────────────────────────────────────
 
 async function uploadToCatbox(audioUrl) {
+  // Download the audio through the worker so we're not relying on catbox
+  // being able to reach a short-lived signed URL
+  const audioRes = await fetch(audioUrl, {
+    signal: AbortSignal.timeout(60000),
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': '*/*' },
+  })
+  if (!audioRes.ok) throw new Error(`audio download ${audioRes.status}`)
+  const buf = await audioRes.arrayBuffer()
+  const ct = audioRes.headers.get('content-type') || 'audio/mpeg'
+  const ext = ct.includes('webm') ? 'webm' : ct.includes('opus') ? 'opus' : ct.includes('ogg') ? 'ogg' : 'mp3'
+
   const form = new FormData()
-  form.append('reqtype', 'urlupload')
-  form.append('url', audioUrl)
+  form.append('reqtype', 'fileupload')
+  form.append('fileToUpload', new Blob([buf], { type: ct }), `audio.${ext}`)
   const res = await fetch('https://catbox.moe/user/api.php', {
     method: 'POST',
     body: form,
-    signal: AbortSignal.timeout(120000),
+    signal: AbortSignal.timeout(60000),
   })
   const text = await res.text()
   if (!text.startsWith('https://')) throw new Error(`catbox: ${text.slice(0, 120)}`)
@@ -96,18 +107,20 @@ async function uploadToCatbox(audioUrl) {
 }
 
 async function getBestAudioUrl(videoId) {
+  let cobaltErr = ''
   try {
     const r = await fromCobalt(videoId)
     if (r.audioStreams?.[0]?.url) return r.audioStreams[0].url
-  } catch {}
-  const fallbacks = [
-    ...PIPED_INSTANCES.map(b => tryPiped(b, videoId)),
-    ...INVIDIOUS_INSTANCES.map(b => tryInvidious(b, videoId)),
-  ]
-  const result = await Promise.any(fallbacks)
-  const best = result.audioStreams.sort((a, b) => b.bitrate - a.bitrate)[0]
-  if (!best?.url) throw new Error('no stream url found')
-  return best.url
+  } catch (e) { cobaltErr = e.message }
+  const fallbacks = PIPED_INSTANCES.map(b => tryPiped(b, videoId))
+  try {
+    const result = await Promise.any(fallbacks)
+    const best = result.audioStreams.sort((a, b) => b.bitrate - a.bitrate)[0]
+    if (best?.url) return best.url
+  } catch (e) {
+    throw new Error(`cobalt: ${cobaltErr} | piped: all failed`)
+  }
+  throw new Error('no stream url found')
 }
 
 // ── Piped sources ─────────────────────────────────────────────────────────────

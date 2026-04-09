@@ -241,16 +241,14 @@ async function lookupYt() {
     addVideoId.value = id
     addTitle.value  = data.title
     addArtist.value = data.author_name
-    if (!workerConn.value) {
-      const t = data.title.replace(/'/g, "\\'"), a = data.author_name.replace(/'/g, "\\'")
-      ytCode.value = `{ id: '${id}', title: '${t}', artist: '${a}' },`
-    }
+    const t = data.title.replace(/'/g, "\\'"), a = data.author_name.replace(/'/g, "\\'")
+    ytCode.value = `{ tid: '${id.slice(0,4)}', id: '${id}', title: '${t}', artist: '${a}' },`
   } catch {
     addVideoId.value = id
     addTitle.value  = ''
     addArtist.value = ''
     ytError.value = 'could not fetch metadata — fill in manually'
-    if (!workerConn.value) ytCode.value = `{ id: '${id}', title: 'Title', artist: 'Artist' },`
+    ytCode.value = `{ tid: '${id.slice(0,4)}', id: '${id}', title: 'Title', artist: 'Artist' },`
   }
   ytLoading.value = false
 }
@@ -266,25 +264,9 @@ async function addToPlaylist(playlistId: string) {
     })
     const pl = playlists.value.find(p => p.id === playlistId)
     if (pl) pl.tracks.push(track)
-    const name = pl?.name ?? 'playlist'
-    addMsg.value = `✓ added — uploading to catbox…`
-    const vid = addVideoId.value
+    addMsg.value = `✓ added to ${pl?.name ?? 'playlist'}`
     ytInput.value = ''; addVideoId.value = ''; addTitle.value = ''; addArtist.value = ''
-    // Upload audio to catbox in background
-    try {
-      const result = await apiFetch('/api/catbox', {
-        method: 'POST',
-        body: JSON.stringify({ videoId: vid, playlistId, tid: track.tid }),
-      })
-      if (pl) {
-        const t = pl.tracks.find(t => t.tid === track.tid)
-        if (t) t.url = result.url
-      }
-      addMsg.value = `✓ added to ${name} & cached`
-    } catch {
-      addMsg.value = `✓ added to ${name} (catbox failed — will stream live)`
-    }
-    setTimeout(() => { addMsg.value = '' }, 3000)
+    setTimeout(() => { addMsg.value = '' }, 2500)
   } catch (e: any) { addMsg.value = `error: ${e.message}` }
   addBusy.value = false
 }
@@ -440,8 +422,8 @@ onUnmounted(() => {
         <p v-if="addMsg" class="sp-add-msg">{{ addMsg }}</p>
       </template>
 
-      <!-- No worker: code snippet fallback -->
-      <template v-else-if="ytCode">
+      <!-- Code snippet (always shown after lookup) -->
+      <template v-if="ytCode">
         <div class="sp-widget-result">
           <pre class="sp-widget-code">{{ ytCode }}</pre>
           <button class="sp-widget-copy" @click="copyCode">copy</button>

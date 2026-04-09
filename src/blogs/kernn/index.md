@@ -3,7 +3,7 @@ title: "KERNN v1 - Building A General Feed Forward Neural Network Accelerator"
 description: "How I built a general purpose feed forward neural network accelerator"
 longDescription: ""
 date: 2026-4-10
-hidden: true
+hidden: false
 ---
 
 # KERNN v1 - Building A General Deep Neural Network Accelerator
@@ -18,7 +18,7 @@ What does it mean to accelerate a Feed Forward Neural Network? It means doing ma
 
 ## How does it work?
 
-The core of the design is a systolic array, which performs the matrix multiplication. All of the other hardware is either for control flow, or helps feed a systolic array.
+The core of the design is a systolic array, which performs the matrix multiplication. All of the other hardware is either for control flow, or helps feed a systolic array. A systolic array lets you perform matrix multiplication in a way that reduces memory bandwidth requirements and maximizes data reuse. Data pulses through it, like a heartbeat.
 
 
-# WORK IN PROGESS, mb.
+## WIP, Tested and Functional, but Midterms and taking all my time :(

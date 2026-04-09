@@ -156,7 +156,7 @@ function formatDate(ts: string) {
 
 .ama-question {
   font-size: 0.95rem;
-  color: var(--vp-c-text-1);
+  color: var(--primary-lt);
   line-height: 1.55;
   font-weight: 500;
 }
@@ -168,7 +168,7 @@ function formatDate(ts: string) {
 
 .ama-answer {
   font-size: 0.9rem;
-  color: var(--vp-c-text-1);
+  color: var(--primary-lt);
   line-height: 1.65;
   opacity: 0.85;
   white-space: pre-wrap;
@@ -185,7 +185,7 @@ function formatDate(ts: string) {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  border: 1px solid var(--vp-c-divider);
+  border: 1px solid var(--hr-color);
   padding: 1.25rem;
 }
 
@@ -198,9 +198,9 @@ function formatDate(ts: string) {
 }
 
 .ama-textarea, .ama-name-input {
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  color: var(--vp-c-text-1);
+  background: var(--detail-lt);
+  border: 1px solid var(--hr-color);
+  color: var(--primary-lt);
   font: inherit;
   font-size: 0.9rem;
   padding: 0.6rem 0.75rem;
@@ -213,18 +213,19 @@ function formatDate(ts: string) {
 }
 
 .ama-textarea:focus, .ama-name-input:focus {
-  border-color: #a78bfa;
+  border-color: var(--accent);
 }
 
 .ama-textarea::placeholder, .ama-name-input::placeholder {
+  color: var(--primary-lt);
   opacity: 0.4;
 }
 
 .ama-submit {
   align-self: flex-end;
   background: none;
-  border: 1px solid var(--vp-c-divider);
-  color: var(--vp-c-text-1);
+  border: 1px solid var(--hr-color);
+  color: var(--primary-lt);
   font: inherit;
   font-size: 0.85rem;
   padding: 0.45rem 1.25rem;
@@ -233,8 +234,8 @@ function formatDate(ts: string) {
 }
 
 .ama-submit:hover:not(:disabled) {
-  border-color: #a78bfa;
-  color: #a78bfa;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .ama-submit:disabled {

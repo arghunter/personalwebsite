@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData } from 'vitepress'
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import Intro from './components/Intro.vue'
 import MusicPlayer from './components/MusicPlayer.vue'
 import NowPlaying from './components/NowPlaying.vue'
@@ -20,9 +20,18 @@ const { frontmatter, page } = useData()
 const is404 = computed(() => page.value.isNotFound)
 
 const isDark = ref(true)
+const navScrolled = ref(false)
+const scrollPct = ref(0)
 
 onMounted(() => {
   isDark.value = !document.documentElement.classList.contains('light')
+  const onScroll = () => {
+    navScrolled.value = window.scrollY > 10
+    const max = document.documentElement.scrollHeight - window.innerHeight
+    scrollPct.value = max > 0 ? Math.round((window.scrollY / max) * 100) : 0
+  }
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onUnmounted(() => window.removeEventListener('scroll', onScroll))
 })
 
 function toggleTheme() {
@@ -42,7 +51,7 @@ function playHeadline() {
 </script>
 
 <template>
-	<nav>
+	<nav :class="{ 'nav-scrolled': navScrolled }">
 		<div class="nav-links">
 			<a href="/">{{ frontmatter.title === 'Home' ? '>' : '' }}Home</a>
 			<a href="/blog">{{ frontmatter.title === 'Blog' ? '>' : '' }}Blog</a>
@@ -77,10 +86,16 @@ function playHeadline() {
 	</div>
 
 	<div v-else-if="is404">
-		<h1 class="title page-title">How'd you get here?</h1>
-
 		<main>
-			<p>There's been a 404 error. Here let's go <a href="/">back home.</a></p>
+			<div class="drc-report">
+				<div class="drc-severity">[DRC] CRITICAL — Route not found</div>
+				<div><span class="drc-field">rule       </span><span class="drc-value">NO_ROUTE_TO_HOST</span></div>
+				<div><span class="drc-field">net        </span><span class="drc-value">{{ page.relativePath || '&lt;unknown&gt;' }}</span></div>
+				<div><span class="drc-field">severity   </span><span class="drc-value">error</span></div>
+				<div><span class="drc-field">violations </span><span class="drc-value">1</span></div>
+				<br/>
+				<div>Return to origin net: <a href="/">~root~</a></div>
+			</div>
 		</main>
 	</div>
 
@@ -98,6 +113,10 @@ function playHeadline() {
 		<main>
 			<Content />
 		</main>
+	</div>
+
+	<div class="scroll-vu" aria-hidden="true">
+		<div class="scroll-vu-fill" :style="{ height: scrollPct + '%' }"></div>
 	</div>
 
 	<MusicPlayer />
