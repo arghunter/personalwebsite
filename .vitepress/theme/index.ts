@@ -14,6 +14,7 @@ import SecretPlayer from './components/SecretPlayer.vue'
 import SecretDashboard from './components/SecretDashboard.vue'
 import NowPlaying from './components/NowPlaying.vue'
 import AMA from './components/AMA.vue'
+import BlockDiagram from './components/BlockDiagram.vue'
 
 export default {
 	Layout,
@@ -25,5 +26,6 @@ export default {
 		app.component('SecretDashboard', SecretDashboard)
 		app.component('NowPlaying', NowPlaying)
 		app.component('AMA', AMA)
+		app.component('BlockDiagram', BlockDiagram)
 	},
 } satisfies Theme

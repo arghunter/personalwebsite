@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData } from 'vitepress'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import Intro from './components/Intro.vue'
 import MusicPlayer from './components/MusicPlayer.vue'
 import NowPlaying from './components/NowPlaying.vue'
@@ -22,6 +22,9 @@ const is404 = computed(() => page.value.isNotFound)
 const isDark = ref(true)
 const navScrolled = ref(false)
 const scrollPct = ref(0)
+const menuOpen = ref(false)
+
+watch(() => page.value.relativePath, () => { menuOpen.value = false })
 
 onMounted(() => {
   isDark.value = !document.documentElement.classList.contains('light')
@@ -52,21 +55,37 @@ function playHeadline() {
 
 <template>
 	<nav :class="{ 'nav-scrolled': navScrolled }">
-		<div class="nav-links">
+		<div class="nav-links nav-links-desktop">
 			<a href="/">{{ frontmatter.title === 'Home' ? '>' : '' }}Home</a>
 			<a href="/blog">{{ frontmatter.title === 'Blog' ? '>' : '' }}Blog</a>
 			<a href="/projects">{{ frontmatter.title === 'Projects' ? '>' : '' }}Projects</a>
 			<a href="/graph">{{ frontmatter.title === 'Graph' ? '>' : '' }}Graph</a>
 		</div>
 
-		<div class="nav-links">
+		<div class="nav-links nav-links-desktop">
 			<a href="/now">{{ frontmatter.title === 'Now' ? '>' : '' }}Now</a>
 			<a href="/experience">{{ frontmatter.title === 'Experience' ? '>' : '' }}Experience</a>
 			<a href="/contact">{{ frontmatter.title === 'Contact' ? '>' : '' }}Contact</a>
-			
-			
 		</div>
+
+		<button class="nav-hamburger" @click="menuOpen = !menuOpen" :aria-label="menuOpen ? 'Close menu' : 'Open menu'">
+			<span class="nav-hamburger-icon" :class="{ open: menuOpen }"></span>
+		</button>
 	</nav>
+
+	<Transition name="mobile-menu">
+		<div v-if="menuOpen" class="mobile-menu" @click.self="menuOpen = false">
+			<nav class="mobile-menu-nav">
+				<a href="/" @click="menuOpen = false">Home</a>
+				<a href="/blog" @click="menuOpen = false">Blog</a>
+				<a href="/projects" @click="menuOpen = false">Projects</a>
+				<a href="/graph" @click="menuOpen = false">Graph</a>
+				<a href="/now" @click="menuOpen = false">Now</a>
+				<a href="/experience" @click="menuOpen = false">Experience</a>
+				<a href="/contact" @click="menuOpen = false">Contact</a>
+			</nav>
+		</div>
+	</Transition>
 
 	<img class="hero-image" src="/agi-hero.svg" draggable="false" />
 	<span class="hero-inc">Armaan Gomes, {{ incWord }} <button class="hero-inc-reroll" @click="rerollIncWord" aria-label="Reroll">↻</button></span>
@@ -104,6 +123,11 @@ function playHeadline() {
 	</div>
 
 	<div v-else>
+		<div class="ds-header">
+			<span>AGI-{{ page.relativePath.split('/').pop()?.replace('.md','').toUpperCase() ?? 'DOC' }}</span>
+			<span>REV {{ frontmatter.rev ?? 'A' }}</span>
+		</div>
+
 		<h1 class="title page-title" style="max-width: 40rem; margin-left: auto; margin-right: auto">{{ frontmatter.title }}</h1>
 
 		<h3 v-if="frontmatter.date !== undefined" class="page-date">
