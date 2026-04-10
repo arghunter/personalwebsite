@@ -30,7 +30,7 @@ const projects = [
     href: 'https://github.com/arghunter/clEar',
     writeup: '/blogs/clear',
     desc: 'Glasses-based beamforming hearing aids · 71% STOI · 9.9 dB SNR · ISEF Grand Award',
-    // longDesc: 'clEar is a glasses-frame beamforming hearing aid system I designed and built from scratch. A 16-microphone MEMS array embedded in the glasses feeds a Zynq FPGA running a real-time MSMVDR beamformer, steering a null toward noise sources while amplifying speech in front of the wearer. The system achieves a 9.9 dB SNR improvement and 71% STOI score on standardized intelligibility benchmarks. I also implemented novel PDM bitstream operators that made the beamforming pipeline 250× faster than naive implementations. The project won the ISEF Third Grand Award and was presented at the Intel International Science and Engineering Fair.',
+    longDesc: 'clEar is a glasses-frame beamforming hearing aid system I designed and built from scratch. A 16-microphone MEMS array embedded in the glasses feeds a Zynq FPGA running a real-time MSMVDR beamformer, steering a null toward noise sources while amplifying speech in front of the wearer. The system achieves a 9.9 dB SNR improvement and 71% STOI score on standardized intelligibility benchmarks. I also implemented novel PDM bitstream operators that made the beamforming pipeline 250× faster than naive implementations. The project won the ISEF Third Grand Award and was presented at the Intel International Science and Engineering Fair.',
     tags: ['DSP', 'FPGA', 'PCB'],
     specs: {
       'Architecture':    'FPGA + custom PCB',
@@ -42,13 +42,13 @@ const projects = [
     },
   },
   {
-    name: 'Supermic + more',
+    name: 'Supermic + ',
     type: ['asic', 'dsp'],
     cols: 6,
     href: 'https://github.com/arghunter/Supermic-tt08',
     writeup: '/blogs/supermic',
-    desc: '8 chips on Tiny Tapeout 8 · 130nm Skywater CMOS · beamforming & audio DSP ASICs',
-    // longDesc: 'A collection of 8 custom ASICs taped out on Tiny Tapeout 8 in the SKY130B 130nm process. The designs span beamforming hardware, audio DSP primitives, and PDM signal processing — all implemented in synthesizable Verilog and physically placed and routed through the open-source OpenLane flow. Tiny Tapeout aggregates many student designs onto a single shared die, making it one of the most accessible paths to real silicon for independent researchers.',
+    desc: '8 ASIC designs on Tiny Tapeout 8 · 130nm Skywater CMOS · phased array beamforming & audio DSP ASICs',
+    longDesc: 'A collection of 8 custom ASICs taped out on Tiny Tapeout 8 in the SKY130B 130nm process. The designs span beamforming hardware, audio DSP primitives, and PDM signal processing. Designs were developed with Verilog and synthesized with OpenLane',
     tags: ['ASIC', 'Verilog','DSP'],
     specs: {
       'Process':      'SKY130B 130nm',
@@ -59,13 +59,13 @@ const projects = [
   },
   // ── Notable cont. ────────────────────────────────── row 2: 4+5+3=12
   {
-    name: 'PDM Bitstream Operators',
+    name: 'Acoustic Camera and PDM Bitstream Operators',
     type: 'dsp',
-    cols: 4,
+    cols: 5,
     href: 'https://isef.net/project/ebed041-novel-pdm-operators-for-efficient-beamforming',
     writeup: null,
     desc: '250× runtime improvement in beamforming · PDM bitstream math · ISEF 2nd Award',
-    // longDesc: 'PDM (Pulse Density Modulation) microphones output a 1-bit oversampled bitstream rather than multi-bit PCM samples. I developed a set of novel mathematical operators that work directly on these PDM bitstreams — enabling addition, scaling, and delay operations without first decimating to PCM. Applied to beamforming, this eliminated the decimation step entirely and produced a 250× runtime speedup on FPGA. The work was published and presented at ISEF, earning a 2nd Place award.',
+    longDesc: 'I developed a set of novel mathematical operators that work directly on PDM bitstreams. This enabled addition, scaling, and delay operations without first decimating to PCM. Applied to beamforming, this eliminated the decimation step entirely and produced a 250× runtime speedup on FPGA. Algorithmic complexity dropped from O(n^2)-> less than O(logn). The work was published and presented at ISEF, earning a 2nd Place award.',
     tags: ['PDM', 'FPGA', 'DSP', 'PCB'],
     specs: {
       'Runtime gain': '250×',
@@ -75,13 +75,13 @@ const projects = [
     },
   },
   {
-    name: 'Potentiostat',
+    name: 'UC Berkeley Potentiostat & Electrochemical Camera',
     type: 'system',
-    cols: 5,
+    cols: 4,
     href: 'https://github.com/arghunter/Potentiostat',
     writeup: null,
     desc: '18-channel high-speed potentiostat · UC Berkeley Nanotech · 256-ch electrochemical camera',
-    // longDesc: 'A high-speed 18-channel potentiostat built for the UC Berkeley Nanotech lab to enable electrochemical imaging. The system applies precise voltage waveforms to an array of electrodes and simultaneously streams the resulting current responses, constructing a 256-channel electrochemical camera. The custom PCB integrates FPGA-based data acquisition with a C# software stack for real-time visualization. Used in active nanoscience research.',
+    longDesc: 'A high-speed 18-channel potentiostat built for the UC Berkeley Nanotech lab to enable low cost blood testing. The system applies precise voltage waveforms to an array of electrodes and simultaneously streams the resulting current responses, allowing backprop for chemical testing. The electrochemical camera integrates FPGA-based data acquisition with a C# software stack for real-time visualization. Used in active nanoscience research.',
     tags: ['PCB', 'FPGA','DSP'],
     specs: {
       'Channels':    '18',
@@ -107,13 +107,13 @@ const projects = [
   },
   // ── ASIC Designs ─────────────────────────────────── row 3: 4+4+4=12
   {
-    name: '16-Mic Beamformer',
+    name: '16-Mic Phased Array Beamformer',
     type: 'asic',
     cols: 4,
     href: 'https://github.com/arghunter/16-Mic-Beamformer-Verilog',
     writeup: null,
     desc: '16-ch PDM beamformer · DDR input · I2S output · fabricated on TT08',
-    // longDesc: 'A 16-channel PDM beamformer ASIC taped out on Tiny Tapeout 8. It accepts DDR PDM input from 16 microphones, applies delay-and-sum beamforming in the PDM domain, and outputs a single steered I2S audio stream. Fully synthesized and place-and-routed in Verilog through the SKY130B 130nm open-source PDK.',
+    longDesc: 'A 16-channel PDM beamformer ASIC taped out on Tiny Tapeout 8. It accepts DDR PDM input from 16 microphones, applies delay-and-sum beamforming in the PDM domain, and outputs a single steered I2S audio stream. Fully synthesized and place-and-routed via OpenLane through the SKY130B 130nm open-source PDK.',
     tags: ['ASIC', 'Verilog','DSP'],
     specs: {
       'Channels': '16',
@@ -129,8 +129,8 @@ const projects = [
     cols: 4,
     href: 'https://github.com/arghunter/Customizable-PDM-Pitch-Filter-ASIC',
     writeup: null,
-    desc: 'Narrowband notch filter exploiting PDM time resolution for frequency removal',
-    // longDesc: 'A configurable narrowband notch filter that operates directly on PDM bitstreams. PDM\'s high oversampling rate gives sub-sample time resolution, which this design exploits to precisely null a target frequency without decimating to PCM. The filter center frequency and bandwidth are set at synthesis time via parameters. Taped out on Tiny Tapeout 8 in SKY130B.',
+    desc: 'Narrowband notch filter exploiting PDM time resolution for frequency filtering',
+    longDesc: 'A configurable narrowband notch filter that operates directly on PDM bitstreams. PDM\'s high oversampling rate gives high time resolution, which this design exploits to precisely null a target frequency without decimating to PCM. The filter center frequency and bandwidth are configurable via parameters. Taped out on Tiny Tapeout 8 in SKY130B.',
     tags: ['ASIC', 'Verilog','DSP'],
     specs: {
       'Type':    'Narrowband notch',
@@ -145,8 +145,8 @@ const projects = [
     cols: 4,
     href: 'https://github.com/arghunter/Customizable-PDM-Cross-Correlator-ASIC',
     writeup: null,
-    desc: 'Cross/auto correlator for direction-of-arrival and pitch ID on PDM bitstreams',
-    // longDesc: 'A PDM-domain cross and auto-correlator ASIC. Cross-correlation between microphone pairs gives the inter-channel time delay, enabling direction-of-arrival estimation without PCM conversion. Auto-correlation gives the fundamental period of a signal, enabling pitch detection. Both operations run entirely on the 1-bit PDM stream. Taped out on Tiny Tapeout 8 in SKY130B 130nm.',
+    desc: 'Cross/auto correlator for direction-of-arrival on PDM bitstreams',
+    longDesc: 'A PDM-domain cross and auto-correlator ASIC. Cross-correlation between microphone pairs gives the time delay of arrival, enabling direction-of-arrival estimation without PCM conversion. Auto-correlation gives the fundamental period of a signal, enabling pitch detection. Taped out on Tiny Tapeout 8 in SKY130B 130nm.',
     tags: ['ASIC', 'Verilog','DSP'],
     specs: {
       'Output':   'Cross + auto correlation',
@@ -184,7 +184,7 @@ const projects = [
       'ISA':   'RISC-V RV32-IM',
       'Type':  '5-stage pipeline',
       'HDL':   'Verilog',
-      'Demo':  'Pong over VGA',
+      'Demo':  'Pong,Mandelbrot over VGA',
     },
   },
   {
@@ -193,7 +193,7 @@ const projects = [
     cols: 4,
     href: null,
     writeup: null,
-    desc: '100 Gb/s+ inter-FPGA bandwidth · >1.6M logic slices',
+    desc: 'Multi FPGA cluster 100 Gb/s+ inter-FPGA bandwidth · >1.6M logic slices',
     // longDesc: 'A multi-FPGA compute cluster under development at MIT\'s Open Compute Lab. Multiple Xilinx FPGAs are interconnected via high-speed transceivers, targeting >100 Gb/s aggregate inter-FPGA bandwidth and >1.6M usable logic slices for large-scale hardware experiments. The cluster is intended as an acceleration substrate for the DNN accelerator research.',
     tags: ['FPGA','PCB'],
     wip: true,
