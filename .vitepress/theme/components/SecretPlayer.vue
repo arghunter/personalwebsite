@@ -55,6 +55,15 @@ const HARDCODED: Playlist[] = [
 
     ],
   },
+   {
+    id: 'league',
+    name: 'League',
+    tracks: [
+      { tid: 'lg-1', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
+      { tid: 'lg-2', id: 'fmI_Ndrxy14', url: 'https://files.catbox.moe/fq5z4u.mp3', title: 'Warriors', artist: 'League of Legends, Imagine Dragons' },
+
+    ],
+  },
 ]
 
 // ── State ─────────────────────────────────────────────────────────────────────
