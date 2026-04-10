@@ -206,18 +206,18 @@ const projects = [
 ]
 
 const colorsDark = {
-  system:   { bg: 'rgba(192,132,252,0.10)', border: 'rgba(192,132,252,0.4)',  text: '#c084fc' },
-  asic:     { bg: 'rgba(251,146,60,0.11)',  border: 'rgba(251,146,60,0.4)',   text: '#fb923c' },
-  dsp:      { bg: 'rgba(56,189,248,0.10)',  border: 'rgba(56,189,248,0.4)',   text: '#38bdf8' },
-  arch:     { bg: 'rgba(52,211,153,0.10)',  border: 'rgba(52,211,153,0.4)',   text: '#34d399' },
-  software: { bg: 'rgba(167,139,250,0.08)', border: 'rgba(167,139,250,0.35)', text: '#a78bfa' },
+  system:   { bg: 'rgba(192,132,252,0.18)', border: 'rgba(192,132,252,0.55)', text: '#c084fc' },
+  asic:     { bg: 'rgba(251,146,60,0.18)',  border: 'rgba(251,146,60,0.55)',  text: '#fb923c' },
+  dsp:      { bg: 'rgba(56,189,248,0.18)',  border: 'rgba(56,189,248,0.55)',  text: '#38bdf8' },
+  arch:     { bg: 'rgba(52,211,153,0.18)',  border: 'rgba(52,211,153,0.55)',  text: '#34d399' },
+  software: { bg: 'rgba(167,139,250,0.16)', border: 'rgba(167,139,250,0.50)', text: '#a78bfa' },
 }
 const colorsLight = {
-  system:   { bg: 'rgba(124,58,237,0.10)',  border: 'rgba(124,58,237,0.5)',   text: '#6d28d9' },
-  asic:     { bg: 'rgba(194,65,12,0.09)',   border: 'rgba(194,65,12,0.5)',    text: '#c2410c' },
-  dsp:      { bg: 'rgba(3,105,161,0.09)',   border: 'rgba(3,105,161,0.5)',    text: '#0369a1' },
-  arch:     { bg: 'rgba(4,120,87,0.09)',    border: 'rgba(4,120,87,0.5)',     text: '#047857' },
-  software: { bg: 'rgba(91,33,182,0.08)',   border: 'rgba(91,33,182,0.45)',   text: '#5b21b6' },
+  system:   { bg: 'rgba(124,58,237,0.18)',  border: 'rgba(124,58,237,0.75)',  text: '#5b21b6' },
+  asic:     { bg: 'rgba(194,65,12,0.16)',   border: 'rgba(194,65,12,0.75)',   text: '#9a3412' },
+  dsp:      { bg: 'rgba(3,105,161,0.16)',   border: 'rgba(3,105,161,0.75)',   text: '#075985' },
+  arch:     { bg: 'rgba(4,120,87,0.16)',    border: 'rgba(4,120,87,0.75)',    text: '#065f46' },
+  software: { bg: 'rgba(91,33,182,0.16)',   border: 'rgba(91,33,182,0.70)',   text: '#4c1d95' },
 }
 const colors = computed(() => isDark.value ? colorsDark : colorsLight)
 
@@ -838,6 +838,8 @@ const legend = [
 .fp-block {
   border: 1px solid var(--bd-p);
   background: var(--bg-p);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   padding: 1.1rem 1.25rem 0.9rem;
   display: flex;
   flex-direction: column;
@@ -894,8 +896,9 @@ const legend = [
 
 .fp-block-desc {
   font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.6;
-  opacity: 0.7;
+  opacity: 0.88;
   flex: 1;
 }
 
@@ -1026,6 +1029,14 @@ const legend = [
   align-content: start;
 }
 
+/* Light mode — stronger block contrast */
+:global(html.light) .fp-block {
+  box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.45);
+}
+:global(html.light) .fp-block-desc {
+  opacity: 1;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .fp-rulers, .fp-row-nums, .fp-c, .fp-drc { display: none; }
@@ -1143,8 +1154,9 @@ const legend = [
 
 .fp-panel-desc {
   font-size: 0.88rem;
+  font-weight: 500;
   line-height: 1.7;
-  opacity: 0.75;
+  opacity: 0.88;
   margin: 0;
 }
 

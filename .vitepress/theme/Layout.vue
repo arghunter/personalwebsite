@@ -132,7 +132,7 @@ function playHeadline() {
 			{{ new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' }) }}
 		</h3>
 
-		<main>
+		<main :class="{ 'blog-post': frontmatter.date !== undefined }">
 			<Content />
 		</main>
 	</div>
