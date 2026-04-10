@@ -114,7 +114,7 @@ async function apiFetch(path: string, opts: RequestInit = {}) {
 async function loadPlaylists() {
   try {
     let data: Playlist[] = await apiFetch('/api/playlists')
-    if (data.length === 0) {
+    if (true) {
       // First time: seed KV with hardcoded playlists
       await apiFetch('/api/playlists', { method: 'PUT', body: JSON.stringify(HARDCODED) })
       data = JSON.parse(JSON.stringify(HARDCODED))
