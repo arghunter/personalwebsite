@@ -29,6 +29,10 @@ const HARDCODED: Playlist[] = [
       { tid: 'ss-6', id: 'VfetGaJBWZk', url: 'https://files.catbox.moe/n707qk.mp3', title: 'Could Have Been Me', artist: 'The Struts' },
       { tid: 'ss-7', id: '58uQjg5N2Dw', url: 'https://files.catbox.moe/lyofto.mp3', title: 'Miracle', artist: 'Jeff Williams ft. Casey Lee Williams' },
       { tid: 'ss-8', id: 'pKt3o7WPYdo', url: 'https://files.catbox.moe/l0ugbo.mp3', title: 'I Lived', artist: 'OneRepublic' },
+      { tid: 'ss-9', id: 'FM7MFYoylVs', url: 'https://files.catbox.moe/ll0019.mp3', title: 'Something Just Like This', artist: 'The Chainsmokers \u0026 Coldplay' },
+      { tid: 'ss-10', id: 'SCD2tB1qILc', url: 'https://files.catbox.moe/zp3ycx.mp3', title: 'Frame of Mind', artist: 'Tristam \u0026 Braken' },
+      { tid: 'ss-11', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
+      { tid: 'ss-12', id: 'EqrGzF25Puk', url: 'https://files.catbox.moe/borrl9.mp3', title: 'Drop Top', artist: 'MEOVV' },
     ],
   },
   {
@@ -45,6 +49,10 @@ const HARDCODED: Playlist[] = [
       { tid: 'hp-8', id: 'SUvlSxoichA', url: 'https://files.catbox.moe/59kevs.mp3', title: 'Remember the Name', artist: 'Fort Minor' },
       { tid: 'hp-9', id: 'XbQc2Qmv6dM', url: 'https://files.catbox.moe/d2e1dx.mp3', title: 'Angry Too', artist: 'Lola Blanc' },
       { tid: 'hp-10', id: 'IgheiVEoT9o', url: 'https://files.catbox.moe/fisgc8.mp3', title: 'Pomegranate Lips', artist: 'Derivakat' },
+      { tid: 'hp-11', id: 'BPyigNOa83M', url: 'https://files.catbox.moe/7if8nc.mp3', title: 'In My Bones', artist: 'The Score' },
+      { tid: 'hp-12', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
+      { tid: 'hp-13', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
+
     ],
   },
 ]

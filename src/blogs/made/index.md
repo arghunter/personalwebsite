@@ -13,7 +13,7 @@ I think everyone should have a personal website that is entirely under their con
 <div style="height: 20px;"></div>
 
 ## What Did I Use?
-This website is directly forked from Liam Hanrahan's website, with a few improvements of my own. I primarily do hardware and low-level software. Web dev is far from my favorite task, so naturally, I asked his permission and based my website off of his.
+This website is directly forked from Liam Hanrahan's website, with a few improvements of my own. I primarily do hardware and low-level software. Web dev is far from my favorite task, so naturally, I asked his permission and based my website off of his. Also most of the changes are made with AI, I much prefer hardware over web dev, and while I can make a website myself, I'd rather be designing chips or routing PCBs.
 
 <div style="height: 20px;"></div>
 
