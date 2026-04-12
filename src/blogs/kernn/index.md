@@ -18,7 +18,7 @@ What does it mean to accelerate a Feed Forward Neural Network? It means doing ma
 
 ## How does it work?
 
-The core of the design is a systolic array, which performs the matrix multiplication. All of the other hardware is either for control flow, or helps feed a systolic array. A systolic array lets you perform matrix multiplication in a way that reduces memory bandwidth requirements and maximizes data reuse. Data pulses through it, like a heartbeat.
+The core of the design is a systolic array, which performs the matrix multiplication. All of the other hardware is either for control flow, or helps feed a systolic array. A systolic array lets you perform matrix multiplication in a way that reduces memory bandwidth requirements and maximizes data reuse. Data pulses through it in a massive 2D pipeline to  
 
 
 ## WIP, Tested and Functional, but Midterms are taking all my time :(

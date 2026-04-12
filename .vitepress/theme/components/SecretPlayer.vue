@@ -33,6 +33,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'ss-10', id: 'SCD2tB1qILc', url: 'https://files.catbox.moe/zp3ycx.mp3', title: 'Frame of Mind', artist: 'Tristam \u0026 Braken' },
       { tid: 'ss-11', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
       { tid: 'ss-12', id: 'EqrGzF25Puk', url: 'https://files.catbox.moe/borrl9.mp3', title: 'Drop Top', artist: 'MEOVV' },
+      { tid: 'ss-13', id: 'HLCMg_qNrX4', url: 'https://files.catbox.moe/u9go1r.mp3', title: 'Speechless', artist: 'Naomi Scott' },
     ],
   },
   {
