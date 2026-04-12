@@ -34,6 +34,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'ss-11', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
       { tid: 'ss-12', id: 'EqrGzF25Puk', url: 'https://files.catbox.moe/borrl9.mp3', title: 'Drop Top', artist: 'MEOVV' },
       { tid: 'ss-13', id: 'HLCMg_qNrX4', url: 'https://files.catbox.moe/u9go1r.mp3', title: 'Speechless', artist: 'Naomi Scott' },
+      { tid: 'ss-14', id: 'JiDeN4h6eQk', url: 'https://files.catbox.moe/k2royg.mp3', title: 'Dancing In The Dark', artist: 'Rihanna' },
     ],
   },
   {
@@ -53,6 +54,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'hp-11', id: 'BPyigNOa83M', url: 'https://files.catbox.moe/7if8nc.mp3', title: 'In My Bones', artist: 'The Score' },
       { tid: 'hp-12', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
       { tid: 'hp-13', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
+      { tid: 'hp-14', id: 'pzt6SmvGpXk', url: 'https://files.catbox.moe/4p7sha.mp3', title: 'Sacrifice', artist: 'G.E.M, League of Legends' },
 
     ],
   },
@@ -62,6 +64,8 @@ const HARDCODED: Playlist[] = [
     tracks: [
       { tid: 'lg-1', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
       { tid: 'lg-2', id: 'fmI_Ndrxy14', url: 'https://files.catbox.moe/fq5z4u.mp3', title: 'Warriors', artist: 'League of Legends, Imagine Dragons' },
+      { tid: 'lg-3', id: 'pzt6SmvGpXk', url: 'https://files.catbox.moe/4p7sha.mp3', title: 'Sacrifice', artist: 'G.E.M, League of Legends' },
+
 
     ],
   },
