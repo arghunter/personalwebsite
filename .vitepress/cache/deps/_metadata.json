@@ -1,37 +1,70 @@
 {
-  "hash": "6e8c1489",
+  "hash": "c4a6b97c",
   "configHash": "a0ad6f94",
-  "lockfileHash": "12a07fdc",
-  "browserHash": "56c4c043",
+  "lockfileHash": "43f8cfb0",
+  "browserHash": "88842a06",
   "optimized": {
     "vue": {
       "src": "../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "d312f5bd",
+      "fileHash": "59269188",
       "needsInterop": false
     },
     "vitepress > @vue/devtools-api": {
       "src": "../../../node_modules/@vue/devtools-api/dist/index.js",
       "file": "vitepress___@vue_devtools-api.js",
-      "fileHash": "40283b85",
+      "fileHash": "371d323d",
       "needsInterop": false
     },
     "vitepress > @vueuse/core": {
       "src": "../../../node_modules/@vueuse/core/dist/index.js",
       "file": "vitepress___@vueuse_core.js",
-      "fileHash": "ae615df3",
+      "fileHash": "c2feb2fd",
       "needsInterop": false
     },
     "marked": {
       "src": "../../../node_modules/marked/lib/marked.esm.js",
       "file": "marked.js",
-      "fileHash": "154ac71c",
+      "fileHash": "31b30fbe",
+      "needsInterop": false
+    },
+    "three": {
+      "src": "../../../node_modules/three/build/three.module.js",
+      "file": "three.js",
+      "fileHash": "739711e8",
+      "needsInterop": false
+    },
+    "three/examples/jsm/postprocessing/EffectComposer.js": {
+      "src": "../../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js",
+      "file": "three_examples_jsm_postprocessing_EffectComposer__js.js",
+      "fileHash": "34cffd48",
+      "needsInterop": false
+    },
+    "three/examples/jsm/postprocessing/RenderPass.js": {
+      "src": "../../../node_modules/three/examples/jsm/postprocessing/RenderPass.js",
+      "file": "three_examples_jsm_postprocessing_RenderPass__js.js",
+      "fileHash": "41999969",
+      "needsInterop": false
+    },
+    "three/examples/jsm/postprocessing/UnrealBloomPass.js": {
+      "src": "../../../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "file": "three_examples_jsm_postprocessing_UnrealBloomPass__js.js",
+      "fileHash": "7c065ab8",
       "needsInterop": false
     }
   },
   "chunks": {
+    "chunk-EZRCSUXT": {
+      "file": "chunk-EZRCSUXT.js"
+    },
+    "chunk-EHZ6W3I7": {
+      "file": "chunk-EHZ6W3I7.js"
+    },
     "chunk-CIQQ7TXU": {
       "file": "chunk-CIQQ7TXU.js"
+    },
+    "chunk-FXVQGD4F": {
+      "file": "chunk-FXVQGD4F.js"
     }
   }
 }

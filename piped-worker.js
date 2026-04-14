@@ -570,6 +570,74 @@ export default {
         }
       }
 
+      // Projects
+      if (p1 === 'projects') {
+        // GET /api/projects — list all
+        if (!p2 && request.method === 'GET') return ok(await kvGet(env, 'projects'))
+
+        // POST /api/projects — create
+        if (!p2 && request.method === 'POST') {
+          const { name, status, description, nextStep } = await request.json()
+          if (!name?.trim()) return err('name required')
+          const item = {
+            id: Math.random().toString(36).slice(2, 12),
+            name: name.trim(),
+            status: status || 'active',
+            description: description?.trim() || '',
+            nextStep: nextStep?.trim() || '',
+            links: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }
+          const list = await kvGet(env, 'projects'); list.unshift(item)
+          await kvSet(env, 'projects', list)
+          return ok(item, 201)
+        }
+
+        if (p2) {
+          // GET /api/projects/:id — fetch single project
+          if (!parts[3] && request.method === 'GET') {
+            const list = await kvGet(env, 'projects')
+            const proj = list.find(p => p.id === p2)
+            if (!proj) return err('not found', 404)
+            return ok(proj)
+          }
+
+          // PATCH /api/projects/:id — update metadata fields
+          if (!parts[3] && request.method === 'PATCH') {
+            const patch = await request.json()
+            const list = await kvGet(env, 'projects')
+            const allowed = ['name', 'status', 'description', 'nextStep', 'links']
+            const filtered = Object.fromEntries(Object.entries(patch).filter(([k]) => allowed.includes(k)))
+            await kvSet(env, 'projects', list.map(p => p.id === p2 ? { ...p, ...filtered, updatedAt: new Date().toISOString() } : p))
+            return ok({ ok: true })
+          }
+
+          // DELETE /api/projects/:id — remove project and its body
+          if (!parts[3] && request.method === 'DELETE') {
+            await kvSet(env, 'projects', (await kvGet(env, 'projects')).filter(p => p.id !== p2))
+            await env.DB.delete(`project-body:${p2}`)
+            return ok({ ok: true })
+          }
+
+          // GET /api/projects/:id/body — fetch markdown body
+          if (parts[3] === 'body' && request.method === 'GET') {
+            const body = await env.DB.get(`project-body:${p2}`) || ''
+            return ok({ body })
+          }
+
+          // PATCH /api/projects/:id/body — save markdown body
+          if (parts[3] === 'body' && request.method === 'PATCH') {
+            const { body } = await request.json()
+            await env.DB.put(`project-body:${p2}`, body ?? '')
+            // Touch updatedAt on project metadata
+            const list = await kvGet(env, 'projects')
+            await kvSet(env, 'projects', list.map(p => p.id === p2 ? { ...p, updatedAt: new Date().toISOString() } : p))
+            return ok({ ok: true })
+          }
+        }
+      }
+
       return err('not found', 404)
     }
 

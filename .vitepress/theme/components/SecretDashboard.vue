@@ -15,16 +15,17 @@ const setupErr   = ref('')
 const setupBusy  = ref(false)
 
 // ── Mobile tabs ────────────────────────────────────────────────────────────────
-type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep' | 'feeds' | 'ama'
+type Tab = 'music' | 'notes' | 'ideas' | 'later' | 'sleep' | 'feeds' | 'ama' | 'projects'
 const tab  = ref<Tab>('music')
 const tabs = [
-  { id: 'music'  as Tab, icon: '♪', label: 'music' },
-  { id: 'notes'  as Tab, icon: '✎', label: 'notes' },
-  { id: 'ideas'  as Tab, icon: '✦', label: 'ideas' },
-  { id: 'later'  as Tab, icon: '○', label: 'later' },
-  { id: 'sleep'  as Tab, icon: '◑', label: 'sleep' },
-  { id: 'feeds'  as Tab, icon: '⊞', label: 'feeds' },
-  { id: 'ama'    as Tab, icon: '?', label: 'ama' },
+  { id: 'music'    as Tab, icon: '♪', label: 'music' },
+  { id: 'notes'    as Tab, icon: '✎', label: 'notes' },
+  { id: 'projects' as Tab, icon: '◈', label: 'projects' },
+  { id: 'ideas'    as Tab, icon: '✦', label: 'ideas' },
+  { id: 'later'    as Tab, icon: '○', label: 'later' },
+  { id: 'sleep'    as Tab, icon: '◑', label: 'sleep' },
+  { id: 'feeds'    as Tab, icon: '⊞', label: 'feeds' },
+  { id: 'ama'      as Tab, icon: '?', label: 'ama' },
 ]
 
 // ── Notes ──────────────────────────────────────────────────────────────────────
@@ -125,6 +126,29 @@ const focusedArticleIndex = ref(-1)
 const feedSavedLinks     = ref<Set<string>>(new Set())
 let feedAutoRefreshTimer: ReturnType<typeof setInterval> | null = null
 
+// ── Projects ───────────────────────────────────────────────────────────────────
+type ProjectStatus = 'active' | 'paused' | 'done' | 'idea'
+interface ProjectLink  { id: string; url: string }
+interface ProjectItem  { id: string; name: string; status: ProjectStatus; description: string; nextStep: string; links: ProjectLink[]; createdAt: string; updatedAt: string }
+const projects          = ref<ProjectItem[]>([])
+const activeProject     = ref<ProjectItem | null>(null)
+const projectFilter     = ref<ProjectStatus | 'all'>('all')
+const projectSearch     = ref('')
+const projectEditName   = ref('')
+const projectEditStatus = ref<ProjectStatus>('active')
+const projectEditDesc   = ref('')
+const projectEditNext   = ref('')
+const projectEditLinks  = ref<ProjectLink[]>([])
+const projectLinkInput  = ref('')
+const projectLinkBusy   = ref(false)
+const projectDirty      = ref(false)
+const projectSaveBusy   = ref(false)
+const projectErr        = ref('')
+const newProjectName    = ref('')
+const newProjectBusy    = ref(false)
+const mobileProjectView = ref<'list' | 'detail'>('list')
+let projectSaveTimer: ReturnType<typeof setTimeout> | null = null
+
 // ── AMA ────────────────────────────────────────────────────────────────────────
 interface AMAItem { id: string; question: string; name: string; answer: string; answered: boolean; askedAt: string; answeredAt: string }
 const amaItems   = ref<AMAItem[]>([])
@@ -181,9 +205,12 @@ async function loadFeeds() {
 async function loadAma() {
   try { amaItems.value = await apiFetch('/api/ama') } catch {}
 }
-function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds(); loadAma(); startFeedAutoRefresh() }
+async function loadProjects() {
+  try { projects.value = await apiFetch('/api/projects') } catch {}
+}
+function loadAll() { loadNotes(); loadIdeas(); loadLater(); loadSleep(); loadFeeds(); loadAma(); loadProjects(); startFeedAutoRefresh() }
 
-const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false, ama: false })
+const mobileLoaded = ref<Record<Tab, boolean>>({ music: true, notes: false, ideas: false, later: false, sleep: false, feeds: false, ama: false, projects: false })
 async function switchTab(t: Tab) {
   const prev = tab.value
   tab.value = t
@@ -203,6 +230,7 @@ async function switchTab(t: Tab) {
   else if (t === 'sleep') await loadSleep()
   else if (t === 'feeds') await loadFeeds()
   else if (t === 'ama') await loadAma()
+  else if (t === 'projects') await loadProjects()
 }
 
 // ── AMA CRUD ───────────────────────────────────────────────────────────────────
@@ -228,6 +256,139 @@ async function deleteAma(id: string) {
 function amaDate(ts: string) {
   if (!ts) return ''
   return new Date(ts).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+// ── Projects CRUD ──────────────────────────────────────────────────────────────
+const filteredProjects = computed(() => {
+  let list = projectFilter.value === 'all' ? projects.value : projects.value.filter(p => p.status === projectFilter.value)
+  const q = projectSearch.value.trim().toLowerCase()
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.nextStep.toLowerCase().includes(q))
+  return list
+})
+
+const projectStatusCounts = computed(() => {
+  const c: Record<string, number> = { all: projects.value.length }
+  for (const s of STATUS_ORDER) c[s] = projects.value.filter(p => p.status === s).length
+  return c
+})
+
+function isStale(p: ProjectItem) {
+  if (p.status === 'done') return false
+  return Date.now() - new Date(p.updatedAt || p.createdAt).getTime() > 14 * 86400 * 1000
+}
+
+function openProject(p: ProjectItem) {
+  if (projectSaveTimer) clearTimeout(projectSaveTimer)
+  if (projectDirty.value) saveProject()
+  activeProject.value = p
+  projectEditName.value = p.name
+  projectEditStatus.value = p.status
+  projectEditDesc.value = p.description
+  projectEditNext.value = p.nextStep
+  projectEditLinks.value = [...(p.links || [])]
+  projectDirty.value = false
+  mobileProjectView.value = 'detail'
+}
+
+function scheduleProjectSave() {
+  projectDirty.value = true
+  if (projectSaveTimer) clearTimeout(projectSaveTimer)
+  projectSaveTimer = setTimeout(() => { if (projectDirty.value) saveProject() }, 1800)
+}
+
+async function saveProject() {
+  if (!activeProject.value) return
+  if (projectSaveTimer) clearTimeout(projectSaveTimer)
+  projectSaveBusy.value = true
+  try {
+    const patch = { name: projectEditName.value.trim() || activeProject.value.name, status: projectEditStatus.value, description: projectEditDesc.value, nextStep: projectEditNext.value }
+    await apiFetch(`/api/projects/${activeProject.value.id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    const updated = { ...activeProject.value, ...patch, updatedAt: new Date().toISOString() }
+    activeProject.value = updated
+    const idx = projects.value.findIndex(p => p.id === updated.id)
+    if (idx >= 0) projects.value[idx] = updated
+    projectDirty.value = false
+  } catch (e: any) { projectErr.value = e.message }
+  projectSaveBusy.value = false
+}
+
+async function addProject() {
+  const name = newProjectName.value.trim()
+  if (!name) return
+  newProjectBusy.value = true; projectErr.value = ''
+  try {
+    const item = await apiFetch('/api/projects', { method: 'POST', body: JSON.stringify({ name, status: 'active' }) })
+    projects.value.unshift(item)
+    newProjectName.value = ''
+    openProject(item)
+  } catch (e: any) { projectErr.value = e.message }
+  newProjectBusy.value = false
+}
+
+async function deleteProject(id: string) {
+  try {
+    await apiFetch(`/api/projects/${id}`, { method: 'DELETE' })
+    projects.value = projects.value.filter(p => p.id !== id)
+    if (activeProject.value?.id === id) {
+      activeProject.value = null; projectDirty.value = false
+      mobileProjectView.value = 'list'
+    }
+  } catch {}
+}
+
+const STATUS_LABELS: Record<string, string> = { active: 'active', paused: 'paused', done: 'done', idea: 'idea' }
+const STATUS_ORDER: ProjectStatus[] = ['active', 'paused', 'idea', 'done']
+
+async function cycleStatus(p: ProjectItem, e: Event) {
+  e.stopPropagation()
+  const next = STATUS_ORDER[(STATUS_ORDER.indexOf(p.status) + 1) % STATUS_ORDER.length]
+  try {
+    await apiFetch(`/api/projects/${p.id}`, { method: 'PATCH', body: JSON.stringify({ status: next }) })
+    p.status = next
+    if (activeProject.value?.id === p.id) { projectEditStatus.value = next }
+    const idx = projects.value.findIndex(x => x.id === p.id)
+    if (idx >= 0) projects.value[idx] = { ...projects.value[idx], status: next, updatedAt: new Date().toISOString() }
+  } catch {}
+}
+
+async function addProjectLink() {
+  const url = projectLinkInput.value.trim()
+  if (!url || !activeProject.value) return
+  projectLinkBusy.value = true
+  const link: ProjectLink = { id: Math.random().toString(36).slice(2, 10), url }
+  const links = [...projectEditLinks.value, link]
+  try {
+    await apiFetch(`/api/projects/${activeProject.value.id}`, { method: 'PATCH', body: JSON.stringify({ links }) })
+    projectEditLinks.value = links
+    activeProject.value = { ...activeProject.value, links }
+    const idx = projects.value.findIndex(p => p.id === activeProject.value!.id)
+    if (idx >= 0) projects.value[idx] = { ...projects.value[idx], links }
+    projectLinkInput.value = ''
+  } catch {}
+  projectLinkBusy.value = false
+}
+
+async function removeProjectLink(linkId: string) {
+  if (!activeProject.value) return
+  const links = projectEditLinks.value.filter(l => l.id !== linkId)
+  try {
+    await apiFetch(`/api/projects/${activeProject.value.id}`, { method: 'PATCH', body: JSON.stringify({ links }) })
+    projectEditLinks.value = links
+    activeProject.value = { ...activeProject.value, links }
+    const idx = projects.value.findIndex(p => p.id === activeProject.value!.id)
+    if (idx >= 0) projects.value[idx] = { ...projects.value[idx], links }
+  } catch {}
+}
+
+function openProjectPage(p: ProjectItem, e?: Event) {
+  e?.stopPropagation()
+  if (projectDirty.value) saveProject()
+  localStorage.setItem('sd_active_proj', p.id)
+  router.go('/project')
+}
+
+function linkHostname(url: string) {
+  try { return new URL(url).hostname.replace(/^www\./, '') } catch { return url }
 }
 
 // ── Feeds CRUD ─────────────────────────────────────────────────────────────────
@@ -1011,11 +1172,96 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- Projects -->
+      <div class="sd-card sd-area-projects">
+        <div class="sd-card-hd">
+          <span class="sd-card-title">projects</span>
+          <div class="sd-proj-filters">
+            <button v-for="f in ['all', ...STATUS_ORDER]" :key="f"
+              :class="['sd-proj-filter-btn', { active: projectFilter === f }]"
+              @click="projectFilter = f as any">
+              {{ f }}<span v-if="projectStatusCounts[f]" class="sd-proj-filter-count">{{ projectStatusCounts[f] }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="sd-proj-layout">
+
+          <!-- Sidebar -->
+          <div class="sd-proj-sidebar">
+            <div class="sd-proj-add">
+              <input v-model="newProjectName" class="sd-input" placeholder="new project…" @keydown.enter="addProject" />
+              <button class="sd-submit-btn" @click="addProject" :disabled="newProjectBusy">{{ newProjectBusy ? '…' : '+' }}</button>
+            </div>
+            <div class="sd-proj-search-wrap">
+              <input v-model="projectSearch" class="sd-proj-search" placeholder="search…" autocomplete="off" />
+              <button v-if="projectSearch" class="sd-search-clear" @click="projectSearch = ''">×</button>
+            </div>
+            <p v-if="projectErr" class="sd-err" style="margin: 0.4rem 0.6rem 0; font-size: 0.75rem;">{{ projectErr }}</p>
+            <div class="sd-proj-list">
+              <div v-for="p in filteredProjects" :key="p.id"
+                :class="['sd-proj-item', { active: activeProject?.id === p.id, 'sd-proj-item-stale': isStale(p) }]"
+                @click="openProject(p)">
+                <span :class="['sd-proj-dot', `sd-proj-dot-${p.status}`]" @click="cycleStatus(p, $event)" title="Click to cycle status"></span>
+                <span class="sd-proj-item-name">{{ p.name }}</span>
+                <button class="sd-proj-page-btn" @click="openProjectPage(p, $event)" title="Open project page">↗</button>
+              </div>
+              <div v-if="!filteredProjects.length" class="sd-empty" style="padding: 1rem 0.75rem; font-size: 0.8rem;">
+                {{ projects.length ? 'no matches' : 'no projects yet' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail pane -->
+          <div class="sd-proj-detail">
+            <div v-if="!activeProject" class="sd-notes-empty-state">
+              <span>select a project or</span>
+              <button class="sd-text-btn sd-new-inline" @click="newProjectName = ''; nextTick(() => (document.querySelector('.sd-proj-add .sd-input') as HTMLInputElement)?.focus())">create one</button>
+            </div>
+            <template v-else>
+              <div class="sd-proj-detail-hd">
+                <input class="sd-proj-name-input" v-model="projectEditName" placeholder="project name" @input="scheduleProjectSave" />
+                <div class="sd-proj-status-row">
+                  <button v-for="s in STATUS_ORDER" :key="s"
+                    :class="['sd-proj-status-btn', `sd-proj-status-btn-${s}`, { active: projectEditStatus === s }]"
+                    @click="projectEditStatus = s; scheduleProjectSave()">{{ s }}</button>
+                  <span class="sd-tb-spacer"></span>
+                  <button class="sd-proj-open-page-btn" @click="openProjectPage(activeProject)" title="Open full markdown page">↗ page</button>
+                  <span class="sd-saved-text" style="font-size:0.7rem;">{{ projectSaveBusy ? 'saving…' : projectDirty ? '' : 'saved' }}</span>
+                  <button v-if="projectDirty" class="sd-save-btn" @click="saveProject" :disabled="projectSaveBusy">save</button>
+                  <button class="sd-tb-del-btn" @click="deleteProject(activeProject.id)" title="Delete project">×</button>
+                </div>
+              </div>
+              <div class="sd-proj-detail-body">
+                <label class="sd-proj-field-label">next step</label>
+                <textarea class="sd-textarea sd-proj-nextstep" v-model="projectEditNext" placeholder="what needs to happen next…" rows="3" @input="scheduleProjectSave"></textarea>
+                <label class="sd-proj-field-label" style="margin-top: 0.75rem;">description</label>
+                <textarea class="sd-textarea sd-proj-desc" v-model="projectEditDesc" placeholder="background, goals, notes…" rows="3" @input="scheduleProjectSave"></textarea>
+                <div class="sd-proj-links-section">
+                  <label class="sd-proj-field-label">links</label>
+                  <div class="sd-proj-links-list">
+                    <div v-for="l in projectEditLinks" :key="l.id" class="sd-proj-link-row">
+                      <a :href="l.url" target="_blank" rel="noopener" class="sd-proj-link-text">{{ linkHostname(l.url) }}</a>
+                      <button class="sd-del-btn" @click="removeProjectLink(l.id)" style="opacity:0.4">×</button>
+                    </div>
+                    <div class="sd-proj-link-add">
+                      <input v-model="projectLinkInput" class="sd-input" placeholder="https://…" style="font-size:0.8rem; padding:0.3rem 0.5rem;" @keydown.enter="addProjectLink" />
+                      <button class="sd-submit-btn" @click="addProjectLink" :disabled="projectLinkBusy" style="font-size:0.8rem; padding:0.3rem 0.6rem;">{{ projectLinkBusy ? '…' : 'add' }}</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="sd-proj-updated">last updated {{ noteShortDate(activeProject.updatedAt || activeProject.createdAt) }}</div>
+              </div>
+            </template>
+          </div>
+
+        </div>
+      </div>
+
     </div><!-- /sd-grid -->
 
     <!-- ── Mobile panels ──────────────────────────────────────────────────────── -->
     <div class="sd-mobile">
-      <div class="sd-mobile-hd">
+      <div class="sd-mobile-hd" v-show="!(tab === 'projects' && mobileProjectView === 'detail')">
         <template v-if="tab === 'notes' && mobileNoteView === 'editor'">
           <button class="sd-back-btn" @click="backFromEditor">←</button>
           <input class="sd-note-title-hd-input" v-model="editTitle" placeholder="title" @input="scheduleAutoSave" />
@@ -1216,6 +1462,74 @@ onUnmounted(() => {
                   {{ feedSavedLinks.has(item.link) ? 'saved' : '→later' }}
                 </button>
               </div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Projects mobile -->
+      <div v-if="mobileLoaded.projects" v-show="tab === 'projects'" class="sd-mobile-panel sd-mobile-panel-proj">
+        <template v-if="mobileProjectView === 'list'">
+          <div class="sd-proj-mobile-top">
+            <div class="sd-proj-filters sd-proj-filters-mobile">
+              <button v-for="f in ['all', ...STATUS_ORDER]" :key="f"
+                :class="['sd-proj-filter-btn', { active: projectFilter === f }]"
+                @click="projectFilter = f as any">
+                {{ f }}<span v-if="projectStatusCounts[f]" class="sd-proj-filter-count">{{ projectStatusCounts[f] }}</span>
+              </button>
+            </div>
+            <div class="sd-proj-add">
+              <input v-model="newProjectName" class="sd-input" placeholder="new project…" @keydown.enter="addProject" />
+              <button class="sd-submit-btn" @click="addProject" :disabled="newProjectBusy">{{ newProjectBusy ? '…' : '+' }}</button>
+            </div>
+            <p v-if="projectErr" class="sd-err" style="margin: 0.25rem 0 0;">{{ projectErr }}</p>
+          </div>
+          <div class="sd-list">
+            <div v-for="p in filteredProjects" :key="p.id"
+              :class="['sd-proj-item-mobile', { 'sd-proj-item-stale': isStale(p) }]"
+              @click="openProject(p)">
+              <span :class="['sd-proj-dot', `sd-proj-dot-${p.status}`]" @click.stop="cycleStatus(p, $event)" style="margin-top:0.35rem; flex-shrink:0;"></span>
+              <div class="sd-proj-item-body">
+                <div class="sd-proj-item-name">{{ p.name }}</div>
+                <div v-if="p.nextStep" class="sd-proj-item-next">{{ p.nextStep }}</div>
+              </div>
+              <button class="sd-proj-page-btn" @click.stop="openProjectPage(p)" title="Open page">↗</button>
+            </div>
+            <div v-if="!filteredProjects.length" class="sd-empty">{{ projects.length ? 'no matches' : 'no projects yet' }}</div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="sd-proj-mobile-detail-hd">
+            <button class="sd-back-btn" @click="mobileProjectView = 'list'; if (projectDirty) saveProject()">←</button>
+            <input class="sd-proj-name-mobile-input" v-model="projectEditName" placeholder="project name" @input="scheduleProjectSave" />
+            <span class="sd-hd-save-status">{{ projectSaveBusy ? '…' : projectDirty ? 'saving' : '✓' }}</span>
+          </div>
+          <div class="sd-mobile-panel" style="padding-top: 0.75rem;">
+            <div class="sd-proj-status-row" style="margin-bottom: 1rem;">
+              <button v-for="s in STATUS_ORDER" :key="s"
+                :class="['sd-proj-status-btn', `sd-proj-status-btn-${s}`, { active: projectEditStatus === s }]"
+                @click="projectEditStatus = s; scheduleProjectSave()">{{ s }}</button>
+            </div>
+            <label class="sd-proj-field-label">next step</label>
+            <textarea class="sd-textarea sd-proj-nextstep" v-model="projectEditNext" placeholder="what needs to happen next…" rows="3" @input="scheduleProjectSave" style="margin-bottom: 0.75rem;"></textarea>
+            <label class="sd-proj-field-label">description</label>
+            <textarea class="sd-textarea sd-proj-desc" v-model="projectEditDesc" placeholder="background, goals, notes…" rows="4" @input="scheduleProjectSave" style="margin-bottom: 0.75rem;"></textarea>
+            <div class="sd-proj-links-section">
+              <label class="sd-proj-field-label">links</label>
+              <div class="sd-proj-links-list">
+                <div v-for="l in projectEditLinks" :key="l.id" class="sd-proj-link-row">
+                  <a :href="l.url" target="_blank" rel="noopener" class="sd-proj-link-text">{{ linkHostname(l.url) }}</a>
+                  <button class="sd-del-btn" @click="removeProjectLink(l.id)">×</button>
+                </div>
+                <div class="sd-proj-link-add">
+                  <input v-model="projectLinkInput" class="sd-input" placeholder="https://…" style="font-size:0.85rem;" @keydown.enter="addProjectLink" />
+                  <button class="sd-submit-btn" @click="addProjectLink" :disabled="projectLinkBusy">{{ projectLinkBusy ? '…' : 'add' }}</button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top: 1rem;">
+              <button class="sd-proj-open-page-btn" @click="openProjectPage(activeProject!)">↗ open page</button>
+              <button class="sd-del-note-mobile" @click="deleteProject(activeProject!.id)">delete</button>
             </div>
           </div>
         </template>
@@ -1952,12 +2266,13 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
     display: grid;
     grid-template-columns: 1fr 1.65fr;
     grid-template-areas:
-      "music notes"
-      "sleep notes"
-      "later notes"
-      "ideas ideas"
-      "feeds feeds"
-      "ama   ama";
+      "music    notes"
+      "sleep    notes"
+      "later    notes"
+      "ideas    ideas"
+      "projects projects"
+      "feeds    feeds"
+      "ama      ama";
     gap: 1rem;
   }
 
@@ -1965,12 +2280,13 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
     border: 1px solid var(--vp-c-divider);
     display: flex; flex-direction: column; overflow: hidden;
   }
-  .sd-area-music { grid-area: music; align-self: start; }
-  .sd-area-notes { grid-area: notes; align-self: stretch; min-height: 520px; }
-  .sd-area-sleep { grid-area: sleep; align-self: start; }
-  .sd-area-later { grid-area: later; align-self: start; }
-  .sd-area-ideas { grid-area: ideas; }
-  .sd-area-feeds { grid-area: feeds; height: 480px; }
+  .sd-area-music    { grid-area: music; align-self: start; }
+  .sd-area-notes    { grid-area: notes; align-self: stretch; min-height: 520px; }
+  .sd-area-sleep    { grid-area: sleep; align-self: start; }
+  .sd-area-later    { grid-area: later; align-self: start; }
+  .sd-area-ideas    { grid-area: ideas; }
+  .sd-area-projects { grid-area: projects; height: 440px; }
+  .sd-area-feeds    { grid-area: feeds; height: 480px; }
 
   /* Cap heights for small cards */
   .sd-area-music .sd-card-body { max-height: 420px; overflow-y: auto; }
@@ -2166,5 +2482,198 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-ama-textarea { resize: none; flex: 1; }
 .sd-ama-item-mobile { padding: 0.85rem 0; border-bottom: 1px solid var(--vp-c-divider); }
 .sd-ama-item-mobile:last-child { border-bottom: none; }
+
+/* ── Projects ─────────────────────────────────────────────────────────────────── */
+.sd-proj-layout {
+  display: flex; flex: 1; min-height: 0; overflow: hidden;
+}
+.sd-proj-sidebar {
+  width: 200px; flex-shrink: 0;
+  border-right: 1px solid var(--vp-c-divider);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sd-proj-add {
+  display: flex; gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
+}
+.sd-proj-add .sd-input { flex: 1; font-size: 0.8rem; padding: 0.3rem 0.5rem; }
+.sd-proj-add .sd-submit-btn { font-size: 0.8rem; padding: 0.3rem 0.65rem; }
+.sd-proj-list { flex: 1; overflow-y: auto; }
+.sd-proj-item {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%;
+  background: none; border: none; border-bottom: 1px solid var(--vp-c-divider);
+  padding: 0.6rem 0.75rem; cursor: pointer; text-align: left;
+  font: inherit; color: inherit; transition: background 0.1s;
+}
+.sd-proj-item:hover { background: var(--vp-c-bg-soft); }
+.sd-proj-item.active { background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent); }
+.sd-proj-item-name { flex: 1; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Status dots */
+.sd-proj-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.sd-proj-dot-active { background: #22c55e; }
+.sd-proj-dot-paused { background: #f59e0b; }
+.sd-proj-dot-done   { background: var(--vp-c-text-3); }
+.sd-proj-dot-idea   { background: #60a5fa; }
+
+/* Filter bar */
+.sd-proj-filters {
+  display: flex; gap: 0.1rem;
+}
+.sd-proj-filter-btn {
+  background: none; border: none; color: var(--vp-c-text-3);
+  font: inherit; font-size: 0.7rem; padding: 0.2rem 0.45rem;
+  cursor: pointer; transition: color 0.1s, background 0.1s; border-radius: 3px;
+}
+.sd-proj-filter-btn:hover { color: var(--vp-c-text-1); background: var(--vp-c-bg-soft); }
+.sd-proj-filter-btn.active { color: var(--vp-c-brand-1); background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent); }
+
+/* Detail pane */
+.sd-proj-detail {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0;
+}
+.sd-proj-detail-hd {
+  padding: 0.6rem 0.85rem 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
+}
+.sd-proj-name-input {
+  display: block; width: 100%; background: none; border: none; outline: none;
+  color: var(--vp-c-text-1); font: inherit; font-size: 1rem; font-weight: 600;
+  padding: 0 0 0.5rem;
+  transition: border-color 0.15s;
+}
+.sd-proj-name-input::placeholder { color: var(--vp-c-text-3); font-weight: 400; }
+
+.sd-proj-status-row {
+  display: flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0; flex-wrap: wrap;
+}
+.sd-proj-status-btn {
+  background: none; border: 1px solid var(--vp-c-divider); color: var(--vp-c-text-3);
+  font: inherit; font-size: 0.72rem; padding: 0.18rem 0.55rem;
+  cursor: pointer; border-radius: 999px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.sd-proj-status-btn:hover { color: var(--vp-c-text-1); border-color: var(--vp-c-text-2); }
+.sd-proj-status-btn-active.active  { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.1); }
+.sd-proj-status-btn-paused.active  { border-color: #f59e0b; color: #f59e0b; background: rgba(245,158,11,0.1); }
+.sd-proj-status-btn-done.active    { border-color: var(--vp-c-text-2); color: var(--vp-c-text-2); background: var(--vp-c-bg-soft); }
+.sd-proj-status-btn-idea.active    { border-color: #60a5fa; color: #60a5fa; background: rgba(96,165,250,0.1); }
+
+.sd-proj-detail-body {
+  flex: 1; overflow-y: auto; padding: 0.85rem;
+  display: flex; flex-direction: column;
+}
+.sd-proj-field-label {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--vp-c-text-3); margin-bottom: 0.3rem; display: block;
+}
+.sd-proj-nextstep {
+  font-size: 0.9rem; resize: none;
+  border-left: 2px solid var(--vp-c-brand-1) !important;
+}
+.sd-proj-desc { font-size: 0.875rem; resize: none; }
+.sd-proj-updated { font-size: 0.7rem; color: var(--vp-c-text-3); margin-top: auto; padding-top: 0.5rem; }
+
+/* Mobile projects */
+.sd-mobile-panel-proj { padding: 0; display: flex; flex-direction: column; }
+.sd-proj-mobile-top { padding: 0.75rem 1rem; border-bottom: 1px solid var(--vp-c-divider); display: flex; flex-direction: column; gap: 0.5rem; }
+.sd-proj-filters-mobile { flex-wrap: wrap; }
+.sd-proj-item-mobile {
+  display: flex; align-items: flex-start; gap: 0.6rem; width: 100%;
+  background: none; border: none; border-bottom: 1px solid var(--vp-c-divider);
+  padding: 0.75rem 1rem; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  transition: background 0.1s;
+}
+.sd-proj-item-mobile:hover { background: var(--vp-c-bg-soft); }
+.sd-proj-item-mobile .sd-proj-dot { margin-top: 0.35rem; }
+.sd-proj-item-body { flex: 1; min-width: 0; }
+.sd-proj-item-mobile .sd-proj-item-name { font-size: 0.9rem; font-weight: 500; color: var(--vp-c-text-1); }
+.sd-proj-item-next { font-size: 0.78rem; color: var(--vp-c-text-2); margin-top: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-proj-status-badge {
+  font-size: 0.65rem; border-radius: 999px; padding: 0.1em 0.5em;
+  border: 1px solid; flex-shrink: 0; align-self: flex-start; margin-top: 0.2rem;
+}
+.sd-proj-status-badge-active { border-color: #22c55e; color: #22c55e; }
+.sd-proj-status-badge-paused { border-color: #f59e0b; color: #f59e0b; }
+.sd-proj-status-badge-done   { border-color: var(--vp-c-text-3); color: var(--vp-c-text-3); }
+.sd-proj-status-badge-idea   { border-color: #60a5fa; color: #60a5fa; }
+
+.sd-proj-mobile-detail-hd {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1rem; border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg); position: sticky; top: 0; z-index: 10;
+}
+.sd-proj-name-mobile-input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--vp-c-text-1); font: inherit; font-size: 0.95rem; font-weight: 600; min-width: 0;
+}
+
+/* Stale indicator */
+.sd-proj-item-stale .sd-proj-dot { box-shadow: 0 0 0 2px #f59e0b; }
+.sd-proj-item-stale .sd-proj-item-name { color: var(--vp-c-text-2); }
+
+/* Project page open button */
+.sd-proj-page-btn {
+  background: none; border: none; color: var(--vp-c-text-3);
+  font: inherit; font-size: 0.8rem; padding: 0 0.3rem;
+  cursor: pointer; opacity: 0; transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0; line-height: 1;
+}
+.sd-proj-item:hover .sd-proj-page-btn,
+.sd-proj-item-mobile:hover .sd-proj-page-btn { opacity: 1; }
+.sd-proj-page-btn:hover { color: var(--vp-c-brand-1); opacity: 1 !important; }
+
+.sd-proj-open-page-btn {
+  background: none; border: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2);
+  font: inherit; font-size: 0.72rem; padding: 0.18rem 0.55rem;
+  cursor: pointer; transition: border-color 0.15s, color 0.15s; flex-shrink: 0;
+}
+.sd-proj-open-page-btn:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+
+/* Search in sidebar */
+.sd-proj-search-wrap {
+  position: relative; flex-shrink: 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.sd-proj-search {
+  display: block; width: 100%; background: none; border: none;
+  color: var(--vp-c-text-1); font: inherit; font-size: 0.8rem;
+  padding: 0.45rem 1.8rem 0.45rem 0.75rem; outline: none;
+}
+.sd-proj-search::placeholder { color: var(--vp-c-text-3); }
+.sd-proj-search:focus { background: var(--vp-c-bg-soft); }
+
+/* Filter count badge */
+.sd-proj-filter-count {
+  font-size: 0.6rem; opacity: 0.7; margin-left: 0.15rem;
+}
+
+/* Links section */
+.sd-proj-links-section { margin-top: 0.75rem; }
+.sd-proj-links-list { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.3rem; }
+.sd-proj-link-row {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.sd-proj-link-row:last-of-type { border-bottom: none; }
+.sd-proj-link-text {
+  flex: 1; font-size: 0.82rem; color: var(--vp-c-brand-1);
+  text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0;
+}
+.sd-proj-link-text:hover { text-decoration: underline; }
+.sd-proj-link-add { display: flex; gap: 0.35rem; margin-top: 0.4rem; }
+.sd-proj-link-add .sd-input { flex: 1; }
+
+/* Mobile page btn always visible */
+@media (max-width: 767px) {
+  .sd-proj-page-btn { opacity: 1 !important; }
+}
 
 </style>

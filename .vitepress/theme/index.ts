@@ -16,6 +16,9 @@ import NowPlaying from './components/NowPlaying.vue'
 import AMA from './components/AMA.vue'
 import BlockDiagram from './components/BlockDiagram.vue'
 import FloorPlan from './components/FloorPlan.vue'
+import ProjectPage from './components/ProjectPage.vue'
+import ManimAnimation from './components/ManimAnimation.vue'
+import SystolicArrayThree from './components/SystolicArrayThree.vue'
 
 export default {
 	Layout,
@@ -29,5 +32,8 @@ export default {
 		app.component('AMA', AMA)
 		app.component('BlockDiagram', BlockDiagram)
 		app.component('FloorPlan', FloorPlan)
+		app.component('ProjectPage', ProjectPage)
+		app.component('ManimAnimation', ManimAnimation)
+		app.component('SystolicArrayThree', SystolicArrayThree)
 	},
 } satisfies Theme
