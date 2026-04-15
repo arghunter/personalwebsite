@@ -35,6 +35,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'ss-12', id: 'EqrGzF25Puk', url: 'https://files.catbox.moe/borrl9.mp3', title: 'Drop Top', artist: 'MEOVV' },
       { tid: 'ss-13', id: 'HLCMg_qNrX4', url: 'https://files.catbox.moe/u9go1r.mp3', title: 'Speechless', artist: 'Naomi Scott' },
       { tid: 'ss-14', id: 'JiDeN4h6eQk', url: 'https://files.catbox.moe/k2royg.mp3', title: 'Dancing In The Dark', artist: 'Rihanna' },
+      { tid: 'ss-15', id: 'VaQ1CZZENZ4', url: 'https://files.catbox.moe/7qx7vf.mp3', title: 'Viva La Vida', artist: 'God Complex' },
     ],
   },
   {
