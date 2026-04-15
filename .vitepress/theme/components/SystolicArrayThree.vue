@@ -231,22 +231,67 @@ onMounted(async () => {
   }
 
   // ── Data dots ─────────────────────────────────────────────────────────────
-  const dotGeo = new THREE.SphereGeometry(0.13, 16, 12)
-  const aMat   = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(ACCENT),
-    emissive: new THREE.Color(ACCENT), emissiveIntensity: 0.35,
-  })
-  const bMat   = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(CYAN),
-    emissive: new THREE.Color(CYAN), emissiveIntensity: 0.35,
-  })
+  // head + halo per dot for additive glow
+  function makeDot(col: string): { head: THREE.Mesh; halo: THREE.Mesh } {
+    const mk = (r: number, op: number) => {
+      const m = new THREE.Mesh(
+        new THREE.SphereGeometry(r, 14, 10),
+        new THREE.MeshBasicMaterial({
+          color: new THREE.Color(col), transparent: true, opacity: op,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+        }),
+      )
+      m.visible = false; scene.add(m); return m
+    }
+    return { head: mk(0.135, 0.95), halo: mk(0.22, 0.22) }
+  }
 
-  const aDots = Array.from({ length: GRID }, () => {
-    const m = new THREE.Mesh(dotGeo, aMat); m.visible = false; scene.add(m); return m
-  })
-  const bDots = Array.from({ length: GRID }, () => {
-    const m = new THREE.Mesh(dotGeo, bMat); m.visible = false; scene.add(m); return m
-  })
+  const aDots = Array.from({ length: GRID }, () => makeDot(ACCENT))
+  const bDots = Array.from({ length: GRID }, () => makeDot(CYAN))
+
+  // pulse ring sprite for PE fire events
+  const RING_DUR  = 0.28
+  interface PulseRing { sp: THREE.Sprite; born: number; r: number; c: number }
+  const pulseRings: PulseRing[] = []
+  const ringPool: THREE.Sprite[] = []
+
+  function makePulseSprite(): THREE.Sprite {
+    const cvs = document.createElement('canvas'); cvs.width = 64; cvs.height = 64
+    const tex = new THREE.CanvasTexture(cvs)
+    const sp  = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: tex, transparent: true, depthTest: false,
+      blending: THREE.AdditiveBlending,
+    }))
+    sp.visible = false; scene.add(sp)
+    return sp
+  }
+
+  function drawRing(sp: THREE.Sprite, progress: number, color: string) {
+    const mat = sp.material as THREE.SpriteMaterial
+    const cvs = (mat.map as THREE.CanvasTexture).image as HTMLCanvasElement
+    const ctx = cvs.getContext('2d')!; const s = 64
+    ctx.clearRect(0, 0, s, s)
+    const alpha = Math.max(0, 1 - progress)
+    ctx.strokeStyle = color
+    ctx.lineWidth   = 3
+    ctx.globalAlpha = alpha * 0.85
+    ctx.beginPath()
+    ctx.arc(s / 2, s / 2, 8 + progress * 22, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.globalAlpha = 1
+    ;(mat.map as THREE.CanvasTexture).needsUpdate = true
+  }
+
+  for (let i = 0; i < GRID * GRID * 3; i++) ringPool.push(makePulseSprite())
+
+  function spawnPulse(r: number, c: number, time: number) {
+    const sp = ringPool.find(s => !s.visible)
+    if (!sp) return
+    sp.scale.set(0.9, 0.9, 1)
+    sp.position.set(c * STEP - OFFSET, DY + 0.05, r * STEP - OFFSET)
+    sp.visible = true
+    pulseRings.push({ sp, born: time, r, c })
+  }
 
   // ── Entry labels ──────────────────────────────────────────────────────────
   for (let r = 0; r < GRID; r++) {
@@ -419,6 +464,8 @@ onMounted(async () => {
       for (let r = 0; r < GRID; r++)
         for (let c = 0; c < GRID; c++)
           fired[k][r][c] = false
+    for (const pr of pulseRings) pr.sp.visible = false
+    pulseRings.length = 0
   }
 
   function animate() {
@@ -437,13 +484,13 @@ onMounted(async () => {
 
     for (let r = 0; r < GRID; r++) {
       const pos = aDotPos(r, tl)
-      aDots[r].visible = !!pos
-      if (pos) aDots[r].position.copy(pos)
+      aDots[r].head.visible = aDots[r].halo.visible = !!pos
+      if (pos) { aDots[r].head.position.copy(pos); aDots[r].halo.position.copy(pos) }
     }
     for (let c = 0; c < GRID; c++) {
       const pos = bDotPos(c, tl)
-      bDots[c].visible = !!pos
-      if (pos) bDots[c].position.copy(pos)
+      bDots[c].head.visible = bDots[c].halo.visible = !!pos
+      if (pos) { bDots[c].head.position.copy(pos); bDots[c].halo.position.copy(pos) }
     }
 
     for (let k = 0; k < GRID; k++) {
@@ -458,6 +505,7 @@ onMounted(async () => {
             peAccum[r][c]++
             cAccum[r][c]   = peAccum[r][c]
             updateC(r, c)
+            spawnPulse(r, c, tl)
           }
 
           const flash = k === currentWave
@@ -472,6 +520,21 @@ onMounted(async () => {
       }
     }
 
+    // update pulse rings
+    for (let i = pulseRings.length - 1; i >= 0; i--) {
+      const pr  = pulseRings[i]
+      const age = tl - pr.born
+      if (age > RING_DUR) {
+        pr.sp.visible = false
+        pulseRings.splice(i, 1)
+        continue
+      }
+      const progress = age / RING_DUR
+      drawRing(pr.sp, progress, GOLD)
+      const s = 0.9 + progress * 0.6
+      pr.sp.scale.set(s, s, 1)
+    }
+
     renderer.render(scene, camera)
   }
 
@@ -484,7 +547,11 @@ onMounted(async () => {
     camera.updateProjectionMatrix()
   }
   window.addEventListener('resize', onResize)
-  cleanup = () => { cancelAnimationFrame(animId); window.removeEventListener('resize', onResize); renderer.dispose() }
+  cleanup = () => {
+    cancelAnimationFrame(animId)
+    window.removeEventListener('resize', onResize)
+    renderer.dispose()
+  }
 })
 
 onUnmounted(() => cleanup?.())

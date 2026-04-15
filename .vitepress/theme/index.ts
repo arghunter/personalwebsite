@@ -19,6 +19,7 @@ import FloorPlan from './components/FloorPlan.vue'
 import ProjectPage from './components/ProjectPage.vue'
 import ManimAnimation from './components/ManimAnimation.vue'
 import SystolicArrayThree from './components/SystolicArrayThree.vue'
+import KernnSystemThree from './components/KernnSystemThree.vue'
 
 export default {
 	Layout,
@@ -35,5 +36,6 @@ export default {
 		app.component('ProjectPage', ProjectPage)
 		app.component('ManimAnimation', ManimAnimation)
 		app.component('SystolicArrayThree', SystolicArrayThree)
+		app.component('KernnSystemThree', KernnSystemThree)
 	},
 } satisfies Theme
