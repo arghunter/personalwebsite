@@ -6,26 +6,26 @@ title: "Now"
 
 ## What I'm Working On
 
-- Kerning, this is not a joke, somehow
+- Optimizing the accelerator. Cut computaition time in half, then realized theres an off by one error in generalization :()
 
 <div style="height: 10px;"></div>
 
 ## What I'm Learning
 
-- OOO Algorithms. Digital Analog Computing
+- Digital Analog Computing, Test bench writing
 
 <div style="height: 10px;"></div>
 
 ## What I'm Reading
 
-- "Hardware Acceleration for Real-Time Compression of 3D Gaussians"
+- "EPAC: The Last Dance"
 
 <div style="height: 10px;"></div>
 
 ## What I'm Listening To
 
-- <span class="newsreader">Long Live the Queen<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=w3SS0Qh-xSY" onclick="if(window.__playMusic){window.__playMusic('w3SS0Qh-xSY','Long Live the Queen','Frank Turner');return false;}"> Frank Turner</a></span></span>
+- <span class="newsreader">Viva la Vida<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=VaQ1CZZENZ4" onclick="if(window.__playMusic){window.__playMusic('VaQ1CZZENZ4','Viva la Vida','God Complex');return false;}"> God Complex</a></span></span>
 
 <div style="height: 60px;"></div>
 
-<span class="subtext">Last updated: April 6th, 2026</span>
+<span class="subtext">Last updated: April 16th, 2026</span>
