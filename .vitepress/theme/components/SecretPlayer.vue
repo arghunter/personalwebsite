@@ -36,6 +36,9 @@ const HARDCODED: Playlist[] = [
       { tid: 'ss-13', id: 'HLCMg_qNrX4', url: 'https://files.catbox.moe/u9go1r.mp3', title: 'Speechless', artist: 'Naomi Scott' },
       { tid: 'ss-14', id: 'JiDeN4h6eQk', url: 'https://files.catbox.moe/k2royg.mp3', title: 'Dancing In The Dark', artist: 'Rihanna' },
       { tid: 'ss-15', id: 'VaQ1CZZENZ4', url: 'https://files.catbox.moe/7qx7vf.mp3', title: 'Viva La Vida', artist: 'God Complex' },
+      { tid: 'ss-16' ,id: 'qPxKBSVgo_o', url: 'https://files.catbox.moe/iepytu.mp3', title: 'Better Than One', artist: 'The Script' },
+      { tid: 'ss-17', id: 'xo1VInw-SKc', url: 'https://files.catbox.moe/cr7gc5.mp3', title: 'Fight Song', artist: 'RachelPlatten' },
+        { tid: 'ss-18',id: 'a2RA0vsZXf8', url: 'https://files.catbox.moe/780pvc.mp3', title: 'Just A Dream', artist: 'Kurt Hugo Schneider' },
     ],
   },
   {
@@ -46,6 +49,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'hp-2', id: 'Okp2H9w8dDI', url: 'https://files.catbox.moe/opkvg4.mp3', title: 'The Triumph', artist: 'Jeff Williams ft. Casey Lee Williams' },
       { tid: 'hp-3', id: 'pKt3o7WPYdo', url: 'https://files.catbox.moe/l0ugbo.mp3', title: 'I Lived', artist: 'OneRepublic' },
       { tid: 'hp-4', id: 'XJZXmFDcPa0', url: 'https://files.catbox.moe/yfd5x1.mp3', title: 'Legendary', artist: 'NEFFEX' },
+      { tid: 'hp-15', id: 'w3viBe2Q0P8', url: 'https://files.catbox.moe/fox9n4.mp3', title: 'Radioactive', artist: 'Imagine Dragons' },
       { tid: 'hp-5', id: 'RJBBMQ_HC9c', url: 'https://files.catbox.moe/xlj4td.mp3', title: 'Caffeine', artist: 'Jeff Williams (feat. Casey Lee Williams & Lamar Hall)' },
       { tid: 'hp-6', id: '23zffqyvp8I', url: 'https://files.catbox.moe/l7q3my.mp3', title: 'UNBREAKABLE', artist: 'AViVA' },
       { tid: 'hp-7', id: 'JAc9NFk0X3Y', url: 'https://files.catbox.moe/ftzg66.mp3', title: 'Me In Me', artist: 'Watt White' },
@@ -56,7 +60,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'hp-12', id: '3_3PFGIfqPg', url: 'https://files.catbox.moe/j6m1me.mp3', title: 'Back One Day', artist: 'NEFFEX' },
       { tid: 'hp-13', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
       { tid: 'hp-14', id: 'pzt6SmvGpXk', url: 'https://files.catbox.moe/4p7sha.mp3', title: 'Sacrifice', artist: 'G.E.M, League of Legends' },
-
+{tid: 'hp-15', id: 'Y4o_8zbelwY', url: 'https://files.catbox.moe/fpo13v.mp3', title: 'Immortals', artist: 'Fall Out Boy' },
     ],
   },
    {
@@ -66,7 +70,7 @@ const HARDCODED: Playlist[] = [
       { tid: 'lg-1', id: 'AGPinGZ-eTg', url: 'https://files.catbox.moe/yzqt86.mp3', title: 'Phoenix', artist: 'Leage of Legends ,Cailin Russo, Chrissy Costanza' },
       { tid: 'lg-2', id: 'fmI_Ndrxy14', url: 'https://files.catbox.moe/fq5z4u.mp3', title: 'Warriors', artist: 'League of Legends, Imagine Dragons' },
       { tid: 'lg-3', id: 'pzt6SmvGpXk', url: 'https://files.catbox.moe/4p7sha.mp3', title: 'Sacrifice', artist: 'G.E.M, League of Legends' },
-
+      { tid: 'lg-4',id: 'wJMWRJDKg5s', url: 'https://files.catbox.moe/4fwo8z.mp3', title: 'Ready, Aim, Fire', artist: 'Imagine Dragons' },
 
     ],
   },
