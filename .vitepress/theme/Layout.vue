@@ -20,19 +20,12 @@ const { frontmatter, page } = useData()
 const is404 = computed(() => page.value.isNotFound)
 
 const isDark = ref(true)
-const scrollPct = ref(0)
 const menuOpen = ref(false)
 
 watch(() => page.value.relativePath, () => { menuOpen.value = false })
 
 onMounted(() => {
   isDark.value = !document.documentElement.classList.contains('light')
-  const onScroll = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight
-    scrollPct.value = max > 0 ? Math.round((window.scrollY / max) * 100) : 0
-  }
-  window.addEventListener('scroll', onScroll, { passive: true })
-  onUnmounted(() => window.removeEventListener('scroll', onScroll))
 })
 
 function toggleTheme() {
@@ -135,10 +128,6 @@ function playHeadline() {
 		<main :class="{ 'blog-post': frontmatter.date !== undefined }">
 			<Content />
 		</main>
-	</div>
-
-	<div class="scroll-vu" aria-hidden="true">
-		<div class="scroll-vu-fill" :style="{ height: scrollPct + '%' }"></div>
 	</div>
 
 	<MusicPlayer />

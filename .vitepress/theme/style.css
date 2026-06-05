@@ -3,16 +3,16 @@
     --primary-dk: #eeeeee;
     --background-dk: #13112a;
 
-    --primary-lt: #dbd6f0;
-    --background-lt: #100d20;
-    --detail-lt: #1c1830;
+    --primary-lt: #e4e0f7;
+    --background-lt: #0d0b1a;
+    --detail-lt: #221e3c;
     --shadow-lt: #00000050;
 
-    --accent: #a78bfa;
+    --accent: #8b6fd4;
     --hr-color: #2d2847;
     --nav-bg: var(--background-lt);
     --bg-image: url("circuit-bg-dark.svg");
-    --headline-shadow: #4c1d95;
+    --headline-shadow: #38157a;
 }
 
 /* ── Light mode ──────────────────────────────────────────── */
@@ -22,11 +22,11 @@ html.light {
     --detail-lt: #d4c9ff;
     --shadow-lt: #2d0b6620;
 
-    --accent: #7c3aed;
+    --accent: #6d32d0;
     --hr-color: #c4aaf0;
     --nav-bg: rgba(236, 228, 255, 0.75);
     --bg-image: url("circuit-bg-light.svg");
-    --headline-shadow: #5b21b6;
+    --headline-shadow: #4c1899;
 }
 
 /* ── Transitions ─────────────────────────────────────────── */
@@ -50,7 +50,7 @@ body, nav, hr, footer {
 
 html {
     font-family: 'DM Mono', Inter, Arial, Helvetica;
-    line-height: 1.9;
+    line-height: 1.72;
     color: var(--primary-lt);
 }
 
@@ -115,6 +115,30 @@ nav {
     justify-content: space-between;
     background: transparent;
     border-bottom: solid 1px transparent;
+    transition: background 200ms ease, border-color 200ms ease, backdrop-filter 200ms ease;
+}
+
+/* Scroll-driven nav backdrop — progressively appears as page scrolls */
+@supports (animation-timeline: scroll()) {
+    nav {
+        animation: nav-scroll linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0px 80px;
+    }
+    @keyframes nav-scroll {
+        from {
+            background: transparent;
+            border-bottom-color: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        to {
+            background: color-mix(in srgb, var(--background-lt) 80%, transparent);
+            border-bottom-color: var(--hr-color);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+    }
 }
 
 strong {
@@ -356,11 +380,12 @@ main {
 
 /* ── Blog post prose ─────────────────────────────────────── */
 .blog-post {
-    background: color-mix(in srgb, var(--background-lt) 82%, transparent);
+    background: color-mix(in srgb, var(--detail-lt) 94%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     padding: 1.5rem 2.5rem 2rem;
     border: 1px solid var(--hr-color);
+    border-left: 3px solid var(--accent);
 }
 
 .blog-post p,
@@ -369,7 +394,7 @@ main {
     font-family: Inter, system-ui, sans-serif;
     font-size: 1.05rem;
     font-weight: 400;
-    line-height: 1.85;
+    line-height: 1.78;
     letter-spacing: 0.01em;
 }
 
@@ -610,14 +635,23 @@ div[class*="language-"] button {
 
 div[class*="language-"] {
     background: var(--background-dk);
-    padding: 1rem;
+    padding: 0;
     border-radius: 0.5rem;
     line-height: 1.5;
+    overflow: hidden;
+}
+
+div[class*="language-"]::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 30%, transparent) 100%);
 }
 
 div[class*="language-"] > pre {
     margin-top: 0;
     margin-bottom: 0;
+    padding: 1rem;
 }
 
 code {
@@ -645,6 +679,7 @@ code {
 .intro-overlay {
     position: fixed;
     inset: 0;
+    bottom: -4px;
     z-index: 999;
     background: var(--background-lt);
     display: flex;
@@ -756,7 +791,7 @@ code {
 }
 
 .intro-exit-leave-to {
-    transform: translateY(-100%);
+    transform: translateY(calc(-100% - 4px));
 }
 
 /* ── Word cycler ─────────────────────────────────────────── */
@@ -914,6 +949,9 @@ blockquote {
     font-style: italic;
     font-weight: 700;
     letter-spacing: 0.1rem;
+    border-left: 2px solid rgba(251,191,36,0.5);
+    padding: 0.5rem 1rem 0.5rem 1.1rem;
+    margin-left: 0;
 }
 
 .hero-inc-reroll {
@@ -966,32 +1004,6 @@ blockquote {
 /* ══ PCB / circuit aesthetic enhancements ══════════════════════════════════ */
 
 
-/* Scanlines — subtle CRT overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0) 0px,
-    rgba(0,0,0,0) 1px,
-    rgba(0,0,0,0.022) 1px,
-    rgba(0,0,0,0.022) 2px
-  );
-}
-
-html.light body::before {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0) 0px,
-    rgba(0,0,0,0) 1px,
-    rgba(0,0,0,0.012) 1px,
-    rgba(0,0,0,0.012) 2px
-  );
-}
-
 /* Circuit-trace hr with solder dots at ends */
 hr {
   border: none;
@@ -1002,11 +1014,11 @@ hr {
 hr::before, hr::after {
   content: '';
   position: absolute;
-  top: -2.5px;
-  width: 5px; height: 5px;
+  top: -2px;
+  width: 3px; height: 3px;
   border-radius: 50%;
   background: var(--accent);
-  opacity: 0.5;
+  opacity: 0.3;
 }
 hr::before { left: 0; }
 hr::after  { right: 0; }
@@ -1018,46 +1030,6 @@ hr::after  { right: 0; }
   overflow: hidden;
 }
 
-/* PCB silkscreen corner marks */
-.project-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(to right, var(--accent) 8px, transparent 8px) 0 0 / 1px 8px no-repeat,
-    linear-gradient(to bottom, var(--accent) 8px, transparent 8px) 0 0 / 8px 1px no-repeat,
-    linear-gradient(to left, var(--accent) 8px, transparent 8px) 100% 0 / 1px 8px no-repeat,
-    linear-gradient(to bottom, var(--accent) 8px, transparent 8px) 100% 0 / 8px 1px no-repeat,
-    linear-gradient(to right, var(--accent) 8px, transparent 8px) 0 100% / 1px 8px no-repeat,
-    linear-gradient(to top, var(--accent) 8px, transparent 8px) 0 100% / 8px 1px no-repeat,
-    linear-gradient(to left, var(--accent) 8px, transparent 8px) 100% 100% / 1px 8px no-repeat,
-    linear-gradient(to top, var(--accent) 8px, transparent 8px) 100% 100% / 8px 1px no-repeat;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.project-card:hover::before { opacity: 0.7; }
-
-@keyframes pcb-signal {
-  0%   { background-position: -120% 0; }
-  100% { background-position: 220%  0; }
-}
-
-/* Signal pulse running along project card bottom edge on hover */
-.project-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-  background-size: 40% 100%;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.project-card:hover::after {
-  opacity: 1;
-  animation: pcb-signal 1.8s linear infinite;
-}
 
 
 /* ── Focus-visible — keyboard navigation ring ────────────────────────────── */
@@ -1112,47 +1084,6 @@ code { border-radius: 2px; }
               inset 0 0 0 2px var(--accent);
 }
 
-/* Project card ref designators — silkscreen label in card heading */
-.project-card { counter-increment: pcb-ref; }
-main { counter-reset: pcb-ref; }
-.project-card .project-header h3::after {
-  content: ' U' counter(pcb-ref);
-  font-size: 0.5rem;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  opacity: 0.35;
-  font-family: 'DM Mono', monospace;
-  vertical-align: super;
-  margin-left: 0.3rem;
-}
-
-/* Blockquote as PCB keepout zone — diagonal amber hatching */
-blockquote {
-  position: relative;
-  border-left: 3px solid #fbbf24;
-  padding: 0.6rem 1rem 0.6rem 1.1rem;
-  margin-left: 0;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 6px,
-    rgba(251,191,36,0.04) 6px,
-    rgba(251,191,36,0.04) 7px
-  );
-}
-blockquote::before {
-  content: 'KEEPOUT';
-  position: absolute;
-  top: -0.55rem; left: 0.5rem;
-  font-size: 0.45rem;
-  letter-spacing: 0.15em;
-  color: #fbbf24;
-  opacity: 0.6;
-  font-family: 'DM Mono', monospace;
-  font-style: normal;
-  background: var(--background-lt);
-  padding: 0 0.2rem;
-}
 
 /* H2 section headings — KiCad net-label arrow */
 main h2 {
@@ -1182,9 +1113,9 @@ input:focus, textarea:focus, select:focus, [contenteditable]:focus {
     0 0 8px rgba(167,139,250,0.35);
 }
 
-/* Inline links — differential pair traces on hover */
+/* Inline links — on hover */
 main a:not(.no-underline):hover {
-  text-decoration: underline double;
+  text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -1195,32 +1126,13 @@ main a:not(.no-underline):hover {
 
 /* Inline code — logic probe / terminal readout */
 code:not(.shiki code) {
-  background: #0b1a0e;
-  color: #4ade80;
-  border: 1px solid rgba(74,222,128,0.2);
+  background: color-mix(in srgb, var(--accent) 14%, var(--background-lt));
+  color: color-mix(in srgb, var(--accent) 60%, var(--primary-lt));
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
   padding: 0.15rem 0.3rem;
   border-radius: 2px;
 }
 
-
-/* Scroll VU meter — right edge signal level bar */
-.scroll-vu {
-  position: fixed;
-  right: 2px;
-  top: 15%;
-  height: 70%;
-  width: 2px;
-  z-index: 50;
-  background: rgba(167,139,250,0.08);
-  pointer-events: none;
-  overflow: hidden;
-}
-.scroll-vu-fill {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, var(--accent), rgba(167,139,250,0.3));
-  transition: height 0.12s ease;
-}
 
 /* Blog post date — REV prefix */
 .page-date::before {

@@ -20,6 +20,7 @@ import ProjectPage from './components/ProjectPage.vue'
 import ManimAnimation from './components/ManimAnimation.vue'
 import SystolicArrayThree from './components/SystolicArrayThree.vue'
 import KernnSystemThree from './components/KernnSystemThree.vue'
+import FP4Widget from './components/FP4Widget.vue'
 
 export default {
 	Layout,
@@ -37,5 +38,6 @@ export default {
 		app.component('ManimAnimation', ManimAnimation)
 		app.component('SystolicArrayThree', SystolicArrayThree)
 		app.component('KernnSystemThree', KernnSystemThree)
+		app.component('FP4Widget', FP4Widget)
 	},
 } satisfies Theme
