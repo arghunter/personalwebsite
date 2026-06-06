@@ -1,11 +1,11 @@
 ---
-title: "Building an Optimized FP4 multiplier"
+title: "Building an Optimized FP4 Multiplier"
 description: "I get bored and get trapped in an optimization loop for 3 days"
 longDescription: ""
 date: 2026-06-05
 hidden: false
 ---
-# Building an Optimized FP4 multiplier
+# Building an Optimized FP4 Multiplier
 
 So a few months ago, Etched, a transformer ASIC company, came to campus and gave a talk. In that talk they proposed a challenge: build the smallest FP4 multiplier possible. Now I disregarded this challenge for quite a while because gate level optimization didn't sound all that fun at the time. Then, one fateful night, around 3 am, I got bored
 
