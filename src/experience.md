@@ -15,7 +15,7 @@ title: "Experience"
 </div>
 <span class="subtext">B.S.E. Electrical Engineering with Computing · Minor in Materials Science/Engineering · GPA 5.0/5.0</span>
 <ul>
-<li>Courses: Algorithms, Computational Structures, Low Level Programming</li>
+<li>Courses: Algorithms, Computer System Architecture, Embedded Systems</li>
 </ul>
 </div>
 </div>
@@ -47,8 +47,22 @@ title: "Experience"
 <div class="timeline-dot"></div>
 <div>
 <div class="timeline-header">
+<strong>MIT Low Energy Autonomous Navigation Group — Student Researcher</strong>
+<span class="subtext">May 2026–Present</span>
+</div>
+<ul>
+<li>Designing a hardware design verification pipeline for robotics platforms with real-time deployment of high-efficiency SOCs and AI vision accelerators.</li>
+<li>Studying efficient ASIC placement to minimize energy use while maximizing throughput.</li>
+</ul>
+</div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-dot"></div>
+<div>
+<div class="timeline-header">
 <strong>MIT Ferroelectric Materials & Devices Group — Student Researcher</strong>
-<span class="subtext">Aug 2025–Present</span>
+<span class="subtext">Aug 2025–May 2026</span>
 </div>
 <ul>
 <li>Improving on-chip energy storage using ferroelectric material effects.</li>
@@ -105,7 +119,7 @@ title: "Experience"
 </div>
 <ul>
 <li>Developed custom accelerators for DNNs; demonstrated PDM, Ternary, and INT8 inference.</li>
-<li>Built a custom RV32-I CPU with pipelined design; compiled and ran Pong over VGA.</li>
+<li>Built a custom RV32-IM CPU with pipelined design; compiled and ran Pong over VGA.</li>
 <li>Designing a custom FPGA server cluster with 100 Gb/s+ inter-FPGA bandwidth and >1.6M logic slices.</li>
 </ul>
 </div>
@@ -115,8 +129,22 @@ title: "Experience"
 <div class="timeline-dot"></div>
 <div>
 <div class="timeline-header">
+<strong>MIT Satellite Team</strong>
+<span class="subtext">Mar 2026–Present</span>
+</div>
+<ul>
+<li>Designing custom power electronics for the LEONIRD High Altitude Balloon.</li>
+<li>Launched high altitude balloon and collected data at over 30,000 feet.</li>
+</ul>
+</div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-dot"></div>
+<div>
+<div class="timeline-header">
 <strong>MIT Motorsports</strong>
-<span class="subtext">Aug 2025–Present</span>
+<span class="subtext">Aug 2025–May 2026</span>
 </div>
 <ul>
 <li>Designing custom motor inverters for Formula SAE with 5× efficiency and 4× precision improvements.</li>
@@ -131,6 +159,8 @@ title: "Experience"
 
 ## Awards
 
+- MIT 6.191 Fastest CPU in Class History
+- Hackclub Undercity Winner
 - ISEF 2nd Award 2025 — $15k Chief of Naval Research Award
 - ISEF 3rd Award 2024 — Grand Award in Biomedical Engineering
 - MakeMIT 2nd Place — Entertainment Track
@@ -144,7 +174,7 @@ title: "Experience"
 
 ## Skills
 
-**Technical:** ASIC Design · Verilog · Chisel · Yosys/OpenLane · C++ · Python · Java · C# · Altium · Vivado · Bash · CAD · Wafer Testing · Probe Manipulation
+**Technical:** ASIC Design · Verilog · Chisel · Yosys/Librelane · C++ · Python · Java · C# · Altium · Vivado · Bash · CAD · Wafer Testing · Probe Manipulation
 
 **Other:** Tutoring (Algebra, Trigonometry, Java) · Team Management
 
