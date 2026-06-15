@@ -125,6 +125,8 @@ function playHeadline() {
 			{{ new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' }) }}
 		</h3>
 
+		<a v-if="frontmatter.date !== undefined" href="/blog" class="blog-back-link">← Blog</a>
+
 		<main :class="{ 'blog-post': frontmatter.date !== undefined }">
 			<Content />
 		</main>
