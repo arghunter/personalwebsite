@@ -8,7 +8,7 @@ date: 2026-6-15
 # Winning a CPU Optimization Challenge and Setting a new Class Record
 
 <!-- ![](image-2.png) -->
-<BlogImage src="./image-2.png" caption="That Time When Hackers put Giant Cat Ears on the Little Dome (I lack a cover photo)" />
+<BlogImage src="./blogs/c191w/image-2.png" caption="That Time When Hackers put Giant Cat Ears on the Little Dome (I lack a cover photo)" />
 
 ## The Challenge
 Last semester, I took 6.191, Computational Structures, at MIT. 6.191 was a fascinating class. It covers everything from low level logic design of individual CMOS gates to adders, CPUs, and eventually operating systems and parallel processing. The TA's were great, the professors were awesome, and the content was super interesting. At the end of the class however, there is a final project. While the project specification document is 20 or so pages long, the gist is pretty simple: Build a RISC-V 32-bit processor that executes a specific program as fast as possible.
@@ -37,13 +37,13 @@ Surely,this would be against the rules? But, it wasn't. While modifying MainMem 
 
 Now of course this means that I have to effectively find a way to process 64 weights every single cycle, load the activation quickly enough, deal with biases, misaligned memory, prefetching, requantization, edge effects on vector operations and many more issues (not to mention the 32 cycle memory delay). As much as I'd love to talk about that, as I personally feel that the tricks I had to pull to deal were pretty cool. I fear that would be too concrete and edge into academic integrity violations.
 
-<BlogImage src="./image-1.png" caption="General Architecture Diagram: An accelerator bolted onto the standard CPU" />
+<BlogImage src="./blogs/c191w/image-1.png" caption="General Architecture Diagram: An accelerator bolted onto the standard CPU" />
 
 ## Part 3: The Implementation
 
 So anyway, I implemented it. It was surprisingly straight forward once I ironed out the kinks. One key design choice however is that I decided to design all of this completely separate from the old 4 stage CPU. I just called one instruction and it ran the first layer of the neural network. Since the first layer accounts for over 90% of the computation, I focused on accelerating that before moving on to the rest. After I got it working, I saw a massive reduction in time: down to 700,000 nanoseconds. While that does seem large, it only took around 15,000 cycles to compute the entire top layer.
 
-<BlogImage src="./image-1.png" caption="A single test synth."/>s
+<BlogImage src="./blogs/c191w/image-3.png" caption="A single test synth." />
 
 So naturally, I decided to submit my design to the online leaderboard and benchmark to verify that the loopholes worked online. But then, disaster struck. It passed the test cases, but when the server synthesized the design to analyze timing, it failed. After hours of debugging and testing, I began to realize that it might be that the design is so large that the server either crashes or runs out of time when synthesizing, causing the failure. So, I had to look for another solution.
 
@@ -65,7 +65,7 @@ In the end my TA suggested that I probably shouldn't put too much more work into
 
 Eventually, I figured it all out and it got my score down to ~46,000 nanoseconds. Beating the class record and claiming the top spot.
 
-<BlogImage src="./image.png" caption="The 6.191 Leaderboard Final Standings" />
+<BlogImage src="./blogs/c191w/image.png" caption="The 6.191 Leaderboard Final Standings" />
 
 
 ## Part 6: The End
