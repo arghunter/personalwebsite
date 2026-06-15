@@ -358,10 +358,10 @@ img.no-border {
 .blog-figure-caption {
     display: block;
     margin-top: 0.5rem;
-    font-size: 0.7rem;
+    font-size: 0.89rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.45;
+    opacity: 0.68;
     font-family: 'DM Mono', monospace;
 }
 
