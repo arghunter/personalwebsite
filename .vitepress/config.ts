@@ -122,7 +122,7 @@ function siteGraphPlugin(): Plugin {
   }
 }
 
-const hostname = 'https://arghunter.github.io'
+const hostname = 'https://armaangomes.com'
 
 export default defineConfig({
   title: "Armaan Gomes",
