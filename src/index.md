@@ -11,7 +11,7 @@ I'm Armaan Gomes, an EECS student at MIT. <span class="newsreader">Welcome to my
 <div style="height: 5px;"></div>
 
 I work on ASIC design, signal processing, and computer architecture — from beamforming hearing aids and ferroelectric capacitors to motor inverters and FPGA clusters. When I'm not wrangling chips or building my wildest ideas, I train taekwondo with my friends.
-<BlockDiagram />
+
 
 
 <div style="height: 5px;"></div>
