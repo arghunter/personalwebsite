@@ -22,6 +22,7 @@ import ManimAnimation from './components/ManimAnimation.vue'
 import SystolicArrayThree from './components/SystolicArrayThree.vue'
 import KernnSystemThree from './components/KernnSystemThree.vue'
 import FP4Widget from './components/FP4Widget.vue'
+import CacheWidget from './components/CacheWidget.vue'
 
 export default {
 	Layout,
@@ -41,5 +42,6 @@ export default {
 		app.component('SystolicArrayThree', SystolicArrayThree)
 		app.component('KernnSystemThree', KernnSystemThree)
 		app.component('FP4Widget', FP4Widget)
+		app.component('CacheWidget', CacheWidget)
 	},
 } satisfies Theme
