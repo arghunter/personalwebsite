@@ -85,7 +85,7 @@ function playHeadline() {
 		<span class="theme-toggle-thumb">{{ isDark ? '☀' : '☾' }}</span>
 	</button>
 
-	<Intro v-if="frontmatter.home" />
+
 
 	<div v-if="frontmatter.home" class="home">
 		<h1 class="headline headline-clickable" @click="playHeadline"><WordCycle /> the <span class="accent-headline">Stars</span></h1>
