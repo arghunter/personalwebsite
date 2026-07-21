@@ -13,7 +13,7 @@ hidden: false
 # DOOM
 Doom is a video game made by id Software that released in 1993. It was a revolution in gaming that spread across the world and defined the modern FPS. Its popularity has given rise to the saying "Doom can run on anything". To prove this point Doom ha been ported to almost everything, from microcontrollers, to toasters, and even bacteria.
 
-Two weeks ago we successfully ran(crawled) Doom on a CPU we built from scratch. To be honest, I still can't believe it. What did we really do though? Well, we designed a custom CPU at the logic gate level, connected it to peripherals, adapted the DOOM source code to run on our machine, and deployed it onto an FPGA to run in real time. Before running Doom, we had only run simple programs that we had written, like Pong and Mandelbrot sets. Now we can run full published games, but getting here was a rather rocky road.
+Two weeks ago we successfully ran(crawled) Doom on a CPU we built from scratch (and then posted a video that got a few million views). To be honest, I still can't believe it. What did we really do though? Well, we designed a custom CPU at the logic gate level, connected it to peripherals, adapted the DOOM source code to run on our machine, and deployed it onto an FPGA to run in real time. Before running Doom, we had only run simple programs that we had written, like Pong and Mandelbrot sets. Now we can run full published games, but getting here was a rather rocky road.
 
 ## The Requirements
 
