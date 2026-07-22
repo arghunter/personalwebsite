@@ -125,7 +125,6 @@ function siteGraphPlugin(): Plugin {
 const hostname = 'https://armaangomes.com'
 
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? '/personalwebsite/' : '/',
   title: "Armaan Gomes",
   description: 'Hi! I\'m Armaan Gomes. I like to build things.',
   srcDir: './src',
