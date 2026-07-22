@@ -89,7 +89,7 @@ function playHeadline() {
 
 	<div v-if="frontmatter.home" class="home">
 		<h1 class="headline headline-clickable" @click="playHeadline"><WordCycle /> the <span class="accent-headline">Stars</span></h1>
-
+ 
 		<main>
 			<Content />
 		</main>
