@@ -16,7 +16,7 @@ title: "Contact"
 <div style="height: 10px;"></div>
 
 ## About Me
-
+ 
 I'm Armaan, an EE/CS student at MIT interested in ASIC design, signal processing, and hardware that solves real problems — from beamforming hearing aids and electrochemical sensors to motor inverters and FPGA clusters.
 
 Outside of engineering I'm a fourth-degree Taekwondo black belt with 12+ years of training.
