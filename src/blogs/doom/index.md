@@ -130,5 +130,5 @@ As always, nothing on this blog post was written by AI. It would be rather point
 
 Porting DOOM was a fun experience, albeit slightly traumatic. I learned a ton about memory and cache, but I think learning how to debug systems this large was the biggest benefit. On a slightly hilarious note, I posted a [9 second video](https://www.instagram.com/armaan.gomes/reel/DatqWKChtnw/?hl=en) of it running, and it is currently sitting at 2 million views, which is crazy. As for future plans, we are currently working on implementing out-of-order processing as well as better memory access patterns. This should make it run a lot faster. Perhaps after that and after we write a basic GPU we could port Quake 2. Hopefully soon we can also run on a larger FPGA as well (foreshadowing). 
 
-Thanks for reading and please reach out if you have any questions! 
+Thanks for reading and please reach out if you have any questions! Btw here is the link to our [doom port](https://github.com/MIT-OpenCompute/doom-hopper), [our cpu](https://github.com/MIT-OpenCompute/hopper-cpu), and the [video that reached a 2 million views](https://www.instagram.com/p/DatqWKChtnw/?hl=en).
 
