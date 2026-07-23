@@ -122,13 +122,13 @@ From here it didn't look like there were many easy ways to improve speed without
 
 So, how far did we get? After compiler optimization, DOOM ran smoothly at 15-20 FPS and is now very playable and quite fun. I see why it was so popular back in the day. With out of order processing and other optimizations we hope to eventually reach 30 FPS.
 
-## AI Usage
-
-As always, nothing on this blog post was written by AI. It would be rather pointless to share the thoughts of a machine on my blog. As far as the code, AI was primarilly used for debugging, writing tests, and helper scripts. LLMs are very good at writing tests as they can procedurally generate hundreds of potential failure points in a few minutes. This helped in tracking down the needle in a haystack bugs that we found in DOOM. I've also found it pretty useful to write helper scripts, like python uart parsers because I could write them on my own, but its just faster to do it with AI. As for the actual Chisel, almost all of it was written by hand. In some cases I asked AI to help with refactoring from my previous code (some of which was in BlueSpec, Verilog, or other Chisel modules) because I was feeling lazy. In my previous experience, LLMs weren't very good at just writing modules from scratch. They frequently made questionable design decisions and required me to hold their hand in anything complex. Also it kind of removes the joy from building stuff like this if its all AI. As for the website, its a fork of my friend Liam's website with AI to help style it (because I hate CSS with a burning passion).
-
 ## In Closing
 
 Porting DOOM was a fun experience, albeit slightly traumatic. I learned a ton about memory and cache, but I think learning how to debug systems this large was the biggest benefit. On a slightly hilarious note, I posted a [9 second video](https://www.instagram.com/armaan.gomes/reel/DatqWKChtnw/?hl=en) of it running, and it is currently sitting at 2 million views, which is crazy. As for future plans, we are currently working on implementing out-of-order processing as well as better memory access patterns. This should make it run a lot faster. Perhaps after that and after we write a basic GPU we could port Quake 2. Hopefully soon we can also run on a larger FPGA as well (foreshadowing). 
 
 Thanks for reading and please reach out if you have any questions! Btw here is the link to our [doom port](https://github.com/MIT-OpenCompute/doom-hopper), [our cpu](https://github.com/MIT-OpenCompute/hopper-cpu), and the [video that reached a 2 million views](https://www.instagram.com/p/DatqWKChtnw/?hl=en).
 
+
+## AI Usage
+
+As always, nothing on this blog post was written by AI. It would be rather pointless to share the thoughts of a machine on my blog. As far as the code, AI was primarilly used for debugging, writing tests, and helper scripts. LLMs are very good at writing tests as they can procedurally generate hundreds of potential failure points in a few minutes. This helped in tracking down the needle in a haystack bugs that we found in DOOM. I've also found it pretty useful to write helper scripts, like python uart parsers because I could write them on my own, but its just faster to do it with AI. As for the actual Chisel, almost all of it was written by hand. In some cases I asked AI to help with refactoring from my previous code (some of which was in BlueSpec, Verilog, or other Chisel modules) because I was feeling lazy. Also it kind of removes the joy from building stuff like this if its all AI.
