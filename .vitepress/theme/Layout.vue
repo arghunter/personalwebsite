@@ -50,11 +50,9 @@ function playHeadline() {
 			<a href="/">{{ frontmatter.title === 'Home' ? '>' : '' }}Home</a>
 			<a href="/blog">{{ frontmatter.title === 'Blog' ? '>' : '' }}Blog</a>
 			<a href="/projects">{{ frontmatter.title === 'Projects' ? '>' : '' }}Projects</a>
-			<a href="/graph">{{ frontmatter.title === 'Graph' ? '>' : '' }}Graph</a>
 		</div>
 
 		<div class="nav-links nav-links-desktop">
-			<a href="/now">{{ frontmatter.title === 'Now' ? '>' : '' }}Now</a>
 			<a href="/experience">{{ frontmatter.title === 'Experience' ? '>' : '' }}Experience</a>
 			<a href="/contact">{{ frontmatter.title === 'Contact' ? '>' : '' }}Contact</a>
 		</div>

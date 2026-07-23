@@ -18,7 +18,7 @@ I work on ASIC design, signal processing, and computer architecture — from bea
 
 
 \> Check out my [projects](./projects.md), [experience](./experience.md), and [blog](./blog.md). <
-- Or try visual navigation with the [graph](./graph.md)
+
 
 
 
