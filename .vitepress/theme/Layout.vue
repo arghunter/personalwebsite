@@ -113,8 +113,8 @@ function playHeadline() {
 
 	<div v-else>
 		<div class="ds-header">
-			<span>AGI-{{ page.relativePath.split('/').pop()?.replace('.md','').toUpperCase() ?? 'DOC' }}</span>
-			<span>REV {{ frontmatter.rev ?? 'A' }}</span>
+			<span>{{ page.relativePath.split('/').pop()?.replace('.md','').toUpperCase() ?? 'DOC' }}</span>
+		
 		</div>
 
 		<h1 class="title page-title" style="max-width: 40rem; margin-left: auto; margin-right: auto">{{ frontmatter.title }}</h1>

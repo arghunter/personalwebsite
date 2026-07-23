@@ -27,10 +27,10 @@ Outside of engineering I'm a fourth-degree Taekwondo black belt with 12+ years o
 - [Kevin Chang](https://www.changchang.me/)
 
 <span class="subtext">still filling this up</span>
+<!-- 
+## Ask Me Anything -->
 
-## Ask Me Anything
-
-<div class="desktop-only"><AMA /></div>
+<!-- <div class="desktop-only"><AMA /></div> -->
 
 <div style="height: 40px;"></div>
 
