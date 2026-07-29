@@ -127,6 +127,7 @@ const hostname = 'https://armaangomes.com'
 export default defineConfig({
   title: "Armaan Gomes",
   description: 'Hi! I\'m Armaan Gomes. I like to build things.',
+  ignoreDeadLinks: true, 
   srcDir: './src',
   head: [
     ['script', {}, `(function(){if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')})()`],
