@@ -1,3 +1,5 @@
+@import './WEB/css/array.css';
+
 @font-face {
     font-family: 'jgs7';
     src: url('jgs7.woff2') format('woff2'),
@@ -32,3 +34,21 @@
     font-style: normal;
     font-display: swap;
 }
+
+ @font-face {
+      font-family: 'YAGIZA';
+      src: url('Cyberpunk.ttf')
+    format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+  }
+
+  @font-face {
+      font-family: 'PLANT';
+      src: url('Eternal.ttf')
+    format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+  }

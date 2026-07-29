@@ -11,11 +11,11 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>Massachusetts Institute of Technology</strong>
-<span class="subtext">Cambridge, MA — May 2029</span>
+<span class="subtext"> Cambridge, MA — May 2029</span>
 </div>
 <span class="subtext">B.S.E. Electrical Engineering with Computing · Minor in Materials Science/Engineering · GPA 5.0/5.0</span>
 <ul>
-<li>Courses: Algorithms, Computer System Architecture, Embedded Systems</li>
+<li>Courses: Algorithms, Graduate Computer System Architecture, Embedded Systems</li>
 </ul>
 </div>
 </div>
@@ -25,13 +25,9 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>Homestead High School</strong>
-<span class="subtext">Cupertino, CA — June 2025</span>
+<span class="subtext"> Cupertino, CA — June 2025</span>
 </div>
 <span class="subtext">GPA 4.0/4.0</span>
-<ul>
-<li>President: Programming Club, Cybersecurity Club</li>
-<li>Science Bowl · Robotics Software Lead</li>
-</ul>
 </div>
 </div>
 
@@ -48,7 +44,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>MIT Low Energy Autonomous Navigation Group — Student Researcher</strong>
-<span class="subtext">May 2026–Present</span>
+<span class="subtext"> May 2026–Present</span>
 </div>
 <ul>
 <li>Designing a hardware design verification pipeline for robotics platforms with real-time deployment of high-efficiency SOCs and AI vision accelerators.</li>
@@ -62,7 +58,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>MIT Ferroelectric Materials & Devices Group — Student Researcher</strong>
-<span class="subtext">Aug 2025–May 2026</span>
+<span class="subtext"> Aug 2025–May 2026</span>
 </div>
 <ul>
 <li>Improving on-chip energy storage using ferroelectric material effects.</li>
@@ -77,7 +73,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>UC Berkeley Nanotechnology Lab — Student Researcher</strong>
-<span class="subtext">Jun 2024–Aug 2025</span>
+<span class="subtext"> Jun 2024–Aug 2025</span>
 </div>
 <ul>
 <li>Built low-cost 18-channel microfluidics potentiostat hardware.</li>
@@ -92,7 +88,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>BWSI: BASICs of ASICs, MIT Lincoln Labs — Student</strong>
-<span class="subtext">Jun 2024–Jul 2024</span>
+<span class="subtext"> Jun 2024–Jul 2024</span>
 </div>
 <ul>
 <li>Learned ASIC fabrication, design, Verilog verification and simulation.</li>
@@ -115,7 +111,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>MIT Open Compute Laboratory</strong>
-<span class="subtext">Aug 2025–Present</span>
+<span class="subtext"> Aug 2025–Present</span>
 </div>
 <ul>
 <li>Developed custom accelerators for DNNs; demonstrated PDM, Ternary, and INT8 inference.</li>
@@ -130,7 +126,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>MIT Satellite Team</strong>
-<span class="subtext">Mar 2026–Present</span>
+<span class="subtext"> Mar 2026–Present</span>
 </div>
 <ul>
 <li>Designing custom power electronics for the LEONIRD High Altitude Balloon.</li>
@@ -144,7 +140,7 @@ title: "Experience"
 <div>
 <div class="timeline-header">
 <strong>MIT Motorsports</strong>
-<span class="subtext">Aug 2025–May 2026</span>
+<span class="subtext"> Aug 2025–May 2026</span>
 </div>
 <ul>
 <li>Designing custom motor inverters for Formula SAE with 5× efficiency and 4× precision improvements.</li>

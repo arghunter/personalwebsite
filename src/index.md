@@ -4,29 +4,29 @@ home: true
 title: "Home"
 ---
 
-<img src="./assets/avatar.png" alt="Armaan Gomes" style="float: right; max-width: 10rem; margin-left: 1rem; margin-bottom: 1rem" class="no-border"></img>
+<img src="./assets/avatar.png" alt="Armaan Gomes" style="float: right; max-width: 13rem; margin-left: 1rem; margin-bottom: 1rem" class="no-border"></img>
 
-I'm Armaan Gomes, an EECS student at MIT. <span class="newsreader">Welcome to my slice of the internet</span>
+I'm Armaan.<div></div>I have an addiction.
 
-<div style="height: 5px;"></div>
+<div style="height: 0px;"></div>
 
-I work on ASIC design, signal processing, and computer architecture — from beamforming hearing aids and ferroelectric capacitors to motor inverters and FPGA clusters. Most recently my friends and I built a CPU to run DOOM. When I'm not wrangling chips or building my wildest ideas, I train taekwondo with my friends.
-
-
+<span class="accent"> I'm addicted to chips.</span> Back in grade school, I preferred Ruffles, really anything Wavy, but now my tastes are a lot less discerning. Nowadays, I'll take anything with Silicon, even Germanium, the smaller the features the better.
 
 <div style="height: 5px;"></div>
 
-
-\> Check out my [projects](./projects.md), [experience](./experience.md), and [blog](./blog.md). <
-
-
+I'm an <span class = "accent">EECS student at MIT </span> who works on ASIC design, signal processing, and computer architecure. I've built beamforming hearing aids and fabricated beamforming ASICs, engineered ferroelectric capacitors and created my own NPU. My friends and I even designed a CPU that runs **[DOOM](./blogs/doom/index.md)**. Why? It seemed cool. If I'm not captivated by chip design, I'm probably either searching for mangos or training taekwondo with my friends. 
 
 
 
 <div style="height: 5px;"></div>
 
-<span class="subtext">If you want to hear what I listen to, some links play music (try the header and quotes)</span>
- <!-- <NowPlaying />    -->
+
+<span class = "accent">\> Check out my [projects](./projects.md), [experience](./experience.md), and [blog](./blog.md). <</span>
+
+
+<div style="height: 5px;"></div>
+
+<span class="subtext">If you want to hear what I listen to, some links play music (try the headline and quotes)</span>
 
 <div style="height: 10px;"></div>
 

@@ -23,8 +23,9 @@ Outside of engineering I'm a fourth-degree Taekwondo black belt with 12+ years o
 
 ## Friends
 
-- [Outer Cloud](https://www.outercloud.dev/)
+- [Liam Hanrahan](https://www.outercloud.dev/)
 - [Kevin Chang](https://www.changchang.me/)
+- [Shannon Wu](https://shannonwu.vercel.app/)
 
 <span class="subtext">still filling this up</span>
 <!-- 

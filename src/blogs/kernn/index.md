@@ -1,5 +1,5 @@
 ---
-title: "KERNN v1 - Building A Feed Forward Neural Network Accelerator"
+title: "KERNN - Building A Feed Forward Neural Network Accelerator"
 description: "How I built a general purpose feed forward neural network accelerator"
 longDescription: ""
 date: 2026-4-15

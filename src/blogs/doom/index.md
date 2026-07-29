@@ -6,12 +6,11 @@ date: 2026-07-21
 hidden: false
 ---
 
-<BlogImage caption="DOOM">
+
 
 ![](./image-2.png)
-</BlogImage>
 
-# DOOM
+
 Doom is a video game made by id Software that released in 1993. It was a revolution in gaming that spread across the world and defined the modern FPS. Its popularity has given rise to the saying "Doom can run on anything". To prove this point Doom has been ported to almost everything, from microcontrollers, to toasters, and even bacteria.
 
 Two weeks ago we successfully ran(crawled) Doom on a CPU we built from scratch (and then posted a video that got a few million views). To be honest, I still can't believe it. What did we really do though? Well, we designed a custom CPU at the logic gate level, connected it to peripherals, adapted the DOOM source code to run on our machine, and deployed it onto an FPGA to run in real time. Before running Doom, we had only run simple programs that we had written, like Pong and Mandelbrot sets. Now we can run full published games, but getting here was a rather rocky road.
@@ -79,7 +78,7 @@ These problems were solved by a series of Clock Domain Crossings (CDCs), FIFOs, 
 
 ### Interfacing and I/O
 
-There are a few more things we need in hardware before we port DOOM though. The CPU works, but has no way to talk to the outside world. We need peripherals: Display Output, Hardware Timer, Debug Output, Keyboard Input. We decided to use Memory Mapped IO(MMIO) for these peripherals. The VGA Controller was already built, but I expanded it to 12 bit color and connected it to the HDMI port. The hardware timer was also simple. It just tracked time in microseconds and saved it to a word in memory. The debug output was slightly trickier. The simple version just hooks up a UART transmitter to a writable memory value. However, if the CPU printed many characters in a row, it would drop some and lead to garbage output. Thus I used a FIFO buffer to stop overflows. The Keyboard Input was worse. My original plan was to interface with the USB Host chip on the Urbana FPGA board that Ryan lent me. However, after writing the SPI driver was was confused to see nothing coming over the SPI bus. It seems like the USB port on the board does not provide power and thus could not power the keyboard. Instead, I wired up a UART receiver and forwarded keypresses from my laptop to the FPGA. It's not perfect, but it works. This rounded out everything we needed to run DOOM.
+There are a few more things we need in hardware before we port DOOM though. The CPU works, but has no way to talk to the outside world. We need peripherals: Display Output, Hardware Timer, Debug Output, Keyboard Input. We decided to use Memory Mapped IO(MMIO) for these peripherals. The VGA Controller was already built, but I expanded it to 12 bit color and connected it to the HDMI port. The hardware timer was also simple. It just tracked time in microseconds and saved it to a word in memory. The debug output was slightly trickier. The simple version just hooks up a UART transmitter to a writable memory value. However, if the CPU printed many characters in a row, it would drop some and lead to garbage output. Thus I used a FIFO buffer to stop overflows. The Keyboard Input was worse. My original plan was to interface with the USB Host chip on the Urbana FPGA board that Ryan lent me. However, after writing the SPI driver, I was confused to see nothing coming over the SPI bus. It seems like the USB port on the board does not provide power and thus could not power the keyboard. Instead, I wired up a UART receiver and forwarded keypresses from my laptop to the FPGA. It's not perfect, but it works. This rounded out everything we needed to run DOOM.
 
 
 ## Porting DOOM and Debugging
@@ -130,5 +129,4 @@ Thanks for reading and please reach out if you have any questions! Btw here is t
 
 
 ## AI Usage
-
 As always, nothing on this blog post was written by AI. It would be rather pointless to share the thoughts of a machine on my blog. As far as the code, AI was primarilly used for debugging, writing tests, and helper scripts. LLMs are very good at writing tests as they can procedurally generate hundreds of potential failure points in a few minutes. This helped in tracking down the needle in a haystack bugs that we found in DOOM. I've also found it pretty useful to write helper scripts, like python uart parsers because I could write them on my own, but its just faster to do it with AI. As for the actual Chisel, almost all of it was written by hand. In some cases I asked AI to help with refactoring from my previous code (some of which was in BlueSpec, Verilog, or other Chisel modules) because I was feeling lazy. Also it kind of removes the joy from building stuff like this if its all AI.

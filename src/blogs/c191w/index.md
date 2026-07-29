@@ -5,7 +5,6 @@ longDescription: "My Computer Architecture class ask us to build the fastest CPU
 date: 2026-6-15
 ---
 
-# Winning a CPU Optimization Challenge and Setting a new Class Record
 
 <BlogImage caption="That Time When Hackers put Giant Cat Ears on the Little Dome (I lack a cover photo)">
 
