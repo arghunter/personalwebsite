@@ -14,7 +14,7 @@ I'm Armaan.<div></div>I have an addiction.
 
 <div style="height: 5px;"></div>
 
-I'm an <span class = "accent">EECS student at MIT </span> who works on ASIC design, signal processing, and computer architecure. I've built beamforming hearing aids and fabricated beamforming ASICs, engineered ferroelectric capacitors and created my own NPU. My friends and I even designed a CPU that runs **[DOOM](./blogs/doom/index.md)**. Why? It seemed cool. If I'm not captivated by chip design, I'm probably either searching for mangos or training taekwondo with my friends. 
+I'm an <span class = "accent">EECS student at MIT </span> who works on ASIC design, signal processing, and computer architecure. I've built beamforming hearing aids and fabricated beamforming ASICs, engineered ferroelectric capacitors and created my own NPU. My friends and I even designed a CPU that runs **[DOOM](./blogs/doom/index.md)**. Why? It seemed cool. If I'm not captivated by chip design, I'm probably either searching for mangoes or training taekwondo with my friends. 
 
 
 
