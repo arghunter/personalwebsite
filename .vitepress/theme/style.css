@@ -2,22 +2,22 @@
 
 :root {
     /* Color — cold monochromatic */
-    --bg:       #f0edf6;
+    --bg:       #f2f3f4;
     --surface:  #dde2ec;
-    --fg:       #0a0d16;
-    --fg-2:     #180f3a;
+    --fg:       #180f3a;
+    --fg-2:     #130c2e;
     --fg-3:     #8f85af;
     --border:   #bec6db;
 
     /* Fonts */
     --font-body:         'Rajdhani', sans-serif;
-    --font-display:      'PLANT', sans-serif;
+    --font-display:      'Redaction 35', sans-serif;
     --font-special:      'YAGIZA';
     --font-mono:         'Sono', 'Courier New', monospace;
 
 
     /* Size scale — large, jarring gaps */
-    --size-xs:   0.6rem;
+    --size-xs:   0.75rem;
     --size-sm:   0.75rem;
     --size-base: 1,02rem;
     --size-ls:   1.06rem;
@@ -100,7 +100,7 @@ nav a {
     letter-spacing: 0.25em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--fg-3);
+    color: var(--fg-2);
 }
 nav a:hover { color: var(--fg); }
 
@@ -166,7 +166,7 @@ nav a:hover { color: var(--fg); }
     border-bottom: 1px solid var(--border);
     text-decoration: none;
 }
-.mobile-menu-nav a:hover { color: var(--fg-3); }
+.mobile-menu-nav a:hover { color: var(--fg-2); }
 
 .mobile-menu-enter-active, .mobile-menu-leave-active { transition: opacity 0.2s ease; }
 .mobile-menu-enter-from,  .mobile-menu-leave-to      { opacity: 0; }
@@ -274,7 +274,7 @@ main {
 
 .music-info { display: flex; flex-direction: column; line-height: 1.2; }
 .music-title { font-size: var(--size-xs); font-weight: var(--w-black); letter-spacing: 0.05em; text-transform: uppercase; }
-.music-artist { font-size: var(--size-xs); color: var(--fg-3); }
+.music-artist { font-size: var(--size-xs); color: var(--fg-2); }
 
 .music-volume {
     -webkit-appearance: none;
@@ -309,7 +309,7 @@ footer {
     font-weight: var(--w-black);
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--fg-3);
+    color: var(--fg-2);
     margin-top: 6rem;
 }
 
