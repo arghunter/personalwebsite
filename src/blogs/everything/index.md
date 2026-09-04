@@ -31,3 +31,4 @@ The day before this blog post Liam and I finally cracked Jane Street's ASIC reve
 
 Finally, that brings us to September 4th, the day this blog is released, and more importantly Liam's birthday. If you haven't wished him, you should wish him now. 
 
+Overall, the past month has been crazy and but I'm grateful for every moment of it.
