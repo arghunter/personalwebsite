@@ -5,13 +5,13 @@ longDescription: ""
 date: 2026-09-04
 ---
 
-First off, before everything else, today is Liam's birthday. I doubt words can truly express how grateful I am to count him as a friend. I admire him and aspire to be more like him every day. He is also literally, figuratively, objectively, and metaphysically awesome. If you are reading this blog the day it's released you should go message him Happy Birthday, or even better fill his inbox with so many birthday messages that it fills his MIT allotted cloud storage.
+First off, before everything else, today is [Liam](https://www.outercloud.dev/)'s birthday. I doubt words can truly express how grateful I am to count him as a friend. I admire him and aspire to be more like him every day. He is also literally, figuratively, objectively, and metaphysically awesome. If you are reading this blog the day it's released you should go message him Happy Birthday, or even better fill his inbox with so many birthday messages that it fills his MIT allotted cloud storage.
 
 Now somehow, Liam's birthday seems to be one of the few predictable events for me in the last month. 
 
 ## A Summary
 
-The last month feels like a series of random events strung together in an almost nonsensical way. In what feels like a blitz, I met a slightly ludicrous number of people, had people offer to fly me out to NYC and SF, run into a bunch of VCs, accidentally applied for a job, visited mansions with living rooms bigger than my home, cracked Jane Street's ASIC reverse engineering challenge, continued CPU work, began work on a GPU, and accepted a job to build a TPU chiplet. Oh and I won the Eigenprize.
+The last month feels like a series of random events strung together in an almost nonsensical way. In what feels like a blitz, I met a slightly ludicrous number of people, had people offer to fly me out to NYC and SF, ran into a bunch of VCs, accidentally applied for a job, visited mansions with living rooms bigger than my home, cracked Jane Street's ASIC reverse engineering challenge, continued CPU work, began work on a GPU, and accepted a job to build a TPU chiplet. Oh and I won the Eigenprize.
 
 ## How it happened
 
