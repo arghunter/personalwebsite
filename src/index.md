@@ -20,6 +20,10 @@ I'm an <span class = "accent">EECS student at MIT </span> who works on ASIC desi
 
 <div style="height: 5px;"></div>
 
+In other news, my friends know my code isn't vibecoded because its so scuffed no llm would have written it. (Still working on it)
+
+<div style="height: 5px;"></div>
+
 
 <span class = "accent">\> Check out my [projects](./projects.md), [experience](./experience.md), and [blog](./blog.md). <</span>
 
