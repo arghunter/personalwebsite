@@ -1570,10 +1570,28 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* ── Site palette mapping ────────────────────────────────────────────────────── */
+/* The dashboard was built on VitePress's default variables; map them onto the
+   site's palette (style.css) so the secret page matches the rest of the site
+   in both theme states. */
+.sd-wrap, .sd-overlay {
+  --vp-c-bg:      var(--bg);
+  --vp-c-bg-soft: var(--surface);
+  --vp-c-bg-elv:  #ffffff;
+  --vp-c-divider: var(--border);
+  --vp-c-text-1:  var(--fg);
+  --vp-c-text-2:  color-mix(in srgb, var(--fg) 68%, var(--bg));
+  --vp-c-text-3:  var(--fg-3);
+  --vp-c-brand-1: var(--fg);
+  --vp-c-brand-2: var(--fg);
+  --vp-c-brand-3: var(--fg);
+  font-family: var(--font-body);
+}
+
 /* ── Overlay / setup ─────────────────────────────────────────────────────────── */
 .sd-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: color-mix(in srgb, var(--vp-c-bg) 55%, transparent);
+  background: color-mix(in srgb, var(--fg) 18%, transparent);
   backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center; padding: 1.5rem;
 }
@@ -1583,8 +1601,6 @@ onUnmounted(() => {
   padding: 1.75rem 2rem; width: 100%; max-width: 22rem;
   display: flex; flex-direction: column; gap: 1rem;
 }
-html.light .sd-setup-card { background: #fff; border-color: rgba(124,58,237,0.3); }
-html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,139,250,0.3); }
 .sd-setup-hd { display: flex; align-items: center; justify-content: space-between; }
 .sd-setup-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--vp-c-text-2); }
 .sd-connect-btn {
@@ -1713,8 +1729,8 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 
 .sd-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
 .sd-row-primary { font-size: 0.9rem; color: var(--vp-c-text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sd-row-link { font-size: 0.9rem; color: var(--vp-c-brand-1); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-.sd-row-link:hover { text-decoration: underline; }
+.sd-row-link { font-size: 0.9rem; color: inherit; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.sd-row-link:hover { text-decoration-color: var(--fg); }
 .sd-row-sub { font-size: 0.78rem; color: var(--vp-c-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sd-row-sub-push { margin-left: auto; font-size: 0.78rem; flex-shrink: 0; }
 .sd-row-actions { display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0; }
@@ -1926,7 +1942,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   flex: 1; resize: none; overflow-y: auto;
   border: none !important; outline: none;
   background: var(--vp-c-bg); color: var(--vp-c-text-1);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem; line-height: 1.7;
   padding: 0.85rem 1rem;
   transition: background 0.15s;
@@ -1948,7 +1964,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-md-preview :deep(li) { margin: 0.25rem 0; }
 .sd-md-preview :deep(li p) { margin: 0; }
 .sd-md-preview :deep(code) {
-  font-family: 'JetBrains Mono', monospace; font-size: 0.875em;
+  font-family: var(--font-mono); font-size: 0.875em;
   background: var(--vp-c-bg-soft); padding: 0.1em 0.4em; border-radius: 3px;
 }
 .sd-md-preview :deep(pre) {
@@ -2009,7 +2025,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   padding: 0.6rem 0.75rem; cursor: pointer; text-align: left;
   font: inherit; color: inherit; transition: background 0.1s;
 }
-.sd-feed-item:hover { background: var(--detail-lt); }
+.sd-feed-item:hover { background: var(--vp-c-bg-soft); }
 .sd-feed-item.active { background: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent); }
 .sd-feed-name { flex: 1; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; }
 .sd-feed-rename-input {
@@ -2072,8 +2088,8 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 .sd-article-focused { background: color-mix(in srgb, var(--vp-c-brand-1) 8%, transparent) !important; outline: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 40%, transparent); }
 .sd-article-row-main { flex: 1; min-width: 0; }
 .sd-article-link { display: block; text-decoration: none; color: inherit; }
-.sd-article-link:hover .sd-article-title { text-decoration: underline; }
-.sd-article-title { font-size: 0.875rem; color: var(--vp-c-brand-1); font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
+.sd-article-link:hover .sd-article-title { text-decoration-color: var(--fg); }
+.sd-article-title { font-size: 0.875rem; color: inherit; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
 .sd-article-summary { font-size: 0.78rem; color: var(--vp-c-text-2); line-height: 1.45; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .sd-article-meta { font-size: 0.7rem; color: var(--vp-c-text-3); }
 .sd-article-actions { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; padding-top: 0.1rem; }
@@ -2185,11 +2201,11 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   background: var(--vp-c-brand-1); color: #fff;
   border: none; font: inherit; font-size: 1.6rem; line-height: 1;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  box-shadow: 0 4px 16px rgba(24,15,58,0.35);
   transition: transform 0.15s, box-shadow 0.15s;
   z-index: 20;
 }
-.sd-mobile-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(124,58,237,0.5); }
+.sd-mobile-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(24,15,58,0.45); }
 .sd-mobile-fab:active { transform: scale(0.95); }
 
 /* Mobile markdown toolbar */
@@ -2277,6 +2293,7 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
   }
 
   .sd-card {
+    background: var(--vp-c-bg-elv);
     border: 1px solid var(--vp-c-divider);
     display: flex; flex-direction: column; overflow: hidden;
   }
@@ -2298,162 +2315,11 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
     padding: 0; overflow: hidden; min-height: 0;
   }
 
-  /* ── Light mode ── */
-  html.light .sd-card { background: #fff; border-color: rgba(124,58,237,0.22); }
-  html.light .sd-card-hd { background: rgba(226,217,255,0.6); border-bottom-color: rgba(124,58,237,0.18); }
-  html.light .sd-card .sd-input,
-  html.light .sd-card .sd-textarea { background: #f9f7ff; border-color: rgba(124,58,237,0.25); }
-  html.light .sd-card .sd-list { border-color: rgba(124,58,237,0.18); }
-  html.light .sd-card .sd-row,
-  html.light .sd-card .sd-note-item { border-bottom-color: rgba(124,58,237,0.1); }
-  html.light .sd-card .sd-row:hover,
-  html.light .sd-card .sd-note-item:hover { background: rgba(124,58,237,0.06); }
-  html.light .sd-card .sd-chart { border-color: rgba(124,58,237,0.15); }
-  html.light .sd-card .sd-bar-track { background: rgba(124,58,237,0.07); border-color: rgba(124,58,237,0.12); }
-  html.light .sd-card .sd-pair-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-card .sd-submit-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-card .sd-mic-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-card .sd-idea-card { border-color: rgba(124,58,237,0.14); }
-  html.light .sd-card .sd-idea-card:hover { background: rgba(124,58,237,0.05); }
-  html.light .sd-card .sd-interim { background: rgba(124,58,237,0.06); }
-
-  html.light .sd-notes-sidebar { border-right-color: rgba(124,58,237,0.15); }
-  html.light .sd-new-note-btn { border-bottom-color: rgba(124,58,237,0.15); }
-  html.light .sd-note-list-item { border-bottom-color: rgba(124,58,237,0.1); }
-  html.light .sd-note-list-item:hover { background: rgba(124,58,237,0.05); }
-  html.light .sd-note-list-item.active { background: rgba(124,58,237,0.1); }
-  html.light .sd-note-title-input { border-bottom-color: rgba(124,58,237,0.18); }
-  html.light .sd-md-toolbar { border-bottom-color: rgba(124,58,237,0.15); }
-  html.light .sd-tb-sep { background: rgba(124,58,237,0.18); }
-  html.light .sd-view-toggle { border-color: rgba(0,0,0,0.15); }
-  html.light .sd-view-btn { border-right-color: rgba(0,0,0,0.12); }
-  html.light .sd-md-editor { background: #fdfcff; }
-  html.light .sd-view-split .sd-md-editor { border-right-color: rgba(124,58,237,0.15) !important; }
-  html.light .sd-md-preview :deep(code) { background: rgba(124,58,237,0.07); }
-  html.light .sd-md-preview :deep(pre) { background: rgba(124,58,237,0.05); border-color: rgba(124,58,237,0.12); }
-
-  /* Light mode SecretPlayer overrides */
-  html.light .sd-music-body :deep(.sp-playlist) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-music-body :deep(.sp-playlist-header:hover) { background: rgba(0,0,0,0.04); }
-  html.light .sd-music-body :deep(.sp-list) { border-top-color: rgba(0,0,0,0.08); }
-  html.light .sd-music-body :deep(.sp-track) { border-bottom-color: rgba(0,0,0,0.06); }
-  html.light .sd-music-body :deep(.sp-track:hover) { background: rgba(124,58,237,0.07); }
-  html.light .sd-music-body :deep(.sp-track-active) { background: rgba(124,58,237,0.12); }
-  html.light .sd-music-body :deep(.sp-controls) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-music-body :deep(.sp-widget) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-music-body :deep(.sp-widget-input) {
-    background: #f9f7ff; border-color: rgba(0,0,0,0.15); color: var(--vp-c-text-1);
-  }
-  html.light .sd-music-body :deep(.sp-widget-btn) { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-music-body :deep(.sp-widget-code) { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
-
-  /* ── Dark mode ── */
-  html:not(.light) .sd-card { background: #1e1b2e; border-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-card-hd { background: rgba(167,139,250,0.1); border-bottom-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-card .sd-input,
-  html:not(.light) .sd-card .sd-textarea { background: #141120; border-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-card .sd-list { border-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-card .sd-row,
-  html:not(.light) .sd-card .sd-note-item { border-bottom-color: rgba(167,139,250,0.1); }
-  html:not(.light) .sd-card .sd-row:hover,
-  html:not(.light) .sd-card .sd-note-item:hover { background: rgba(167,139,250,0.07); }
-  html:not(.light) .sd-card .sd-chart { border-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-card .sd-bar-track { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-card .sd-pair-btn { border-color: rgba(167,139,250,0.25); }
-  html:not(.light) .sd-card .sd-submit-btn { border-color: rgba(167,139,250,0.25); }
-  html:not(.light) .sd-card .sd-mic-btn { border-color: rgba(167,139,250,0.25); }
-  html:not(.light) .sd-card .sd-idea-card { border-color: rgba(167,139,250,0.15); background: rgba(167,139,250,0.04); }
-  html:not(.light) .sd-card .sd-idea-card:hover { background: rgba(167,139,250,0.09); }
-
-  html:not(.light) .sd-notes-sidebar { border-right-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-new-note-btn { border-bottom-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-note-list-item { border-bottom-color: rgba(167,139,250,0.1); }
-  html:not(.light) .sd-note-list-item:hover { background: rgba(167,139,250,0.07); }
-  html:not(.light) .sd-note-list-item.active { background: rgba(167,139,250,0.12); }
-  html:not(.light) .sd-note-title-input { border-bottom-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-md-toolbar { border-bottom-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-tb-sep { background: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-view-toggle { border-color: rgba(167,139,250,0.25); }
-  html:not(.light) .sd-view-btn { border-right-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-md-editor { background: #141120; }
-  html:not(.light) .sd-view-split .sd-md-editor { border-right-color: rgba(167,139,250,0.15) !important; }
-  html:not(.light) .sd-md-preview :deep(code) { background: rgba(167,139,250,0.1); }
-  html:not(.light) .sd-md-preview :deep(pre) { background: rgba(167,139,250,0.06); border-color: rgba(167,139,250,0.15); }
-
   /* Hide mobile UI */
   .sd-tabbar { display: none; }
   .sd-mobile-hd { display: none; }
   .sd-mobile { display: none; }
   .sd-mobile-fab { display: none; }
-}
-
-/* ── Explicit mobile theming ─────────────────────────────────────────────────── */
-@media (max-width: 767px) {
-  /* Dark mode mobile */
-  html:not(.light) .sd-mobile { background: #100d20; }
-  html:not(.light) .sd-mobile-hd { background: #100d20; border-bottom-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-tabbar { background: #100d20; border-top-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-mobile-panel .sd-list { border-color: rgba(167,139,250,0.18); }
-  html:not(.light) .sd-mobile-panel .sd-row,
-  html:not(.light) .sd-mobile-panel .sd-note-item { border-bottom-color: rgba(167,139,250,0.1); }
-  html:not(.light) .sd-mobile-panel .sd-row:hover,
-  html:not(.light) .sd-mobile-panel .sd-note-item:hover { background: rgba(167,139,250,0.07); }
-  html:not(.light) .sd-mobile-panel .sd-input,
-  html:not(.light) .sd-mobile-panel .sd-textarea { background: #0d0a18; border-color: rgba(167,139,250,0.22); }
-  html:not(.light) .sd-mobile-panel .sd-pair-btn { border-color: rgba(167,139,250,0.28); }
-  html:not(.light) .sd-mobile-panel .sd-chart { border-color: rgba(167,139,250,0.18); }
-  html:not(.light) .sd-mobile-panel .sd-bar-track { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.15); }
-  html:not(.light) .sd-mobile-panel .sd-idea-card { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.15); }
-
-  /* Notes list items - dark */
-  html:not(.light) .sd-note-list-item-mobile { border-bottom-color: rgba(167,139,250,0.12); }
-  html:not(.light) .sd-note-list-item-mobile:hover { background: rgba(167,139,250,0.07); }
-  html:not(.light) .sd-mobile-md-toolbar { background: #100d20; border-bottom-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-mobile-editor-footer { border-top-color: rgba(167,139,250,0.2); }
-  html:not(.light) .sd-md-editor { background: #0d0a18; color: #e2d9f3; }
-  html:not(.light) .sd-md-preview { color: #e2d9f3; }
-
-  /* Light mode mobile */
-  html.light .sd-mobile { background: #fff; }
-  html.light .sd-mobile-hd { background: #fff; border-bottom-color: rgba(124,58,237,0.18); }
-  html.light .sd-tabbar { background: #fff; border-top-color: rgba(124,58,237,0.18); }
-  html.light .sd-mobile-panel .sd-list { border-color: rgba(124,58,237,0.2); }
-  html.light .sd-mobile-panel .sd-row,
-  html.light .sd-mobile-panel .sd-note-item { border-bottom-color: rgba(124,58,237,0.1); }
-  html.light .sd-mobile-panel .sd-row:hover,
-  html.light .sd-mobile-panel .sd-note-item:hover { background: rgba(124,58,237,0.06); }
-  html.light .sd-mobile-panel .sd-input,
-  html.light .sd-mobile-panel .sd-textarea { background: #f5f0ff; border-color: rgba(124,58,237,0.28); }
-  html.light .sd-mobile-panel .sd-pair-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-mobile-panel .sd-submit-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-mobile-panel .sd-mic-btn { border-color: rgba(0,0,0,0.18); }
-  html.light .sd-mobile-panel .sd-chart { border-color: rgba(124,58,237,0.18); }
-  html.light .sd-mobile-panel .sd-bar-track { background: rgba(124,58,237,0.07); border-color: rgba(124,58,237,0.14); }
-  html.light .sd-mobile-panel .sd-idea-card { background: #faf8ff; border-color: rgba(124,58,237,0.16); }
-  html.light .sd-mobile-panel .sd-idea-card:hover { background: rgba(124,58,237,0.06); }
-  html.light .sd-mobile-panel .sd-interim { background: rgba(124,58,237,0.07); }
-
-  /* Notes list items - light */
-  html.light .sd-note-list-item-mobile { border-bottom-color: rgba(124,58,237,0.12); }
-  html.light .sd-note-list-item-mobile:hover { background: rgba(124,58,237,0.04); }
-  html.light .sd-mobile-md-toolbar { background: #fff; border-bottom-color: rgba(124,58,237,0.18); }
-  html.light .sd-mobile-editor-footer { border-top-color: rgba(124,58,237,0.15); }
-  html.light .sd-md-editor { background: #fdfcff; color: #213547; }
-  html.light .sd-md-preview { color: #213547; }
-
-  /* SecretPlayer light mode overrides */
-  html.light .sd-mobile-panel :deep(.sp-playlist) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-mobile-panel :deep(.sp-playlist-header:hover) { background: rgba(0,0,0,0.04); }
-  html.light .sd-mobile-panel :deep(.sp-list) { border-top-color: rgba(0,0,0,0.08); }
-  html.light .sd-mobile-panel :deep(.sp-track) { border-bottom-color: rgba(0,0,0,0.06); }
-  html.light .sd-mobile-panel :deep(.sp-track:hover) { background: rgba(124,58,237,0.07); }
-  html.light .sd-mobile-panel :deep(.sp-track-active) { background: rgba(124,58,237,0.12); }
-  html.light .sd-mobile-panel :deep(.sp-controls) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-mobile-panel :deep(.sp-widget) { border-color: rgba(0,0,0,0.1); }
-  html.light .sd-mobile-panel :deep(.sp-widget-input) {
-    background: #f5f0ff; border-color: rgba(0,0,0,0.15); color: #213547;
-  }
-  html.light .sd-mobile-panel :deep(.sp-widget-btn) { border-color: rgba(0,0,0,0.18); }
 }
 
 /* ── Transition ──────────────────────────────────────────────────────────────── */
@@ -2663,11 +2529,12 @@ html:not(.light) .sd-setup-card { background: #1e1b2e; border-color: rgba(167,13
 }
 .sd-proj-link-row:last-of-type { border-bottom: none; }
 .sd-proj-link-text {
-  flex: 1; font-size: 0.82rem; color: var(--vp-c-brand-1);
-  text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1; font-size: 0.82rem; color: inherit;
+  text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   min-width: 0;
 }
-.sd-proj-link-text:hover { text-decoration: underline; }
+.sd-proj-link-text:hover { text-decoration-color: var(--fg); }
 .sd-proj-link-add { display: flex; gap: 0.35rem; margin-top: 0.4rem; }
 .sd-proj-link-add .sd-input { flex: 1; }
 

@@ -2,41 +2,72 @@
 <rss version="2.0">
     <channel>
         <title>Armaan Gomes</title>
-        <link>https://arghunter.github.io</link>
+        <link>https://armaangomes.com</link>
         <description>Welcome to my feed!</description>
-        <lastBuildDate>Wed, 08 Apr 2026 18:35:51 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 23 Sep 2026 00:01:17 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
         <image>
             <title>Armaan Gomes</title>
-            <url>https://arghunter.github.io/favicon.png</url>
-            <link>https://arghunter.github.io</link>
+            <url>https://armaangomes.com/favicon.png</url>
+            <link>https://armaangomes.com</link>
         </image>
         <item>
-            <title><![CDATA[KERNN v1 - Building A General Feed Forward Neural Network Accelerator]]></title>
-            <link>https://arghunter.github.io/blogs/kernn/</link>
-            <guid isPermaLink="false">https://arghunter.github.io/blogs/kernn/</guid>
-            <pubDate>Fri, 10 Apr 2026 04:00:00 GMT</pubDate>
+            <title><![CDATA[Everything, Everywhere, All at Once]]></title>
+            <link>https://armaangomes.com/blogs/everything/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/everything/</guid>
+            <pubDate>Fri, 04 Sep 2026 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Out of Order, on Technicality - RISCV]]></title>
+            <link>https://armaangomes.com/blogs/techooo/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/techooo/</guid>
+            <pubDate>Mon, 27 Jul 2026 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Running DOOM on our Custom CPU and Going Viral]]></title>
+            <link>https://armaangomes.com/blogs/doom/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/doom/</guid>
+            <pubDate>Tue, 21 Jul 2026 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Winning a CPU Optimization Challenge and Setting a New Class Record]]></title>
+            <link>https://armaangomes.com/blogs/c191w/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/c191w/</guid>
+            <pubDate>Mon, 15 Jun 2026 04:00:00 GMT</pubDate>
+            <description><![CDATA[My Computer Architecture class ask us to build the fastest CPUs for a specific task. Coincidentally, it turns out to be a task I had just worked on, so I decided to lock in.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Building an Optimized FP Four Multiplier]]></title>
+            <link>https://armaangomes.com/blogs/fp4/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/fp4/</guid>
+            <pubDate>Fri, 05 Jun 2026 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[KERNN - Building A Feed Forward Neural Network Accelerator]]></title>
+            <link>https://armaangomes.com/blogs/kernn/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/kernn/</guid>
+            <pubDate>Wed, 15 Apr 2026 04:00:00 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Supermic+more: PDM Bitstream ASICs for Audio Signal Processing]]></title>
-            <link>https://arghunter.github.io/blogs/supermic/</link>
-            <guid isPermaLink="false">https://arghunter.github.io/blogs/supermic/</guid>
+            <link>https://armaangomes.com/blogs/supermic/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/supermic/</guid>
             <pubDate>Sun, 01 Sep 2024 04:00:00 GMT</pubDate>
             <description><![CDATA[PDM microphones have remarkable properties for beamforming. By manipulating the bitstream directly at 3072 kHz rather than converting to PCM first, delay-and-sum beamforming becomes simpler and more precise. This project implements these operations as ASICs using the Skywater 130nm CMOS process, with eight designs submitted for fabrication.]]></description>
         </item>
         <item>
             <title><![CDATA[clEar: Glasses-Based Beamforming Hearing Aids]]></title>
-            <link>https://arghunter.github.io/blogs/clear/</link>
-            <guid isPermaLink="false">https://arghunter.github.io/blogs/clear/</guid>
+            <link>https://armaangomes.com/blogs/clear/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/clear/</guid>
             <pubDate>Wed, 01 May 2024 04:00:00 GMT</pubDate>
             <description><![CDATA[clEar is a glasses-based beamforming hearing aid that uses Golomb-spaced microphone arrays, a custom MSMVDR beamforming technique, and a hybrid multi-speaker tracking algorithm to achieve a 71% increase in STOI and 9.9 dB SNR improvement. ISEF Grand Award, CSEF First Place.]]></description>
         </item>
         <item>
             <title><![CDATA[How It's Made]]></title>
-            <link>https://arghunter.github.io/blogs/made/</link>
-            <guid isPermaLink="false">https://arghunter.github.io/blogs/made/</guid>
+            <link>https://armaangomes.com/blogs/made/</link>
+            <guid isPermaLink="false">https://armaangomes.com/blogs/made/</guid>
             <pubDate>Sat, 04 Feb 1026 04:56:02 GMT</pubDate>
             <description><![CDATA[Everyone who can, should make a personal website. So here's how I made mine.]]></description>
         </item>
