@@ -123,6 +123,7 @@ function siteGraphPlugin(): Plugin {
 }
 
 const hostname = 'https://armaangomes.com'
+const SITE_DESCRIPTION = 'Hi! I\'m Armaan Gomes. I like to build things.'
 
 export default defineConfig({
   title: "Armaan Gomes",
@@ -139,12 +140,38 @@ export default defineConfig({
     }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['link', { rel: 'manifest', href: '/manifest.json' }],
-    ['link', { rel: 'apple-touch-icon', href: '/agi-icon-512.png' }],
     ['meta', { name: 'theme-color', content: '#a78bfa' }],
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
     ['meta', { name: 'apple-mobile-web-app-title', content: 'AGI' }]
   ],
+  transformPageData(pageData) {
+    const isPost = pageData.relativePath.startsWith('blogs/')
+    const title = isPost
+      ? (pageData.frontmatter.title ?? pageData.title)
+      : `${pageData.frontmatter.title ?? pageData.title ?? ''} \u2014 Armaan Gomes`
+          .replace(/^\s*\u2014\s*/, '')
+          .replace(/^Home \u2014 /, '')
+    // '||' not '??': empty-string frontmatter should fall through too
+    const description =
+      pageData.frontmatter.description ||
+      pageData.description ||
+      SITE_DESCRIPTION
+    const url = `${hostname}/${pageData.relativePath.replace(/(index)?\.md$/, '')}`
+
+    pageData.frontmatter.head ??= []
+    pageData.frontmatter.head.push(
+      ['meta', { property: 'og:type', content: isPost ? 'article' : 'website' }],
+      ['meta', { property: 'og:site_name', content: 'Armaan Gomes' }],
+      ['meta', { property: 'og:title', content: title }],
+      ['meta', { property: 'og:description', content: description }],
+      ['meta', { property: 'og:url', content: url }],
+      // summary (not summary_large_image) + no twitter:image = text-only card
+      ['meta', { name: 'twitter:card', content: 'summary' }],
+      ['meta', { name: 'twitter:title', content: title }],
+      ['meta', { name: 'twitter:description', content: description }],
+    )
+  },
   vite: { plugins: [siteGraphPlugin()], envDir: process.cwd() },
   cleanUrls: true,
   markdown: {

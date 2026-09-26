@@ -1,1 +1,0 @@
-import{_ as e,b as t,c as a}from"./chunks/framework.Yp4hj_cn.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"now.md","filePath":"now.md"}'),o={name:"now.md"};function n(r,s,c,p,_,d){return t(),a("div")}const f=e(o,[["render",n]]);export{m as __pageData,f as default};

@@ -4,7 +4,7 @@
         <title>Armaan Gomes</title>
         <link>https://armaangomes.com</link>
         <description>Welcome to my feed!</description>
-        <lastBuildDate>Sat, 26 Sep 2026 05:09:14 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 26 Sep 2026 05:31:55 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -17,7 +17,7 @@
             <title><![CDATA[Building a GPU in 24 hours and winning HackMIT]]></title>
             <link>https://armaangomes.com/blogs/hackmitgpu/</link>
             <guid isPermaLink="false">https://armaangomes.com/blogs/hackmitgpu/</guid>
-            <pubDate>Wed, 23 Sep 2026 00:00:00 GMT</pubDate>
+            <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[Everything, Everywhere, All at Once]]></title>
