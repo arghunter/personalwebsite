@@ -340,3 +340,123 @@ footer a { color: inherit; }
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
 }
+
+/* Inline code — the ':not(pre code)' keeps block tokens untouched */
+:not(pre) > code {
+    padding: 0.1em 0.35em;
+    font-size: 0.92em;
+    color: var(--fg-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+a > code { color: inherit; }
+
+/* ── Code blocks ─────────────────────────────────────────────── */
+/* The theme imports vp-code.css (token colors) but not vp-doc.css, which is
+   where the default theme positions the copy button and language label.
+   Without those rules both render inline above the <pre>. */
+
+div[class*='language-'] {
+    position: relative;
+    margin: 1.25rem 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+div[class*='language-'] pre {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    background: transparent;
+    white-space: pre;
+    word-break: normal;
+    overflow-x: auto;
+}
+
+div[class*='language-'] code { font-size: var(--size-sm); }
+
+div[class*='language-'] > span.lang {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--size-xs);
+    font-weight: var(--w-mid);
+    color: var(--fg-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+div[class*='language-'] > button.copy {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    padding: 0.15rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--size-xs);
+    color: var(--fg-3);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+div[class*='language-'] > button.copy::before { content: 'copy'; }
+div[class*='language-'] > button.copy.copied::before { content: 'copied'; }
+div[class*='language-'] > button.copy:hover { color: var(--fg); }
+
+div[class*='language-']:hover > button.copy,
+div[class*='language-'] > button.copy:focus-visible { opacity: 1; }
+div[class*='language-']:hover > span.lang { opacity: 0; }
+
+/* ── Side-by-side media rows ─────────────────────────────────── */
+.blog-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.25rem 0;
+}
+
+.blog-row > figure {
+    margin: 0;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* markdown wraps images in <p>; drop its margin so items align at the top */
+.blog-row > figure p { margin: 0; }
+
+/* Default: matched height, widths follow each item's aspect ratio. */
+.blog-row img,
+.blog-row video {
+    width: auto;
+    height: var(--row-h, 420px);
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* Opt-in: equal-width columns instead. */
+.blog-row-equal-width > figure { flex: 1 1 0; }
+
+.blog-row-equal-width img,
+.blog-row-equal-width video {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 700px) {
+    .blog-row { flex-direction: column; align-items: center; }
+    .blog-row img,
+    .blog-row video { width: 100%; height: auto; }
+}

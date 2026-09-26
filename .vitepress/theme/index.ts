@@ -10,6 +10,7 @@ import 'vitepress/dist/client/theme-default/styles/components/vp-code.css'
 
 import InlineImage from './components/InlineImage.vue'
 import BlogImage from './components/BlogImage.vue'
+import BlogRow from './components/BlogRow.vue'
 import GraphView from './components/GraphView.vue'
 import SecretPlayer from './components/SecretPlayer.vue'
 import SecretDashboard from './components/SecretDashboard.vue'
@@ -30,6 +31,7 @@ export default {
 	enhanceApp({ app, router, siteData }) {
 		app.component('InlineImage', InlineImage)
 		app.component('BlogImage', BlogImage)
+		app.component('BlogRow', BlogRow)
 		app.component('GraphView', GraphView)
 		app.component('SecretPlayer', SecretPlayer)
 		app.component('SecretDashboard', SecretDashboard)

@@ -3,11 +3,8 @@ import { useData } from 'vitepress'
 import { computed, ref, watch } from 'vue'
 import MusicPlayer from './components/MusicPlayer.vue'
 import WordCycle from './components/WordCycle.vue'
-import VimIndicator from './components/VimIndicator.vue'
-import { useVimKeys } from './useVimKeys'
 import { useEasterEgg } from './useEasterEgg'
 
-useVimKeys()
 const { enableShake, needsShakePermission, shakeEnabled } = useEasterEgg()
 
 const { frontmatter, page } = useData()
