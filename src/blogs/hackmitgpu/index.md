@@ -2,7 +2,7 @@
 title: "Building a GPU in 24 hours and winning HackMIT"
 description: "GPUs are expensive. We are broke. So, we built one. Why not?"
 longDescription: ""
-date: 2026-09-23
+date: 2026-09-26
 hidden: false
 ---
 
@@ -175,11 +175,9 @@ The following is pieced together from my friends. After our name was put on scre
 
 At the end of the day, we pulled off what we thought impossible. We built a simple GPU in 24 hours and ran custom kernels on it. We even won HackMIT, but more important than all of that, the memories I made with my friends were the best part of it all.
 
-<BlogImage caption="Our Awesome Team">
+<BlogImage caption="Our Awesome Team" width="50%">
 
 ![](image-4.png)
 </BlogImage>
 
-
-
-<
+<span class="newsreader">"You are filled with determination'"<span style="white-space: nowrap"> - <a href="https://www.youtube.com/watch?v=LI4kRinTzSg" onclick="if(window.__playMusic){window.__playMusic('s6Gjq-oxHEs','I May Fall (Acoustic)','Jeff & Casey Lee Williams');return false;}">Undertale</a></span></span>
