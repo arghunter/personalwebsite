@@ -1,22 +1,22 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vitepress'
+import { nowPlaying, engine } from '../music'
+import SeekBar from './SeekBar.vue'
 
-const isPlaying   = ref(false)
-const isVisible   = ref(false)
-const volume      = ref(80)
-const trackTitle  = ref('')
-const trackArtist = ref('')
-const trackId     = ref('')
+const route = useRoute()
+// On the secret page's mobile layout the dashboard shows its own bar above the tabs.
+const onSecret = computed(() => /^\/secret(\.html)?$/.test(route.path))
+
 const screenMode  = ref(false)
 const usingNative = ref(false)
-
-const audioEl   = ref(null)
-let player      = null
-let wakeLock    = null
+const audioEl     = ref(null)
+let player   = null
+let wakeLock = null
+let ytTimer  = null
 
 function setIsPlaying(val) {
-  isPlaying.value = val
-  if (typeof window.__onPlayStateChange === 'function') window.__onPlayStateChange(val)
+  nowPlaying.playing = val
   if ('mediaSession' in navigator)
     navigator.mediaSession.playbackState = val ? 'playing' : 'paused'
 }
@@ -28,34 +28,67 @@ function updateMediaSession(videoId, title, artist) {
   navigator.mediaSession.metadata = new MediaMetadata(meta)
 }
 
+function updatePositionState() {
+  if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return
+  const d = nowPlaying.duration
+  if (!d || !isFinite(d)) return
+  try { navigator.mediaSession.setPositionState({ duration: d, position: Math.min(nowPlaying.time, d), playbackRate: 1 }) } catch {}
+}
+
+// ── YouTube time polling (the iframe API has no timeupdate event) ────────────
+function startYtTimer() {
+  stopYtTimer()
+  ytTimer = setInterval(() => {
+    if (usingNative.value || !player?.getCurrentTime) return
+    nowPlaying.time = player.getCurrentTime() || 0
+    nowPlaying.duration = player.getDuration() || 0
+  }, 500)
+}
+function stopYtTimer() { if (ytTimer) { clearInterval(ytTimer); ytTimer = null } }
+
 // Priority: direct URL → YT iframe
 async function playMusic(videoId, title, artist, directUrl) {
-  trackTitle.value  = title
-  trackArtist.value = artist
-  trackId.value     = videoId ?? ''
-  isVisible.value   = true
+  nowPlaying.title    = title
+  nowPlaying.artist   = artist
+  nowPlaying.videoId  = videoId ?? ''
+  nowPlaying.visible  = true
+  nowPlaying.time     = 0
+  nowPlaying.duration = 0
   updateMediaSession(videoId, title, artist)
 
   if (directUrl && audioEl.value) {
+    player?.pauseVideo?.()
+    stopYtTimer()
     usingNative.value = true
     audioEl.value.src    = directUrl
-    audioEl.value.volume = volume.value / 100
+    audioEl.value.volume = nowPlaying.volume / 100
     try { await audioEl.value.play(); return }
     catch (e) { console.warn('[music] native play() rejected:', e.message) }
   }
 
-  // Fall back to YT iframe
+  // Fall back to YT iframe — make sure the <audio> element isn't still playing the last song.
   usingNative.value = false
+  if (audioEl.value && !audioEl.value.paused) audioEl.value.pause()
   if (videoId && player) {
     player.loadVideoById(videoId)
-    player.setVolume(volume.value)
+    player.setVolume(nowPlaying.volume)
     player.playVideo()
+    startYtTimer()
   }
 }
 
 function onAudioEnded() {
   if (typeof window.__onMusicEnd === 'function') window.__onMusicEnd()
   else { audioEl.value.currentTime = 0; audioEl.value.play() }
+}
+function onTimeUpdate() {
+  if (!usingNative.value) return
+  nowPlaying.time = audioEl.value.currentTime || 0
+}
+function onDuration() {
+  if (!usingNative.value) return
+  nowPlaying.duration = audioEl.value.duration || 0
+  updatePositionState()
 }
 
 // ── Screen-on mode ────────────────────────────────────────────────────────────
@@ -65,44 +98,53 @@ async function enterScreenMode() {
     try { wakeLock = await navigator.wakeLock.request('screen') } catch {}
   }
 }
-
 function exitScreenMode() {
   screenMode.value = false
   wakeLock?.release()
   wakeLock = null
 }
-
 function onKeyDown(e) {
   if (screenMode.value && e.key === 'Escape') exitScreenMode()
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 function toggle() {
   if (usingNative.value && audioEl.value) {
-    isPlaying.value ? audioEl.value.pause() : audioEl.value.play()
+    nowPlaying.playing ? audioEl.value.pause() : audioEl.value.play()
   } else if (player) {
-    isPlaying.value ? player.pauseVideo() : player.playVideo()
+    nowPlaying.playing ? player.pauseVideo() : player.playVideo()
   }
 }
-
-function next() { if (typeof window.__nextTrack === 'function') window.__nextTrack() }
-function prev() { if (typeof window.__prevTrack === 'function') window.__prevTrack() }
-
+function seek(t) {
+  if (usingNative.value && audioEl.value) audioEl.value.currentTime = t
+  else player?.seekTo?.(t, true)
+  nowPlaying.time = t
+  updatePositionState()
+}
 function setVolume(e) {
-  volume.value = Number(e.target.value)
-  if (audioEl.value) audioEl.value.volume = volume.value / 100
-  if (player) player.setVolume(volume.value)
+  nowPlaying.volume = Number(e.target.value)
+  if (audioEl.value) audioEl.value.volume = nowPlaying.volume / 100
+  if (player) player.setVolume(nowPlaying.volume)
+  try { localStorage.setItem('mp_vol', String(nowPlaying.volume)) } catch {}
 }
 
 onMounted(() => {
-  window.__playMusic  = playMusic
-  window.__pauseMusic  = () => {
-    if (usingNative.value) audioEl.value?.pause()
-    else player?.pauseVideo()
-  }
-  window.__resumeMusic = () => {
-    if (usingNative.value) audioEl.value?.play()
-    else player?.playVideo()
+  try { const v = Number(localStorage.getItem('mp_vol')); if (v >= 0 && v <= 100 && localStorage.getItem('mp_vol') !== null) nowPlaying.volume = v } catch {}
+
+  engine.toggle = toggle
+  engine.seek = seek
+  engine.enterScreen = enterScreenMode
+
+  window.__playMusic   = playMusic
+  window.__pauseMusic  = () => { if (usingNative.value) audioEl.value?.pause(); else player?.pauseVideo() }
+  window.__resumeMusic = () => { if (usingNative.value) audioEl.value?.play();  else player?.playVideo() }
+
+  if ('mediaSession' in navigator) {
+    const ms = navigator.mediaSession
+    ms.setActionHandler('play',          () => toggle())
+    ms.setActionHandler('pause',         () => toggle())
+    ms.setActionHandler('nexttrack',     () => engine.next())
+    ms.setActionHandler('previoustrack', () => engine.prev())
+    try { ms.setActionHandler('seekto', (d) => { if (d.seekTime != null) seek(d.seekTime) }) } catch {}
   }
 
   if (!window.YT) {
@@ -116,15 +158,7 @@ onMounted(() => {
       videoId: '',
       playerVars: { autoplay: 0, loop: 1 },
       events: {
-        onReady: () => {
-          player.setVolume(volume.value)
-          if ('mediaSession' in navigator) {
-            navigator.mediaSession.setActionHandler('play',          () => toggle())
-            navigator.mediaSession.setActionHandler('pause',         () => toggle())
-            navigator.mediaSession.setActionHandler('nexttrack',     next)
-            navigator.mediaSession.setActionHandler('previoustrack', prev)
-          }
-        },
+        onReady: () => player.setVolume(nowPlaying.volume),
         onStateChange: (e) => {
           if (usingNative.value) return // native audio owns state
           setIsPlaying(e.data === window.YT.PlayerState.PLAYING)
@@ -142,18 +176,24 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
+  stopYtTimer()
   wakeLock?.release()
 })
 </script>
 
 <template>
-  <div id="yt-hidden-player" style="display:none"></div>
+  <!-- 1px offscreen instead of display:none: browsers often refuse to play hidden iframes -->
+  <div class="yt-offscreen" aria-hidden="true"><div id="yt-hidden-player"></div></div>
   <audio
     ref="audioEl"
+    preload="auto"
     style="display:none"
     @play="setIsPlaying(true)"
     @pause="setIsPlaying(false)"
     @ended="onAudioEnded"
+    @timeupdate="onTimeUpdate"
+    @durationchange="onDuration"
+    @loadedmetadata="onDuration"
   />
 
   <!-- Screen-on overlay -->
@@ -161,44 +201,54 @@ onUnmounted(() => {
     <div v-if="screenMode" class="screen-overlay">
       <button class="screen-exit" @click="exitScreenMode" aria-label="Exit">✕</button>
       <div class="screen-track">
-        <div class="screen-title">{{ trackTitle }}</div>
-        <div class="screen-artist">{{ trackArtist }}</div>
+        <div class="screen-title">{{ nowPlaying.title }}</div>
+        <div class="screen-artist">{{ nowPlaying.artist }}</div>
       </div>
       <div class="screen-controls">
-        <button class="screen-btn" @click="prev" aria-label="Previous">&#9664;&#9664;</button>
-        <button class="screen-btn screen-btn-play" @click="toggle" :aria-label="isPlaying ? 'Pause' : 'Play'">
-          {{ isPlaying ? '▮▮' : '▶' }}
+        <button class="screen-btn" @click="engine.prev" aria-label="Previous">&#9664;&#9664;</button>
+        <button class="screen-btn screen-btn-play" @click="toggle" :aria-label="nowPlaying.playing ? 'Pause' : 'Play'">
+          {{ nowPlaying.playing ? '▮▮' : '▶' }}
         </button>
-        <button class="screen-btn" @click="next" aria-label="Next">&#9654;&#9654;</button>
+        <button class="screen-btn" @click="engine.next" aria-label="Next">&#9654;&#9654;</button>
       </div>
     </div>
   </Transition>
 
   <!-- Player bar -->
   <Transition name="player-fade">
-    <div v-if="isVisible" class="music-player">
-      <button class="music-btn music-btn-screen" @click="enterScreenMode" aria-label="Screen on mode">☽</button>
-      <button class="music-btn" @click="toggle" :aria-label="isPlaying ? 'Pause' : 'Play'">
-        {{ isPlaying ? '▮▮' : '▶' }}
-      </button>
-      <div class="music-info">
-        <span class="music-title">{{ trackTitle }}</span>
-        <span class="music-artist">{{ trackArtist }}</span>
+    <div v-if="nowPlaying.visible" :class="['music-player', { 'music-player-secret': onSecret }]">
+      <div class="music-row">
+        <button class="music-btn music-btn-screen" @click="enterScreenMode" aria-label="Screen on mode">☽</button>
+        <button v-if="nowPlaying.hasQueue" class="music-btn music-btn-ghost" @click="engine.prev" aria-label="Previous">&#9664;&#9664;</button>
+        <button class="music-btn" @click="toggle" :aria-label="nowPlaying.playing ? 'Pause' : 'Play'">
+          {{ nowPlaying.playing ? '▮▮' : '▶' }}
+        </button>
+        <button v-if="nowPlaying.hasQueue" class="music-btn music-btn-ghost" @click="engine.next" aria-label="Next">&#9654;&#9654;</button>
+        <div class="music-info">
+          <span class="music-title">{{ nowPlaying.title }}</span>
+          <span class="music-artist">{{ nowPlaying.artist }}</span>
+        </div>
+        <input
+          class="music-volume"
+          type="range"
+          min="0"
+          max="100"
+          :value="nowPlaying.volume"
+          @input="setVolume"
+          aria-label="Volume"
+        />
       </div>
-      <input
-        class="music-volume"
-        type="range"
-        min="0"
-        max="100"
-        :value="volume"
-        @input="setVolume"
-        aria-label="Volume"
-      />
+      <SeekBar />
     </div>
   </Transition>
 </template>
 
 <style scoped>
+.yt-offscreen {
+  position: fixed; left: -10px; top: -10px;
+  width: 1px; height: 1px; overflow: hidden;
+  opacity: 0; pointer-events: none;
+}
 .screen-overlay {
   position: fixed;
   inset: 0;

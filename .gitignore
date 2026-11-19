@@ -1,0 +1,3 @@
+# Worker credentials for scripts/songs.mjs
+.env.songs
+.claude/*

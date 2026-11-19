@@ -251,11 +251,29 @@ main {
     left: 1.5rem;
     z-index: 100;
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    flex-direction: column;
+    gap: 0.15rem;
+    width: min(22rem, calc(100vw - 3rem));
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 0.35rem 0.9rem 0.35rem 0.4rem;
+    padding: 0.4rem 0.6rem 0.2rem 0.4rem;
+}
+.music-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+.music-btn-ghost {
+    background: none;
+    color: var(--fg);
+    font-size: 0.5rem;
+    opacity: 0.55;
+}
+.music-btn-ghost:hover { opacity: 1; }
+/* The secret dashboard has its own now-playing bar above the mobile tab bar */
+@media (max-width: 767px) {
+    .music-player-secret { display: none; }
 }
 
 .music-btn {
@@ -272,9 +290,9 @@ main {
     flex-shrink: 0;
 }
 
-.music-info { display: flex; flex-direction: column; line-height: 1.2; }
-.music-title { font-size: var(--size-xs); font-weight: var(--w-black); letter-spacing: 0.05em; text-transform: uppercase; }
-.music-artist { font-size: var(--size-xs); color: var(--fg-2); }
+.music-info { display: flex; flex-direction: column; line-height: 1.2; flex: 1; min-width: 0; }
+.music-title { font-size: var(--size-xs); font-weight: var(--w-black); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.music-artist { font-size: var(--size-xs); color: var(--fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .music-volume {
     -webkit-appearance: none;

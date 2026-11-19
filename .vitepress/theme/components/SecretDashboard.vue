@@ -3,6 +3,7 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vitepress'
 import { marked } from 'marked'
 import SecretPlayer from './SecretPlayer.vue'
+import SecretNowBar from './SecretNowBar.vue'
 
 const router = useRouter()
 
@@ -181,6 +182,14 @@ async function testAndSave() {
     setupErr.value = e.message === '401' ? 'wrong api key' : `could not reach worker (${e.message})`
   }
   setupBusy.value = false
+}
+
+// Forget this device: clears the unlock flag and worker credentials.
+function lockDashboard() {
+  if (!confirm('Lock the dashboard on this device? You will need the easter egg and api key again.')) return
+  for (const k of ['sd_s', 'sd_w', 'sd_k']) localStorage.removeItem(k)
+  try { sessionStorage.removeItem('sd_home') } catch {}
+  window.location.href = '/'
 }
 
 // ── Data loaders ───────────────────────────────────────────────────────────────
@@ -868,6 +877,10 @@ onUnmounted(() => {
         </div>
         <p v-if="setupErr" class="sd-err">{{ setupErr }}</p>
         <button class="sd-connect-btn" @click="testAndSave" :disabled="setupBusy">{{ setupBusy ? '…' : 'connect' }}</button>
+        <div v-if="ready" class="sd-setup-foot">
+          <a href="/?home" class="sd-text-btn">view public site</a>
+          <button class="sd-text-btn sd-lock-btn" @click="lockDashboard">lock this device</button>
+        </div>
       </div>
     </div>
   </Transition>
@@ -1558,6 +1571,9 @@ onUnmounted(() => {
 
     </div><!-- /sd-mobile -->
 
+    <!-- Mobile now-playing bar (sits above the tab bar) -->
+    <SecretNowBar class="sd-nowbar" @open="switchTab('music')" />
+
     <!-- Mobile tab bar -->
     <nav class="sd-tabbar">
       <button v-for="t in tabs" :key="t.id" :class="['sd-tab', { active: tab === t.id }]" @click="switchTab(t.id)">
@@ -1610,6 +1626,9 @@ onUnmounted(() => {
 }
 .sd-connect-btn:hover:not(:disabled) { background: var(--vp-c-brand-1); color: #fff; }
 .sd-connect-btn:disabled { opacity: 0.35; cursor: default; }
+.sd-setup-foot { display: flex; justify-content: space-between; align-items: center; margin-top: -0.25rem; }
+.sd-setup-foot a { text-decoration: none; }
+.sd-lock-btn:hover { color: #e11d48; }
 
 /* ── Shared ──────────────────────────────────────────────────────────────────── */
 .sd-field { display: flex; flex-direction: column; gap: 0.35rem; }
@@ -1787,7 +1806,7 @@ onUnmounted(() => {
 }
 .sd-card-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--vp-c-text-2); font-weight: 600; }
 .sd-card-body { padding: 1rem; }
-.sd-music-body { padding: 0; }
+.sd-music-body { padding: 0.85rem 1rem 0.5rem; }
 .sd-music-body :deep(.sp) { max-width: none; margin: 0; }
 
 /* ── Notes two-pane editor ───────────────────────────────────────────────────── */
@@ -2306,7 +2325,7 @@ onUnmounted(() => {
   .sd-area-feeds    { grid-area: feeds; height: 480px; }
 
   /* Cap heights for small cards */
-  .sd-area-music .sd-card-body { max-height: 420px; overflow-y: auto; }
+  .sd-area-music .sd-card-body { max-height: 560px; overflow-y: auto; }
   .sd-area-later .sd-list-scroll { max-height: 260px; }
 
   /* Notes two-pane body */
@@ -2317,6 +2336,7 @@ onUnmounted(() => {
 
   /* Hide mobile UI */
   .sd-tabbar { display: none; }
+  .sd-nowbar { display: none; }
   .sd-mobile-hd { display: none; }
   .sd-mobile { display: none; }
   .sd-mobile-fab { display: none; }

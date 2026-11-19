@@ -3,11 +3,15 @@
 // Required bindings (set in Worker Settings):
 //   KV namespace  : DB        → create a KV namespace and bind it as "DB"
 //   Environment variable: API_KEY  → any secret string you choose
+//   R2 bucket (optional): SONGS → create an R2 bucket (e.g. "songs") and bind it as "SONGS".
+//     Song audio is stored there and served from /song/<key>. Without it, audio
+//     falls back to catbox.moe.
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
+  'Access-Control-Allow-Headers': 'Content-Type, X-API-Key, Range',
+  'Access-Control-Expose-Headers': 'Content-Length, Content-Range, Accept-Ranges',
 }
 
 const PIPED_INSTANCES = [
@@ -81,18 +85,71 @@ function parseRSSAtom(xml) {
 
 // ── Catbox upload ─────────────────────────────────────────────────────────────
 
-async function uploadToCatbox(audioUrl) {
-  // Download the audio through the worker so we're not relying on catbox
-  // being able to reach a short-lived signed URL
-  const audioRes = await fetch(audioUrl, {
+// ── Song storage (R2, falling back to catbox) ─────────────────────────────────
+
+function extFor(ct, name = '') {
+  const m = name.match(/\.([a-z0-9]{2,4})$/i)
+  if (m) return m[1].toLowerCase()
+  if (ct.includes('webm')) return 'webm'
+  if (ct.includes('opus')) return 'opus'
+  if (ct.includes('ogg')) return 'ogg'
+  if (ct.includes('mp4') || ct.includes('m4a') || ct.includes('aac')) return 'm4a'
+  if (ct.includes('flac')) return 'flac'
+  if (ct.includes('wav')) return 'wav'
+  return 'mp3'
+}
+
+function safeName(name) {
+  return (name || 'audio').toLowerCase().replace(/\.[a-z0-9]{2,4}$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'audio'
+}
+
+// Store audio bytes and return a public URL that an <audio> element can play.
+async function storeAudio(env, origin, buf, ct, name) {
+  const ext = extFor(ct, name)
+  if (env.SONGS) {
+    const key = `${genSlug()}${genSlug()}-${safeName(name)}.${ext}`
+    await env.SONGS.put(key, buf, { httpMetadata: { contentType: ct, cacheControl: 'public, max-age=31536000, immutable' } })
+    return `${origin}/song/${key}`
+  }
+  return uploadToCatbox(buf, ct, ext)
+}
+
+async function downloadAudio(audioUrl) {
+  const res = await fetch(audioUrl, {
     signal: AbortSignal.timeout(60000),
     headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': '*/*' },
   })
-  if (!audioRes.ok) throw new Error(`audio download ${audioRes.status}`)
-  const buf = await audioRes.arrayBuffer()
-  const ct = audioRes.headers.get('content-type') || 'audio/mpeg'
-  const ext = ct.includes('webm') ? 'webm' : ct.includes('opus') ? 'opus' : ct.includes('ogg') ? 'ogg' : 'mp3'
+  if (!res.ok) throw new Error(`audio download ${res.status}`)
+  return { buf: await res.arrayBuffer(), ct: res.headers.get('content-type') || 'audio/mpeg' }
+}
 
+// YouTube video → hosted audio URL (cobalt/Piped, then R2 or catbox).
+async function hostVideoAudio(env, origin, videoId) {
+  const { buf, ct } = await downloadAudio(await getBestAudioUrl(videoId))
+  return storeAudio(env, origin, buf, ct, videoId)
+}
+
+// Fill in the url on every pending track for this video, across all playlists.
+async function setUrlForVideo(env, videoId, url) {
+  const pls = await kvGet(env, 'playlists')
+  let n = 0
+  for (const pl of pls) for (const t of pl.tracks) if (t.id === videoId && !t.url) { t.url = url; n++ }
+  if (n) await kvSet(env, 'playlists', pls)
+  return n
+}
+
+// Delete R2 objects that no track points at any more.
+async function deleteOrphanSongs(env, origin, urls) {
+  if (!env.SONGS) return
+  const pls = await kvGet(env, 'playlists')
+  const used = new Set(pls.flatMap(p => p.tracks.map(t => t.url)).filter(Boolean))
+  for (const u of urls) {
+    if (!u || used.has(u) || !u.startsWith(`${origin}/song/`)) continue
+    await env.SONGS.delete(u.slice(`${origin}/song/`.length))
+  }
+}
+
+async function uploadToCatbox(buf, ct, ext) {
   const form = new FormData()
   form.append('reqtype', 'fileupload')
   form.append('fileToUpload', new Blob([buf], { type: ct }), `audio.${ext}`)
@@ -211,7 +268,7 @@ function genSlug() {
 // ── Main handler ──────────────────────────────────────────────────────────────
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
     const url = new URL(request.url)
@@ -223,6 +280,30 @@ export default {
       const dest = await env.DB.get(`link:${p1}`)
       if (!dest) return new Response('Not found', { status: 404 })
       return Response.redirect(dest, 302)
+    }
+
+    // ── /song/:key → public audio from R2 (supports Range for seeking / iOS) ──
+    if (p0 === 'song' && p1 && (request.method === 'GET' || request.method === 'HEAD')) {
+      if (!env.SONGS) return new Response('not found', { status: 404, headers: CORS })
+      const obj = await env.SONGS.get(p1, { range: request.headers })
+      if (!obj) return new Response('not found', { status: 404, headers: CORS })
+      const headers = new Headers(CORS)
+      obj.writeHttpMetadata(headers)
+      headers.set('etag', obj.httpEtag)
+      headers.set('accept-ranges', 'bytes')
+      if (!headers.has('cache-control')) headers.set('cache-control', 'public, max-age=31536000, immutable')
+      let status = 200
+      if (request.headers.has('range') && obj.range) {
+        const r = obj.range
+        const start = 'suffix' in r ? obj.size - r.suffix : (r.offset ?? 0)
+        const end = 'suffix' in r ? obj.size - 1 : (r.length !== undefined ? start + r.length - 1 : obj.size - 1)
+        headers.set('content-range', `bytes ${start}-${end}/${obj.size}`)
+        headers.set('content-length', String(end - start + 1))
+        status = 206
+      } else {
+        headers.set('content-length', String(obj.size))
+      }
+      return new Response(request.method === 'HEAD' ? null : obj.body, { status, headers })
     }
 
     // ── /api/* → authenticated KV routes ──────────────────────────────────────
@@ -409,8 +490,9 @@ export default {
 
           // DELETE /api/playlists/:id
           if (!sub && request.method === 'DELETE') {
-            pls.splice(plIdx, 1)
+            const [removed] = pls.splice(plIdx, 1)
             await kvSet(env, 'playlists', pls)
+            ctx.waitUntil(deleteOrphanSongs(env, url.origin, removed.tracks.map(t => t.url)).catch(() => {}))
             return ok({ ok: true })
           }
 
@@ -418,15 +500,28 @@ export default {
           if (sub === 'tracks' && !tid && request.method === 'POST') {
             const body = await request.json()
             if (!body.title?.trim()) return err('title required')
+            // Reuse audio we already host for this video, if any.
+            const known = body.id && !body.url
+              ? pls.flatMap(p => p.tracks).find(t => t.id === body.id && t.url)?.url
+              : undefined
             const track = {
               tid: genSlug(),
               ...(body.id && { id: body.id }),
               title: body.title.trim(),
               artist: body.artist?.trim() || '',
-              ...(body.url && { url: body.url }),
+              ...((body.url || known) && { url: body.url || known }),
             }
             pls[plIdx].tracks.push(track)
             await kvSet(env, 'playlists', pls)
+            // New YouTube track with no audio yet: host it in the background.
+            // If this fails the track stays pending; `npm run songs` picks it up later.
+            if (track.id && !track.url) {
+              ctx.waitUntil(
+                hostVideoAudio(env, url.origin, track.id)
+                  .then(u => setUrlForVideo(env, track.id, u))
+                  .catch(e => console.log(`host ${track.id} failed: ${e.message}`))
+              )
+            }
             return ok(track, 201)
           }
 
@@ -440,33 +535,47 @@ export default {
 
           // DELETE /api/playlists/:id/tracks/:tid
           if (sub === 'tracks' && tid && request.method === 'DELETE') {
+            const removed = pls[plIdx].tracks.find(t => t.tid === tid)
             pls[plIdx].tracks = pls[plIdx].tracks.filter(t => t.tid !== tid)
             await kvSet(env, 'playlists', pls)
+            if (removed?.url) ctx.waitUntil(deleteOrphanSongs(env, url.origin, [removed.url]).catch(() => {}))
             return ok({ ok: true })
           }
         }
       }
 
-      // Catbox upload
-      if (p1 === 'catbox' && !p2 && request.method === 'POST') {
-        const { videoId, playlistId, tid } = await request.json()
-        if (!videoId) return err('videoId required')
+      // PUT /api/upload?name=song.mp3 — raw audio body → { url }
+      if (p1 === 'upload' && !p2 && request.method === 'PUT') {
+        const ct = request.headers.get('content-type') || 'audio/mpeg'
+        if (!/^(audio|video)\/|application\/octet-stream/.test(ct)) return err('expected an audio file')
+        const buf = await request.arrayBuffer()
+        if (!buf.byteLength) return err('empty file')
         try {
-          const audioUrl = await getBestAudioUrl(videoId)
-          const catboxUrl = await uploadToCatbox(audioUrl)
-          // If playlistId + tid provided, persist the URL on the track
-          if (playlistId && tid) {
-            const pls = await kvGet(env, 'playlists')
-            const plIdx = pls.findIndex(p => p.id === playlistId)
-            if (plIdx >= 0) {
-              pls[plIdx].tracks = pls[plIdx].tracks.map(t => t.tid === tid ? { ...t, url: catboxUrl } : t)
-              await kvSet(env, 'playlists', pls)
-            }
-          }
-          return ok({ url: catboxUrl })
+          return ok({ url: await storeAudio(env, url.origin, buf, ct, url.searchParams.get('name') || 'audio') }, 201)
         } catch (e) {
           return err(`upload failed: ${e.message}`, 502)
         }
+      }
+
+      // POST /api/fetch-audio { videoId } — host a YouTube video's audio now and
+      // fill it in on every pending track for that video. (/api/catbox is the old name.)
+      if ((p1 === 'fetch-audio' || p1 === 'catbox') && !p2 && request.method === 'POST') {
+        const { videoId } = await request.json()
+        if (!videoId) return err('videoId required')
+        try {
+          const hosted = await hostVideoAudio(env, url.origin, videoId)
+          await setUrlForVideo(env, videoId, hosted)
+          return ok({ url: hosted })
+        } catch (e) {
+          return err(`couldn't fetch audio: ${e.message}`, 502)
+        }
+      }
+
+      // POST /api/resolve { videoId, url } — used by scripts/songs.mjs after a yt-dlp upload
+      if (p1 === 'resolve' && !p2 && request.method === 'POST') {
+        const { videoId, url: hosted } = await request.json()
+        if (!videoId || !hosted) return err('videoId and url required')
+        return ok({ updated: await setUrlForVideo(env, videoId, hosted) })
       }
 
       // Feeds

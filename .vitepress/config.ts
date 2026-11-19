@@ -132,6 +132,9 @@ export default defineConfig({
   srcDir: './src',
   head: [
     ['script', {}, `(function(){if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')})()`],
+    // Once the secret dashboard is unlocked on this device, opening the site lands on it.
+    // `/?home` shows the public homepage instead (for the rest of that tab's session).
+    ['script', {}, `(function(){try{var p=location.pathname;if((p!=='/'&&p!=='/index.html')||localStorage.getItem('sd_s')!=='1')return;if(/[?&]home(=|&|$)/.test(location.search)){sessionStorage.setItem('sd_home','1');return}if(sessionStorage.getItem('sd_home')!=='1')location.replace('/secret')}catch(e){}})()`],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', {

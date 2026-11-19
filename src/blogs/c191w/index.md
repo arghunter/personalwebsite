@@ -93,3 +93,7 @@ Now if you would like to read about more traditional CPU designs (that are at ac
 
 
 
+
+## Edits
+
+Its now the new semester and the design project has once again bee released. Sadly a number of loop holes have been closed. However, my friends have good ideas. I hope to see them storm the leaderboard and beat my score soon.
