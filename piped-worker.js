@@ -285,7 +285,23 @@ export default {
     // ── /song/:key → public audio from R2 (supports Range for seeking / iOS) ──
     if (p0 === 'song' && p1 && (request.method === 'GET' || request.method === 'HEAD')) {
       if (!env.SONGS) return new Response('not found', { status: 404, headers: CORS })
-      const obj = await env.SONGS.get(p1, { range: request.headers })
+      // Parse Range ourselves: Safari (esp. iOS, and in the background) needs an exact
+      // Content-Range on every 206, and R2's returned range object isn't reliable for that.
+      const m = (request.headers.get('range') || '').match(/^bytes=(\d*)-(\d*)$/)
+      let range = null
+      if (m && (m[1] || m[2])) {
+        const head = await env.SONGS.head(p1)
+        if (!head) return new Response('not found', { status: 404, headers: CORS })
+        const size = head.size
+        let start, end
+        if (m[1]) { start = +m[1]; end = m[2] ? Math.min(+m[2], size - 1) : size - 1 }
+        else { start = Math.max(0, size - +m[2]); end = size - 1 }
+        if (start >= size || start > end) {
+          return new Response(null, { status: 416, headers: { ...CORS, 'content-range': `bytes */${size}` } })
+        }
+        range = { start, end, size }
+      }
+      const obj = await env.SONGS.get(p1, range ? { range: { offset: range.start, length: range.end - range.start + 1 } } : undefined)
       if (!obj) return new Response('not found', { status: 404, headers: CORS })
       const headers = new Headers(CORS)
       obj.writeHttpMetadata(headers)
@@ -293,12 +309,9 @@ export default {
       headers.set('accept-ranges', 'bytes')
       if (!headers.has('cache-control')) headers.set('cache-control', 'public, max-age=31536000, immutable')
       let status = 200
-      if (request.headers.has('range') && obj.range) {
-        const r = obj.range
-        const start = 'suffix' in r ? obj.size - r.suffix : (r.offset ?? 0)
-        const end = 'suffix' in r ? obj.size - 1 : (r.length !== undefined ? start + r.length - 1 : obj.size - 1)
-        headers.set('content-range', `bytes ${start}-${end}/${obj.size}`)
-        headers.set('content-length', String(end - start + 1))
+      if (range) {
+        headers.set('content-range', `bytes ${range.start}-${range.end}/${range.size}`)
+        headers.set('content-length', String(range.end - range.start + 1))
         status = 206
       } else {
         headers.set('content-length', String(obj.size))

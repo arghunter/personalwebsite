@@ -182,8 +182,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- 1px offscreen instead of display:none: browsers often refuse to play hidden iframes -->
-  <div class="yt-offscreen" aria-hidden="true"><div id="yt-hidden-player"></div></div>
+  <div id="yt-hidden-player" style="display:none"></div>
   <audio
     ref="audioEl"
     preload="auto"
@@ -244,11 +243,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.yt-offscreen {
-  position: fixed; left: -10px; top: -10px;
-  width: 1px; height: 1px; overflow: hidden;
-  opacity: 0; pointer-events: none;
-}
 .screen-overlay {
   position: fixed;
   inset: 0;
