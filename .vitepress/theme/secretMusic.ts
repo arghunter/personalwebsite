@@ -84,7 +84,8 @@ export const music = reactive({
   current:   null as null | { pl: string; tid: string },
   shuffle:   false,
   loop:      'none' as 'none' | 'playlist' | 'track',
-  order:     [] as string[], // play order (tids) for the current playlist
+  scope:     '',             // what the queue covers: a playlist id, or ALL
+  order:     [] as string[], // play order, as keys from qkey()
   error:     '',
 })
 
@@ -174,54 +175,101 @@ function reportNowPlaying(title: string, artist: string, live: boolean) {
 }
 
 // ── Playback ──────────────────────────────────────────────────────────────────
-function buildOrder(plId: string, firstTid?: string) {
-  const tids = findPl(plId)?.tracks.map(t => t.tid) ?? []
-  if (music.shuffle) {
-    for (let i = tids.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [tids[i], tids[j]] = [tids[j], tids[i]]
-    }
-    if (firstTid && tids.includes(firstTid)) { tids.splice(tids.indexOf(firstTid), 1); tids.unshift(firstTid) }
+// The queue covers one playlist, or every playlist (ALL). Entries are "plId/tid" keys.
+export const ALL = '*'
+const qkey = (pl: string, tid: string) => `${pl}/${tid}`
+const unkey = (k: string) => { const i = k.indexOf('/'); return { pl: k.slice(0, i), tid: k.slice(i + 1) } }
+
+// "Touch the Sky" + "Jeff Williams ft. Casey Lee Williams" → "touch the sky|jeff williams"
+const songKey = (t: Track) =>
+  `${t.title.toLowerCase().replace(/\s*[([].*$/, '').trim()}|${t.artist.toLowerCase().split(/,|&|\bft\.?|\bfeat\.?/)[0].trim()}`
+
+// Every track the scope covers. Across all playlists, a song that's in several of
+// them (same video, audio file, or title + main artist) is only queued once.
+function poolFor(scope: string) {
+  if (scope !== ALL) return (findPl(scope)?.tracks ?? []).map(t => qkey(scope, t.tid))
+  const seen = new Set<string>(), keys: string[] = []
+  for (const pl of music.playlists) for (const t of pl.tracks) {
+    const ids = [t.url, t.id, songKey(t)].filter(Boolean) as string[]
+    if (ids.some(id => seen.has(id))) continue
+    for (const id of ids) seen.add(id)
+    keys.push(qkey(pl.id, t.tid))
   }
-  music.order = tids
+  return keys
 }
 
-export function playTrack(plId: string, tid: string) {
-  const t = findPl(plId)?.tracks.find(x => x.tid === tid)
+function buildOrder(scope: string, first?: string) {
+  const keys = poolFor(scope)
+  if (music.shuffle) {
+    for (let i = keys.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [keys[i], keys[j]] = [keys[j], keys[i]]
+    }
+  }
+  // When shuffling, the song that's playing goes first. It's also added back if it
+  // was dropped as a duplicate, so it can be found in the order.
+  if (first) {
+    const i = keys.indexOf(first)
+    if (music.shuffle || i < 0) { if (i >= 0) keys.splice(i, 1); keys.unshift(first) }
+  }
+  music.scope = scope
+  music.order = keys
+}
+
+function play(pl: string, tid: string) {
+  const t = findPl(pl)?.tracks.find(x => x.tid === tid)
   if (!t) return
-  if (music.current?.pl !== plId || !music.order.includes(tid)) buildOrder(plId, tid)
-  music.current = { pl: plId, tid }
+  music.current = { pl, tid }
   win().__playMusic?.(t.id, t.title, t.artist, t.url)
   reportNowPlaying(t.title, t.artist, true)
 }
 
+// Tapping a song plays it with its own playlist as the queue.
+export function playTrack(plId: string, tid: string) {
+  const k = qkey(plId, tid)
+  if (music.scope !== plId || !music.order.includes(k)) buildOrder(plId, k)
+  play(plId, tid)
+}
+
+function startScope(scope: string) {
+  buildOrder(scope)
+  if (music.order[0]) { const { pl, tid } = unkey(music.order[0]); play(pl, tid) }
+}
+
 export function playPlaylist(plId: string, shuffled = music.shuffle) {
   music.shuffle = shuffled
-  buildOrder(plId)
-  if (music.order[0]) playTrack(plId, music.order[0])
+  startScope(plId)
+}
+
+// Shuffle every song on every playlist.
+export function shuffleAll() {
+  music.shuffle = true
+  startScope(ALL)
 }
 
 export function advance(dir: 1 | -1) {
   const c = music.current
   if (!c) return
   // Keep the order in sync with any adds/deletes since it was built.
-  const tids = findPl(c.pl)?.tracks.map(t => t.tid) ?? []
-  music.order = music.order.filter(t => tids.includes(t))
-  for (const t of tids) if (!music.order.includes(t)) music.order.push(t)
+  const pool = poolFor(music.scope || c.pl)
+  const inPool = new Set(pool)
+  music.order = music.order.filter(k => inPool.has(k))
+  for (const k of pool) if (!music.order.includes(k)) music.order.push(k)
   const len = music.order.length
   if (!len) return
-  let n = music.order.indexOf(c.tid) + dir
+  let n = music.order.indexOf(qkey(c.pl, c.tid)) + dir
   if (n >= len) {
     if (music.loop === 'none') return
-    if (music.shuffle) buildOrder(c.pl)
+    if (music.shuffle) buildOrder(music.scope || c.pl)
     n = 0
   }
   if (n < 0) n = 0
-  playTrack(c.pl, music.order[n])
+  const { pl, tid } = unkey(music.order[n])
+  play(pl, tid)
 }
 
 function onEnd() {
-  if (music.loop === 'track' && music.current) playTrack(music.current.pl, music.current.tid)
+  if (music.loop === 'track' && music.current) play(music.current.pl, music.current.tid)
   else advance(1)
 }
 
@@ -232,7 +280,8 @@ export function togglePlay() {
 
 export function toggleShuffle() {
   music.shuffle = !music.shuffle
-  if (music.current) buildOrder(music.current.pl, music.current.tid)
+  const c = music.current
+  if (c) buildOrder(music.scope || c.pl, qkey(c.pl, c.tid))
 }
 
 export function cycleLoop() {

@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { nowPlaying } from '../music'
 import {
   music, viewPlaylist, attachPlayer, detachPlayer,
-  playTrack, playPlaylist, toggleShuffle, cycleLoop,
+  playTrack, playPlaylist, shuffleAll, toggleShuffle, cycleLoop, ALL,
   addTrack, deleteTrack, createPlaylist, deletePlaylist, retryHosting,
   uploadAudio, extractVideoId, lookupYouTube, metaFromFilename, knownUrlFor,
   type Track,
@@ -229,6 +229,7 @@ onUnmounted(detachPlayer)
     <div v-if="viewPlaylist" class="sp-actions">
       <button class="sp-btn" @click="playPlaylist(viewPlaylist.id, false)" :disabled="!tracks.length">▶ play</button>
       <button class="sp-btn" @click="playPlaylist(viewPlaylist.id, true)" :disabled="!tracks.length">⇄ shuffle</button>
+      <button :class="['sp-btn', { on: music.scope === ALL && music.current }]" @click="shuffleAll" title="Shuffle every song on every playlist">⇄ all</button>
       <span class="sp-spacer"></span>
       <button :class="['sp-icon', { on: music.shuffle }]" @click="toggleShuffle" :title="music.shuffle ? 'shuffle on' : 'shuffle off'" aria-label="Shuffle">⇄</button>
       <button :class="['sp-icon', { on: music.loop !== 'none' }]" @click="cycleLoop" :title="loopLabel" :aria-label="loopLabel">
@@ -258,7 +259,7 @@ onUnmounted(detachPlayer)
         <button
           v-if="!t.url && t.id"
           class="sp-pending"
-          :title="retrying[t.tid] ? 'hosting…' : 'not hosted yet — plays from YouTube. Tap to try hosting now.'"
+          :title="retrying[t.tid] ? 'hosting…' : 'not hosted yet — plays from YouTube, which stops when the phone locks. Run npm run songs to host it.'"
           @click.stop="retry(t)"
         >{{ retrying[t.tid] ? '…' : '◌' }}</button>
         <button v-if="editMode" class="sp-x" @click.stop="removeTrack(t)" :aria-label="`Remove ${t.title}`">×</button>
@@ -338,6 +339,7 @@ onUnmounted(detachPlayer)
   transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 .sp-btn:hover:not(:disabled) { border-color: var(--fg); }
+.sp-btn.on { border-color: var(--fg); }
 .sp-btn:disabled { opacity: 0.35; cursor: default; }
 .sp-btn-primary { background: var(--fg); color: var(--bg); border-color: var(--fg); min-width: 4.5rem; }
 .sp-btn-primary:hover:not(:disabled) { opacity: 0.85; }
