@@ -46,8 +46,62 @@ function startYtTimer() {
 }
 function stopYtTimer() { if (ytTimer) { clearInterval(ytTimer); ytTimer = null } }
 
+// ── Playback log (last 60 events, for debugging background playback on phones) ──
+function log(msg) {
+  try {
+    const l = JSON.parse(localStorage.getItem('mp_log') || '[]')
+    l.push(`${new Date().toTimeString().slice(0, 8)}${document.hidden ? ' [bg]' : ''} ${msg}`)
+    localStorage.setItem('mp_log', JSON.stringify(l.slice(-60)))
+  } catch {}
+}
+
+// ── Next-song preloading ──────────────────────────────────────────────────────
+// The next song is downloaded into memory while the current one plays, so the
+// switch at the end of a song needs no network (a phone in a pocket can have a
+// weak or changing connection right then). Holds at most the current + next file.
+const blobs = new Map() // hosted url → blob: url
+let currentUrl = ''     // hosted url of the song in the <audio> element
+let prefetching = ''
+let lastPrefetch = 0
+function trimBlobs(keep) {
+  for (const [u, b] of blobs) if (!keep.includes(u)) { URL.revokeObjectURL(b); blobs.delete(u) }
+}
+async function prefetchNext() {
+  const next = window.__peekNextUrl?.()
+  if (!next || next === currentUrl || blobs.has(next) || prefetching === next) return
+  prefetching = next
+  lastPrefetch = Date.now()
+  try {
+    const res = await fetch(next)
+    if (!res.ok) throw new Error(`${res.status}`)
+    const blob = await res.blob()
+    if (window.__peekNextUrl?.() !== next) return // queue changed meanwhile
+    trimBlobs([currentUrl])
+    blobs.set(next, URL.createObjectURL(blob))
+    log(`preloaded next (${Math.round(blob.size / 1e5) / 10} MB)`)
+  } catch (e) {
+    log(`preload failed: ${e.message}`)
+  } finally {
+    if (prefetching === next) prefetching = ''
+  }
+}
+
+let playSeq = 0
+let retries = 0
+let skips = 0 // songs skipped in a row because they couldn't play; reset when one plays
+
+// Load `src` into the <audio> element and play it, optionally from `at` seconds.
+async function playNative(src, at = 0) {
+  const el = audioEl.value
+  el.src = src
+  el.volume = nowPlaying.volume / 100
+  if (at) el.addEventListener('loadedmetadata', () => { el.currentTime = at }, { once: true })
+  await el.play()
+}
+
 // Priority: direct URL → YT iframe
 async function playMusic(videoId, title, artist, directUrl) {
+  const seq = ++playSeq
   nowPlaying.title    = title
   nowPlaying.artist   = artist
   nowPlaying.videoId  = videoId ?? ''
@@ -60,10 +114,40 @@ async function playMusic(videoId, title, artist, directUrl) {
     player?.pauseVideo?.()
     stopYtTimer()
     usingNative.value = true
-    audioEl.value.src    = directUrl
-    audioEl.value.volume = nowPlaying.volume / 100
-    try { await audioEl.value.play(); return }
-    catch (e) { console.warn('[music] native play() rejected:', e.message) }
+    currentUrl = directUrl
+    retries = 0
+    const cached = blobs.get(directUrl)
+    trimBlobs([directUrl])
+    log(`play "${title}"${cached ? ' (preloaded)' : ''}`)
+    try {
+      await playNative(cached || directUrl)
+      if (seq === playSeq) prefetchNext()
+      return
+    } catch (e) {
+      if (seq !== playSeq) return // a newer song was started meanwhile; leave it alone
+      log(`play() rejected: ${e.name} ${e.message}`)
+      if (cached) {
+        // The preloaded copy failed: try streaming it instead.
+        try { await playNative(directUrl); if (seq === playSeq) prefetchNext(); return } catch (e2) {
+          if (seq !== playSeq) return
+          log(`play() rejected again: ${e2.name}`)
+        }
+      }
+    }
+  }
+
+  // On the secret dashboard (which has a queue), skip a song that can't play as
+  // a file instead of falling back to the hidden YouTube player: YouTube stops
+  // when the phone locks. Pending songs (no file yet) still play from YouTube
+  // while the screen is on. Stops after 5 skips in a row (e.g. offline).
+  const hasQueue = typeof window.__nextTrack === 'function'
+  if (hasQueue && (directUrl || document.hidden)) {
+    if (audioEl.value && !audioEl.value.paused) audioEl.value.pause()
+    if (skips >= 5) { log('too many failures in a row, stopping'); skips = 0; playSeq++; setIsPlaying(false); return }
+    skips++
+    log(`skipping "${title}" (${directUrl ? "file won't play" : 'not hosted, screen off'})`)
+    window.__nextTrack()
+    return
   }
 
   // Fall back to YT iframe — make sure the <audio> element isn't still playing the last song.
@@ -77,13 +161,39 @@ async function playMusic(videoId, title, artist, directUrl) {
   }
 }
 
+// The audio failed to load or broke mid-song (e.g. the connection dropped):
+// reload it from where it stopped, twice at most, then move on to the next song.
+function onAudioError() {
+  const el = audioEl.value
+  if (!usingNative.value || !currentUrl || !el?.error) return
+  const at = el.currentTime || 0
+  log(`audio error ${el.error.code} at ${Math.round(at)}s${el.src.startsWith('blob:') ? ' (preloaded)' : ''}`)
+  if (retries++ < 2) {
+    const seq = playSeq
+    setTimeout(() => {
+      if (seq !== playSeq) return
+      playNative(currentUrl, at).catch(e => log(`retry failed: ${e.name}`))
+    }, 1500 * retries)
+  } else if (typeof window.__nextTrack === 'function' && skips < 5) {
+    skips++
+    log('giving up on this song, skipping')
+    window.__nextTrack()
+  }
+}
+
+function onPlaying() { skips = 0 }
+
 function onAudioEnded() {
+  log('ended')
   if (typeof window.__onMusicEnd === 'function') window.__onMusicEnd()
   else { audioEl.value.currentTime = 0; audioEl.value.play() }
 }
 function onTimeUpdate() {
   if (!usingNative.value) return
   nowPlaying.time = audioEl.value.currentTime || 0
+  // In the last minute, make sure the (possibly changed) next song is preloaded.
+  const left = nowPlaying.duration - nowPlaying.time
+  if (left > 0 && left < 60 && !prefetching && Date.now() - lastPrefetch > 20_000) prefetchNext()
 }
 function onDuration() {
   if (!usingNative.value) return
@@ -175,6 +285,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  trimBlobs([])
   window.removeEventListener('keydown', onKeyDown)
   stopYtTimer()
   wakeLock?.release()
@@ -188,8 +299,10 @@ onUnmounted(() => {
     preload="auto"
     style="display:none"
     @play="setIsPlaying(true)"
+    @playing="onPlaying"
     @pause="setIsPlaying(false)"
     @ended="onAudioEnded"
+    @error="onAudioError"
     @timeupdate="onTimeUpdate"
     @durationchange="onDuration"
     @loadedmetadata="onDuration"

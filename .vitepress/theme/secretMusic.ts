@@ -268,6 +268,18 @@ export function advance(dir: 1 | -1) {
   play(pl, tid)
 }
 
+// Audio url of the song that will play after the current one (for preloading).
+function peekNextUrl(): string | undefined {
+  const c = music.current
+  if (!c) return
+  const find = (k?: string) => { if (!k) return; const { pl, tid } = unkey(k); return findPl(pl)?.tracks.find(t => t.tid === tid)?.url }
+  if (music.loop === 'track') return find(qkey(c.pl, c.tid))
+  const n = music.order.indexOf(qkey(c.pl, c.tid)) + 1
+  if (n < music.order.length) return find(music.order[n])
+  // At the end: a looping, unshuffled queue starts over (a shuffled one is reshuffled, so unknown).
+  if (music.loop === 'playlist' && !music.shuffle) return find(music.order[0])
+}
+
 function onEnd() {
   if (music.loop === 'track' && music.current) play(music.current.pl, music.current.tid)
   else advance(1)
@@ -295,6 +307,7 @@ export function attachPlayer() {
   win().__onMusicEnd = onEnd
   win().__nextTrack  = () => advance(1)
   win().__prevTrack  = () => advance(-1)
+  win().__peekNextUrl = peekNextUrl
   nowPlaying.hasQueue = true
   loadPlaylists()
 }
@@ -303,6 +316,7 @@ export function detachPlayer() {
   win().__onMusicEnd = undefined
   win().__nextTrack  = undefined
   win().__prevTrack  = undefined
+  win().__peekNextUrl = undefined
   nowPlaying.hasQueue = false
   const t = currentTrack.value
   if (nowPlaying.playing && t) reportNowPlaying(t.title, t.artist, false)

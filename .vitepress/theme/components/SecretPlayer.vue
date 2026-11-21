@@ -145,6 +145,13 @@ async function removeTrack(t: Track) {
   try { await deleteTrack(viewPlaylist.value.id, t.tid) } catch (e: any) { alert(`couldn't delete: ${e.message}`) }
 }
 
+// What the player did recently ([bg] = screen off). Helps when songs stop in a pocket.
+const playLog = ref<string | null>(null)
+function toggleLog() {
+  if (playLog.value !== null) { playLog.value = null; return }
+  try { playLog.value = (JSON.parse(localStorage.getItem('mp_log') || '[]') as string[]).reverse().join('\n') } catch { playLog.value = '' }
+}
+
 // ── Playlist management ───────────────────────────────────────────────────────
 const newPlName = ref('')
 async function newPlaylist() {
@@ -274,11 +281,15 @@ onUnmounted(detachPlayer)
         <button class="sp-btn" @click="newPlaylist" :disabled="!newPlName.trim()">create</button>
       </div>
       <button v-if="viewPlaylist" class="sp-danger" @click="removePlaylist">delete “{{ viewPlaylist.name }}”</button>
+      <button class="sp-link" @click="toggleLog">{{ playLog === null ? 'playback log' : 'hide playback log' }}</button>
+      <pre v-if="playLog !== null" class="sp-log">{{ playLog || 'nothing logged yet' }}</pre>
     </div>
   </div>
 </template>
 
 <style scoped>
+.sp-link { background: none; border: none; padding: 0; font: inherit; font-size: 0.75rem; color: var(--muted, inherit); opacity: 0.7; cursor: pointer; text-align: left; text-decoration: underline; }
+.sp-log { font-size: 0.7rem; line-height: 1.5; max-height: 14rem; overflow: auto; white-space: pre-wrap; margin: 0; padding: 0.5rem; border: 1px solid var(--border); }
 .sp {
   display: flex; flex-direction: column; gap: 0.75rem;
   font-family: var(--font-body); color: var(--fg);
